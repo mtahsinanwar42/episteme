@@ -26,7 +26,7 @@ const users = [
     lastName: "User",
     phone: "+31616849000",
     email: "admin@episteme.org",
-    password: "Admin123!",
+    password: "admin",
     roles: ["ADMIN"],
     status: USER_STATUS.ACTIVE,
     linkedInUrl: "https://www.linkedin.com/in/admin/",
@@ -36,7 +36,7 @@ const users = [
     lastName: "User",
     phone: "+8801710912970",
     email: "author@episteme.org",
-    password: "Author123!",
+    password: "author",
     roles: ["USER"],
     status: USER_STATUS.ACTIVE,
     linkedInUrl: "https://www.linkedin.com/in/user/",
@@ -46,7 +46,7 @@ const users = [
     lastName: "User",
     phone: "01710912970",
     email: "reviewer@episteme.org",
-    password: "Reviewer123!",
+    password: "reviewer",
     roles: ["REVIEWER", "USER"],
     status: USER_STATUS.ACTIVE,
     linkedInUrl: "https://www.linkedin.com/in/reviewer/",
@@ -56,8 +56,10 @@ const users = [
 const conferenceData = {
   title: "EPISTEME 2026 – Open Science Conference",
   slug: "episteme-2026",
-  startDate: "2026-05-10",
-  endDate: "2026-05-15",
+  startAt: "2026-05-10",
+  endAt: "2026-05-15",
+  submissionPeriodStartAt: "2026-04-15",
+  submissionPeriodEndAt: "2026-04-30",
 };
 
 async function destroyData() {

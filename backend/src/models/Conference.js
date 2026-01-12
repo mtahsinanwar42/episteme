@@ -21,21 +21,36 @@ export default (sequelize, DataTypes) => {
         unique: true,
         field: "slug",
       },
-      startDate: {
-        type: DataTypes.DATEONLY,
+      startAt: {
+        type: DataTypes.DATE,
         allowNull: false,
-        field: "start_date",
+        field: "start_at",
       },
-      endDate: {
-        type: DataTypes.DATEONLY,
+      endAt: {
+        type: DataTypes.DATE,
         allowNull: false,
-        field: "end_date",
+        field: "end_at",
+      },
+      submissionPeriodStartAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: "submission_period_start_at",
+      },
+      submissionPeriodEndAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: "submission_period_end_at",
+      },
+      metadataFileId: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        field: "metadata_file_id",
       },
       status: {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "status",
-        defaultValue: CONFERENCE_STATUS.OPEN_FOR_SUBMISSION,
+        defaultValue: CONFERENCE_STATUS.INACTIVE,
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -58,8 +73,12 @@ export default (sequelize, DataTypes) => {
       updatedAt: "updatedAt",
       validate: {
         datesOrder() {
-          if (this.startDate && this.endDate && this.startDate > this.endDate) {
-            throw new Error("startDate must be <= endDate");
+          if (this.startAt && this.endAt && this.startAt > this.endAt) {
+            throw new Error("startAt must be <= endAt");
+          }
+
+          if (this.submissionPeriodStartAt && this.submissionPeriodEndAt && this.submissionPeriodStartAt > this.submissionPeriodEndAt) {
+            throw new Error("submissionPeriodStartAt must be <= submissionPeriodEndAt");
           }
         },
       },

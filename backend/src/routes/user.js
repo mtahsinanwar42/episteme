@@ -1,5 +1,5 @@
 import express from 'express';
-import { getUsers, getUser, saveUser, updateUser, toggleUserStatus } from '../controllers/user.js';
+import { getUsers, getUser, saveUser, updateUser, updateUserStatus } from '../controllers/user.js';
 import { authenticate, authorize } from '../middlewares/auth.js';
 import { advancedResults } from '../middlewares/advancedResults.js';
 import { sequelize } from "../config/db.js";
@@ -47,6 +47,6 @@ router
 
 router
   .route("/:id/status")
-  .put(toggleUserStatus);
+  .put(updateUserStatus);
 
 export default router;

@@ -1,6 +1,5 @@
-import bcrypt from "bcryptjs";
 import ErrorResponse from "../utils/ErrorResponse.js";
-import { USER_ROLE, USER_STATUS } from "../utils/constants.js";
+import { USER_STATUS } from "../utils/constants.js";
 import { serializeUser } from "../utils/serializers.js";
 import { isEmpty, isNotEmpty } from "../utils/string.js";
 
@@ -10,7 +9,7 @@ export function createUserService({ User, fileService }) {
   }
 
   if (!fileService) {
-    throw new Error("createAuthService requires { fileService }");
+    throw new Error("createUserService requires { fileService }");
   }
 
   function normalizeRoles(roles) {
@@ -122,8 +121,8 @@ export function createUserService({ User, fileService }) {
     return serializeUser(user, cvFilePath, photoFilePath);
   }
 
-  async function toggleUserStatusById(id, status) {
-    if (![USER_STATUS.INACTIVE, USER_STATUS.ACTIVE, USER_STATUS.SUSPENDED, USER_STATUS.DELETED].includes(status)) {
+  async function updateUserStatusById(id, status) {
+    if (!Object.values(USER_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid user status");
     }
 
@@ -142,6 +141,6 @@ export function createUserService({ User, fileService }) {
     getUserById,
     createUser,
     updateUserById,
-    toggleUserStatusById,
+    updateUserStatusById,
   };
 }

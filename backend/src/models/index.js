@@ -22,7 +22,9 @@ export const initModels = (sequelize) => {
   const ContentSubmissionPayment = ContentSubmissionPaymentModel(sequelize, DataTypes);
 
   User.belongsTo(File, { foreignKey: "cvFileId", as: "cvFile" });
-  User.belongsTo(File, { foreignKey: "photoFileId", as: "photoFile" })
+  User.belongsTo(File, { foreignKey: "photoFileId", as: "photoFile" });
+
+  Conference.belongsTo(File, { foreignKey: "metadataFileId", as: "metadataFile" });
 
   User.hasMany(File, { foreignKey: "uploadedBy", as: "uploadedFiles" });
   File.belongsTo(User, { foreignKey: "uploadedBy", as: "uploader" });

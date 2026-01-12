@@ -8,23 +8,36 @@ import { createFileService } from "../services/file.js";
 const { File } = initModels(sequelize);
 const fileService = createFileService({ File });
 
+// @desc    Get File by id
+// @route   GET /api/v1/files/:id
+// @access  Private
+export const getFile = asyncHandler(async (req, res, next) => {
+  const file = await fileService.getAccessCheckedFile(req);
+
+  return res.status(200).json({
+    success: true,
+    data: file,
+  });
+});
+
+
 // @ desc   Download File
-// @ route  GET /api/v1/file/download?path=...
+// @ route  GET /api/v1/files/download?path=...
 // @ access Private
-export const download = asyncHandler(async (req, res, next) => {
+export const downloadFile = asyncHandler(async (req, res, next) => {
   const filePath = req.query.path;
 
   if (isEmpty(filePath)) {
     return next(new ErrorResponse(400, "path must be present in payload"));
   }
 
-  await fileService.checkDownloadAccess(req);
+  const file = await fileService.getAccessCheckedFile(req);
 
   return res.download(filePath);
 });
 
 // @ desc   Upload File (bucketed)
-// @ route  POST /api/v1/file/upload/:bucket
+// @ route  POST /api/v1/files/upload/:bucket
 // @ access Private
 export const uploadFile = asyncHandler(async (req, res, next) => {
   if (!req.file) {

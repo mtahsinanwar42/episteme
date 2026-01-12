@@ -15,6 +15,7 @@ import { initModels } from "./models/index.js";
 import { notFound, errorHandler } from "./middlewares/error.js";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
+import conferenceRoutes from "./routes/conference.js";
 import fileRoutes from "./routes/file.js";
 
 dotenv.config();
@@ -59,9 +60,10 @@ app.get("/health", async (req, res) => {
 });
 
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/file', fileRoutes);
+app.use('/api/v1/files', fileRoutes);
 
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/conferences', conferenceRoutes);
 
 if (process.env.FILE_STORAGE_PATH) {
   const storageBaseAbs = path.resolve(__dirname, process.env.FILE_STORAGE_PATH);

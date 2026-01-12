@@ -53,11 +53,11 @@ export const updateUser = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Toggle user status (activate/deactivate)
+// @desc    Update user status (activate/deactivate)
 // @route   PUT /api/v1/users/:id/status
 // @access  Private
-export const toggleUserStatus = asyncHandler(async (req, res) => {
-  const user = await userService.toggleUserStatusById(req.params.id, req.body.status);
+export const updateUserStatus = asyncHandler(async (req, res) => {
+  const user = await userService.updateUserStatusById(req.params.id, req.body.status);
 
   return res.status(200).json({
     success: true,

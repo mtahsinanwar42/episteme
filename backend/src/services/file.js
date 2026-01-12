@@ -24,32 +24,60 @@ export function createFileService({ File }) {
     return serializeFile(file);
   }
 
-  async function checkDownloadAccess(req) {
-    const storageKeyOrPath = req.query.path;
-    const userId = req.user.id;
-    const userRoles = req.user.roles || [];
+  async function getAccessCheckedFile(req) {
+    const userId = req.user?.id;
+    const userRoles = req.user?.roles || [];
 
-    if (storageKeyOrPath.startsWith(process.env.FILE_STORAGE_PUBLIC_PATH)) {
-      return true;
+    const fileIdParam = req.params?.id;
+    const storageKeyOrPath = req.query?.path;
+
+    if (!fileIdParam && !storageKeyOrPath) {
+      throw new ErrorResponse(400, "Provide req.params.id for /files/:id or req.query.path for /files/download");
     }
 
-    const file = await File.findOne({
-      where: { storageKey: storageKeyOrPath },
-    });
+    if (storageKeyOrPath
+      && process.env.FILE_STORAGE_PUBLIC_PATH
+      && storageKeyOrPath.startsWith(process.env.FILE_STORAGE_PUBLIC_PATH)) {
+
+      return null;
+    }
+
+    const file = fileIdParam
+      ? await File.findByPk(fileIdParam)
+      : await File.findOne({ where: { storageKey: storageKeyOrPath } });
 
     if (!file) {
-      throw new ErrorResponse(404, `file not found for path/storageKey: ${storageKeyOrPath}`);
+      throw new ErrorResponse(
+        404,
+        fileIdParam ? `file not found for id: ${fileIdParam}` : `file not found for path/storageKey: ${storageKeyOrPath}`
+      );
     }
 
-    const isOwner = file.uploadedBy === userId;
+    if (process.env.FILE_STORAGE_PUBLIC_PATH
+      && typeof file.storageKey === "string"
+      && file.storageKey.startsWith(process.env.FILE_STORAGE_PUBLIC_PATH)) {
+
+      return file;
+    }
+
+    if (!userId) {
+      throw new ErrorResponse(401, "Not Authorized");
+    }
+
+    const isOwner = Number(file.uploadedBy) === Number(userId);
     const isAdmin = userRoles.includes(USER_ROLE.ADMIN);
     const isReviewer = userRoles.includes(USER_ROLE.REVIEWER);
 
     if (!isOwner && !isAdmin && !isReviewer) {
-      throw new ErrorResponse(403, `Access denied to file: ${storageKeyOrPath}`);
+      throw new ErrorResponse(
+        403,
+        fileIdParam
+          ? `Access denied to file id: ${fileIdParam}`
+          : `Access denied to file: ${storageKeyOrPath}`
+      );
     }
 
-    return true;
+    return file;
   }
 
   async function getFileIdByPath(storageKeyOrPath, { fieldName = "file" } = {}) {
@@ -84,8 +112,8 @@ export function createFileService({ File }) {
 
   return {
     save,
-    checkDownloadAccess,
+    getAccessCheckedFile,
     getFileIdByPath,
-    getFilePathById
+    getFilePathById,
   };
 }

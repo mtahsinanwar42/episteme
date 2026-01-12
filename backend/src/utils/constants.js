@@ -12,9 +12,10 @@ export const USER_ROLE = Object.freeze({
 
 export const CONFERENCE_STATUS = Object.freeze({
   INACTIVE: 0,
-  OPEN_FOR_SUBMISSION: 1,
-  CLOSED_FOR_SUBMISSION: 2,
-  FINISHED: 3,
+  ACTIVE: 1,
+  FINISHED: 2,
+  ARCHIVED: 3,
+  DELETED: 9,
 });
 
 export const CONTENT_SUBMISSION_STATUS = Object.freeze({
@@ -51,7 +52,7 @@ export const FILE_BUCKETS = {
   cvs: { visibility: "private", maxSize: 10_000_000, types: /docx|pdf/ },
   profile_photos: { visibility: "public", maxSize: 5_000_000, types: /jpg|jpeg|png/ },
   papers: { visibility: "private", maxSize: 20_000_000, types: /docx|pdf/ },
-  assets: { visibility: "public", maxSize: 5_000_000, types: /jpg|jpeg|png|svg/ },
+  assets: { visibility: "public", maxSize: 5_000_000, types: /jpg|jpeg|png|svg|json/ },
 };
 
 export const DEFAULT_PAGE_LIMIT = 10;
