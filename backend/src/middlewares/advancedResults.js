@@ -2,6 +2,8 @@ import { Op } from "sequelize";
 import { DEFAULT_PAGE_LIMIT } from "../utils/constants.js";
 
 export const advancedResults = (model, { include = [], transform } = {}) => async (req, res, next) => {
+  console.log(req.query);
+
   const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
   const limit = Math.max(1, Number.parseInt(req.query.limit, 10) || DEFAULT_PAGE_LIMIT);
   const offset = limit * (page - 1);
@@ -79,29 +81,51 @@ const OPERATOR_HANDLERS = {
   lte: (field, rawValue, where) => {
     where[field][Op.lte] = coerceValue(rawValue);
   },
+  contains: (field, rawValue, where) => {
+    where[field][Op.contains] = [String(rawValue).trim()];
+  },
+  overlap: (field, rawValue, where) => {
+    const items = String(rawValue)
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+    where[field][Op.overlap] = items;
+  },
 };
 
 function buildWhere(queryObj) {
   const where = {};
-  const operatorRegex = /^(.+)\[(gt|gte|lt|lte|in|like|iLike)\]$/;
+  const operatorRegex = /^(.+)\[(gt|gte|lt|lte|in|like|iLike|contains|overlap)\]$/;
 
   for (const [key, rawValue] of Object.entries(queryObj)) {
     const match = key.match(operatorRegex);
 
-    if (!match) {
-      where[key] = coerceValue(rawValue);
+    if (match) {
+      const field = match[1];
+      const op = match[2];
+
+      if (!where[field] || typeof where[field] !== "object" || Array.isArray(where[field])) {
+        where[field] = {};
+      }
+
+      OPERATOR_HANDLERS[op]?.(field, rawValue, where);
       continue;
     }
 
-    const field = match[1];
-    const op = match[2];
+    if (rawValue && typeof rawValue === "object" && !Array.isArray(rawValue)) {
+      const field = key.endsWith("=") ? key.slice(0, -1) : key;
 
-    if (!Object.prototype.hasOwnProperty.call(where, field) || typeof where[field] !== "object" || Array.isArray(where[field])) {
-      where[field] = {};
+      if (!where[field] || typeof where[field] !== "object") {
+        where[field] = {};
+      }
+
+      for (const [op, v] of Object.entries(rawValue)) {
+        OPERATOR_HANDLERS[op]?.(field, v, where);
+      }
+      continue;
     }
 
-    const handler = OPERATOR_HANDLERS[op];
-    if (handler) handler(field, rawValue, where);
+    where[key] = coerceValue(rawValue);
   }
 
   return where;

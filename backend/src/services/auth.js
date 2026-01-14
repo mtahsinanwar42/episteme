@@ -50,8 +50,8 @@ export function createAuthService({ User, fileService }) {
   }
 
   async function register(payload) {
-    const { email, password, roles, firstName, lastName, phone, cvFilePath, photoFilePath, linkedinUrl } =
-      payload;
+    const { email, password, roles, firstName, lastName, phone,
+      country, institution, occupation, cvFilePath, photoFilePath, linkedinUrl } = payload;
 
     if (isEmpty(email) || isEmpty(password)) {
       throw new ErrorResponse(400, "Please provide an email and password");
@@ -61,8 +61,8 @@ export function createAuthService({ User, fileService }) {
       throw new ErrorResponse(400, "Email already in use");
     }
 
-    if (isEmpty(firstName) || isEmpty(lastName)) {
-      throw new ErrorResponse(400, "Please provide firstName and lastName");
+    if (isEmpty(firstName) || isEmpty(lastName) || isEmpty(institution) || isEmpty(occupation) || isEmpty(country)) {
+      throw new ErrorResponse(400, "Please provide firstName, lastName, institution, occupation, and country");
     }
 
     const normalizedRoles = normalizeRoles(roles);
@@ -91,6 +91,9 @@ export function createAuthService({ User, fileService }) {
       status,
       firstName,
       lastName,
+      institution,
+      occupation,
+      country,
       phone,
       cvFileId,
       photoFileId,
@@ -118,7 +121,8 @@ export function createAuthService({ User, fileService }) {
   }
 
   async function updateMyDetails(userId, payload) {
-    const { firstName, lastName, phone, linkedinUrl, photoFilePath, cvFilePath } = payload;
+    const { firstName, lastName, phone, institution, occupation, country,
+      linkedinUrl, photoFilePath, cvFilePath } = payload;
 
     const updates = {};
 
@@ -132,6 +136,18 @@ export function createAuthService({ User, fileService }) {
 
     if (isNotEmpty(phone)) {
       updates.phone = phone;
+    }
+
+    if (isNotEmpty(country)) {
+      updates.country = country;
+    }
+
+    if (isNotEmpty(institution)) {
+      updates.institution = institution;
+    }
+
+    if (isNotEmpty(occupation)) {
+      updates.occupation = occupation;
     }
 
     if (isNotEmpty(linkedinUrl)) {

@@ -18,6 +18,32 @@ export const CONFERENCE_STATUS = Object.freeze({
   DELETED: 9,
 });
 
+export const TRAINING_STATUS = Object.freeze({
+  UPCOMING: 0,
+  ONGOING: 1,
+  COMPLETED: 2,
+  DELETED: 9,
+});
+
+export const ANNOUNCEMENT_STATUS = Object.freeze({
+  UPCOMING: 0,
+  ONGOING: 1,
+  COMPLETED: 2,
+  DELETED: 9,
+});
+
+export const BLOG_STATUS = Object.freeze({
+  DRAFT: 0,
+  PUBLISHED: 1,
+  DELETED: 9,
+});
+
+export const ACTIVITY_STATUS = Object.freeze({
+  DRAFT: 0,
+  PUBLISHED: 1,
+  DELETED: 9,
+});
+
 export const CONTENT_SUBMISSION_STATUS = Object.freeze({
   PENDING_APPROVAL: 1,
   RETURNED: 2,
@@ -26,12 +52,19 @@ export const CONTENT_SUBMISSION_STATUS = Object.freeze({
   DELETED: 9,
 });
 
+export const CONTENT_SUBMISSION_UPLOADER_USER_TYPE = Object.freeze({
+  USER: "USER",
+  REVIEWER: "REVIEWER",
+  ADMIN: "ADMIN",
+});
+
 export const REVIEW_ASSIGNMENT_STATUS = Object.freeze({
   ASSIGNED: 1,
   ACCEPTED: 2,
   DECLINED: 3,
   COMPLETED: 4,
   OVERDUE: 5,
+  DELETED: 9,
 });
 export const REVIEW_RECOMMENDATION = Object.freeze({
   ACCEPTED: 1,

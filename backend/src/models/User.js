@@ -108,6 +108,21 @@ export default (sequelize, DataTypes) => {
           },
         },
       },
+      institution: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        field: "institution",
+      },
+      occupation: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        field: "occupation",
+      },
+      country: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        field: "country",
+      },
       resetPasswordToken: {
         type: DataTypes.TEXT,
         allowNull: true,

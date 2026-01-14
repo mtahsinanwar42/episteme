@@ -25,25 +25,26 @@ export function createConferenceService({ Conference, fileService }) {
   }
 
   async function createConference(payload) {
-    const { title, slug, startAt, endAt, submissionPeriodStartAt, submissionPeriodEndAt, metadataFilePath, } =
+    const { title, slug, startAt, endAt, submissionPeriodStartAt, submissionPeriodEndAt, metadataFilePath, status } =
       payload;
 
     if (isEmpty(title) || isEmpty(slug)
       || isEmpty(startAt) || isEmpty(endAt)
-      || isEmpty(submissionPeriodStartAt) || isEmpty(submissionPeriodEndAt)) {
+      || isEmpty(submissionPeriodStartAt) || isEmpty(submissionPeriodEndAt)
+      || isEmpty(metadataFilePath)) {
 
-      throw new ErrorResponse(400, "Please provide a title, slug, startAt, endAt, submissionPeriodStartAt and submissionPeriodEndAt");
+      throw new ErrorResponse(400, "Please provide a title, slug, startAt, endAt, submissionPeriodStartAt, submissionPeriodEndAt and metadataFilePath");
+    }
+
+    if (!Object.values(CONFERENCE_STATUS).includes(status)) {
+      throw new ErrorResponse(400, "Invalid conference status");
     }
 
     if (await Conference.findOne({ where: { slug } })) {
       throw new ErrorResponse(400, "Slug already in use");
     }
 
-    let metadataFileId = null;
-
-    if (isNotEmpty(metadataFilePath)) {
-      metadataFileId = await fileService.getFileIdByPath(metadataFilePath, { fieldName: "metadataFilePath" });
-    }
+    const metadataFileId = await fileService.getFileIdByPath(metadataFilePath, { fieldName: "metadataFilePath" });
 
     const [conference] = await Conference.bulkCreate([{
       title,
@@ -53,14 +54,15 @@ export function createConferenceService({ Conference, fileService }) {
       submissionPeriodStartAt,
       submissionPeriodEndAt,
       metadataFileId,
+      status,
     }], { individualHooks: true, returning: true });
 
     return serializeConference(conference, metadataFilePath);
   }
 
   async function updateConferenceById(id, payload) {
-    const { title, slug, startAt, endAt, submissionPeriodStartAt, submissionPeriodEndAt, metadataFilePath, } =
-      payload;
+    const { title, slug, startAt, endAt, submissionPeriodStartAt,
+      submissionPeriodEndAt, metadataFilePath, status } = payload;
 
     const conference = await Conference.findByPk(id);
     if (!conference) {
@@ -109,6 +111,14 @@ export function createConferenceService({ Conference, fileService }) {
 
     if (isNotEmpty(metadataFilePath)) {
       updates.metadataFileId = await fileService.getFileIdByPath(metadataFilePath, { fieldName: "metadataFilePath" });
+    }
+
+    if (Number.isInteger(status)) {
+      if (!Object.values(CONFERENCE_STATUS).includes(status)) {
+        throw new ErrorResponse(400, "Invalid conference status");
+      }
+
+      updates.status = status;
     }
 
     await conference.update(updates);

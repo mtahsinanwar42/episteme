@@ -25,6 +25,11 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         field: "assigned_by_usr_id",
       },
+      assignedByNotes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "assigned_by_notes",
+      },
       assignedAt: {
         type: DataTypes.DATE,
         allowNull: false,

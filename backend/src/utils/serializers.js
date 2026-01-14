@@ -7,6 +7,9 @@ export const serializeUser = (user, cvFilePath, photoFilePath) => {
     phone: user.phone,
     roles: user.roles,
     status: user.status,
+    institution: user.institution,
+    occupation: user.occupation,
+    country: user.country,
     cvFilePath: cvFilePath,
     photoFilePath: photoFilePath,
     linkedinUrl: user.linkedinUrl,
@@ -28,6 +31,50 @@ export const serializeConference = (conference, metadataFilePath) => {
     metadataFilePath: metadataFilePath,
     createdAt: conference.createdAt,
     updatedAt: conference.updatedAt,
+  };
+};
+
+export const serializeTraining = (training, metadataFilePath) => {
+  return {
+    id: training.id,
+    title: training.title,
+    status: training.status,
+    metadataFilePath: metadataFilePath,
+    createdAt: training.createdAt,
+    updatedAt: training.updatedAt,
+  };
+};
+
+export const serializeAnnouncement = (announcement, metadataFilePath) => {
+  return {
+    id: announcement.id,
+    title: announcement.title,
+    status: announcement.status,
+    metadataFilePath: metadataFilePath,
+    createdAt: announcement.createdAt,
+    updatedAt: announcement.updatedAt,
+  };
+};
+
+export const serializeBlog = (blog, metadataFilePath) => {
+  return {
+    id: blog.id,
+    title: blog.title,
+    status: blog.status,
+    metadataFilePath: metadataFilePath,
+    createdAt: blog.createdAt,
+    updatedAt: blog.updatedAt,
+  };
+};
+
+export const serializeActivity = (activity, metadataFilePath) => {
+  return {
+    id: activity.id,
+    title: activity.title,
+    status: activity.status,
+    metadataFilePath: metadataFilePath,
+    createdAt: activity.createdAt,
+    updatedAt: activity.updatedAt,
   };
 };
 

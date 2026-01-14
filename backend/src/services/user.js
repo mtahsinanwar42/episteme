@@ -1,5 +1,5 @@
 import ErrorResponse from "../utils/ErrorResponse.js";
-import { USER_STATUS } from "../utils/constants.js";
+import { USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import { serializeUser } from "../utils/serializers.js";
 import { isEmpty, isNotEmpty } from "../utils/string.js";
 
@@ -30,8 +30,8 @@ export function createUserService({ User, fileService }) {
   }
 
   async function createUser(payload) {
-    const { email, password, roles, firstName, lastName, phone, cvFilePath, photoFilePath, linkedinUrl } =
-      payload;
+    const { email, password, roles, firstName, lastName, phone,
+      institution, occupation, country, cvFilePath, photoFilePath, linkedinUrl, status } = payload;
 
     if (isEmpty(email) || isEmpty(password)) {
       throw new ErrorResponse(400, "Please provide an email and password");
@@ -41,11 +41,20 @@ export function createUserService({ User, fileService }) {
       throw new ErrorResponse(400, "Email already in use");
     }
 
-    if (isEmpty(firstName) || isEmpty(lastName)) {
-      throw new ErrorResponse(400, "Please provide firstName and lastName");
+    if (isEmpty(firstName) || isEmpty(lastName) || isEmpty(institution) || isEmpty(occupation) || isEmpty(country)) {
+      throw new ErrorResponse(400, "Please provide firstName, lastName, institution, occupation, and country");
+    }
+
+    if (!Object.values(USER_STATUS).includes(status)) {
+      throw new ErrorResponse(400, "Invalid user status");
     }
 
     const normalizedRoles = normalizeRoles(roles);
+    const allowedCombo = new Set([USER_ROLE.USER, USER_ROLE.REVIEWER]);
+
+    if (normalizedRoles.length > 1 && !normalizedRoles.every((r) => allowedCombo.has(r))) {
+      throw new ErrorResponse(400, "Invalid combination of roles. You can only combine USER and REVIEWER roles.");
+    }
 
     let cvFileId = null;
     let photoFileId = null;
@@ -62,9 +71,12 @@ export function createUserService({ User, fileService }) {
       email,
       password,
       roles: normalizedRoles,
-      status: payload.status,
+      status,
       firstName,
       lastName,
+      institution,
+      occupation,
+      country,
       phone,
       cvFileId,
       photoFileId,
@@ -75,7 +87,8 @@ export function createUserService({ User, fileService }) {
   }
 
   async function updateUserById(id, payload) {
-    const { firstName, lastName, phone, linkedinUrl, photoFilePath, cvFilePath, roles } = payload;
+    const { firstName, lastName, phone, institution, occupation, country,
+      linkedinUrl, photoFilePath, cvFilePath, roles, status } = payload;
 
     const updates = {};
 
@@ -85,6 +98,18 @@ export function createUserService({ User, fileService }) {
 
     if (isNotEmpty(lastName)) {
       updates.lastName = lastName;
+    }
+
+    if (isNotEmpty(country)) {
+      updates.country = country;
+    }
+
+    if (isNotEmpty(institution)) {
+      updates.institution = institution;
+    }
+
+    if (isNotEmpty(occupation)) {
+      updates.occupation = occupation;
     }
 
     if (isNotEmpty(phone)) {
@@ -108,7 +133,22 @@ export function createUserService({ User, fileService }) {
     }
 
     if (roles && Array.isArray(roles) && roles.length > 0) {
-      updates.roles = normalizeRoles(roles);
+      const normalizedRoles = normalizeRoles(roles);
+      const allowedCombo = new Set([USER_ROLE.USER, USER_ROLE.REVIEWER]);
+
+      if (normalizedRoles.length > 1 && !normalizedRoles.every((r) => allowedCombo.has(r))) {
+        throw new ErrorResponse(400, "Invalid combination of roles. You can only combine USER and REVIEWER roles.");
+      }
+
+      updates.roles = normalizedRoles;
+    }
+
+    if (Number.isInteger(status)) {
+      if (!Object.values(USER_STATUS).includes(status)) {
+        throw new ErrorResponse(400, "Invalid user status");
+      }
+
+      updates.status = status;
     }
 
     const user = await User.findByPk(id);

@@ -18,6 +18,16 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         field: "uploader_usr_id",
       },
+      uploaderUsrType: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        field: "uploader_usr_type",
+      },
+      uploaderNotes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "uploader_notes",
+      },
       fileId: {
         type: DataTypes.BIGINT,
         allowNull: false,

@@ -16,6 +16,10 @@ import { notFound, errorHandler } from "./middlewares/error.js";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
 import conferenceRoutes from "./routes/conference.js";
+import trainingRoutes from "./routes/training.js";
+import blogRoutes from "./routes/blog.js";
+import activityRoutes from "./routes/activity.js";
+import announcementRoutes from "./routes/announcement.js";
 import fileRoutes from "./routes/file.js";
 
 dotenv.config();
@@ -64,6 +68,10 @@ app.use('/api/v1/files', fileRoutes);
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/conferences', conferenceRoutes);
+app.use('/api/v1/trainings', trainingRoutes);
+app.use('/api/v1/blogs', blogRoutes);
+app.use('/api/v1/activities', activityRoutes);
+app.use('/api/v1/announcements', announcementRoutes);
 
 if (process.env.FILE_STORAGE_PATH) {
   const storageBaseAbs = path.resolve(__dirname, process.env.FILE_STORAGE_PATH);

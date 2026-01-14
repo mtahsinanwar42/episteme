@@ -2,10 +2,13 @@ import { DataTypes } from "sequelize";
 
 import UserModel from "./User.js";
 import ConferenceModel from "./Conference.js";
+import AnnouncementModel from "./Announcement.js";
+import TrainingModel from "./Training.js";
+import ActivityModel from "./Activity.js";
+import BlogModel from "./Blog.js";
 import FileModel from "./File.js";
 import ContentSubmissionModel from "./ContentSubmission.js";
 import ContentSubmissionVersionModel from "./ContentSubmissionVersion.js";
-import ContentSubmissionMessageModel from "./ContentSubmissionMessage.js";
 import ContentReviewAssignmentModel from "./ContentReviewAssignment.js";
 import ContentReviewModel from "./ContentReview.js";
 import ContentSubmissionPaymentModel from "./ContentSubmissionPayment.js";
@@ -13,10 +16,13 @@ import ContentSubmissionPaymentModel from "./ContentSubmissionPayment.js";
 export const initModels = (sequelize) => {
   const User = UserModel(sequelize, DataTypes);
   const Conference = ConferenceModel(sequelize, DataTypes);
+  const Activity = ActivityModel(sequelize, DataTypes);
+  const Announcement = AnnouncementModel(sequelize, DataTypes);
+  const Blog = BlogModel(sequelize, DataTypes);
+  const Training = TrainingModel(sequelize, DataTypes);
   const File = FileModel(sequelize, DataTypes);
   const ContentSubmission = ContentSubmissionModel(sequelize, DataTypes);
   const ContentSubmissionVersion = ContentSubmissionVersionModel(sequelize, DataTypes);
-  const ContentSubmissionMessage = ContentSubmissionMessageModel(sequelize, DataTypes);
   const ContentReviewAssignment = ContentReviewAssignmentModel(sequelize, DataTypes);
   const ContentReview = ContentReviewModel(sequelize, DataTypes);
   const ContentSubmissionPayment = ContentSubmissionPaymentModel(sequelize, DataTypes);
@@ -25,6 +31,10 @@ export const initModels = (sequelize) => {
   User.belongsTo(File, { foreignKey: "photoFileId", as: "photoFile" });
 
   Conference.belongsTo(File, { foreignKey: "metadataFileId", as: "metadataFile" });
+  Activity.belongsTo(File, { foreignKey: "metadataFileId", as: "metadataFile" });
+  Announcement.belongsTo(File, { foreignKey: "metadataFileId", as: "metadataFile" });
+  Blog.belongsTo(File, { foreignKey: "metadataFileId", as: "metadataFile" });
+  Training.belongsTo(File, { foreignKey: "metadataFileId", as: "metadataFile" });
 
   User.hasMany(File, { foreignKey: "uploadedBy", as: "uploadedFiles" });
   File.belongsTo(User, { foreignKey: "uploadedBy", as: "uploader" });
@@ -55,21 +65,6 @@ export const initModels = (sequelize) => {
     as: "currentVersion",
     constraints: false,
   });
-
-  ContentSubmission.hasMany(ContentSubmissionMessage, { foreignKey: "contentSubmissionId", as: "messages" });
-  ContentSubmissionMessage.belongsTo(ContentSubmission, { foreignKey: "contentSubmissionId", as: "submission" });
-
-  ContentSubmissionVersion.hasMany(ContentSubmissionMessage, {
-    foreignKey: "contentSubmissionVersionId",
-    as: "messages",
-  });
-  ContentSubmissionMessage.belongsTo(ContentSubmissionVersion, {
-    foreignKey: "contentSubmissionVersionId",
-    as: "version",
-  });
-
-  User.hasMany(ContentSubmissionMessage, { foreignKey: "sndrId", as: "sentMessages" });
-  ContentSubmissionMessage.belongsTo(User, { foreignKey: "sndrId", as: "sender" });
 
   ContentSubmission.hasMany(ContentReviewAssignment, {
     foreignKey: "contentSubmissionId",
@@ -122,9 +117,12 @@ export const initModels = (sequelize) => {
     File,
     ContentSubmission,
     ContentSubmissionVersion,
-    ContentSubmissionMessage,
     ContentReviewAssignment,
     ContentReview,
     ContentSubmissionPayment,
+    Activity,
+    Announcement,
+    Training,
+    Blog,
   };
 };
