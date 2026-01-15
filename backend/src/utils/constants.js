@@ -52,6 +52,11 @@ export const CONTENT_SUBMISSION_STATUS = Object.freeze({
   DELETED: 9,
 });
 
+export const CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE = Object.freeze({
+  USER_ADMIN: "USER_ADMIN",
+  ADMIN_REVIEWER: "ADMIN_REVIEWER",
+});
+
 export const CONTENT_SUBMISSION_UPLOADER_USER_TYPE = Object.freeze({
   USER: "USER",
   REVIEWER: "REVIEWER",
@@ -88,4 +93,5 @@ export const FILE_BUCKETS = {
   assets: { visibility: "public", maxSize: 5_000_000, types: /jpg|jpeg|png|svg|json/ },
 };
 
+export const DEFAULT_PAGE_NO = 1;
 export const DEFAULT_PAGE_LIMIT = 10;

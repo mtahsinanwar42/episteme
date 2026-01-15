@@ -1,5 +1,5 @@
 import express from 'express';
-import { getConferences, saveConference, getConference, updateConference, updateConferenceStatus } from '../controllers/conference.js';
+import { getConferences, saveConference, getConference, updateConference, updateConferenceStatus, getConferencePublications } from '../controllers/conference.js';
 import { authenticate, authorize } from '../middlewares/auth.js';
 import { advancedResults } from '../middlewares/advancedResults.js';
 import { sequelize } from "../config/db.js";
@@ -32,6 +32,10 @@ router
 router
   .route('/:id')
   .get(getConference);
+
+router
+  .route('/:id/publications')
+  .get(getConferencePublications);
 
 router.route('/')
   .post(authenticate, authorize(USER_ROLE.ADMIN), saveConference);

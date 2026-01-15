@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
+import { findConferencePublicationsById } from "../repositories/conference.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
-import { CONFERENCE_STATUS } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS } from "../utils/constants.js";
 import { serializeConference } from "../utils/serializers.js";
 import { isEmpty, isNotEmpty } from "../utils/string.js";
 
@@ -22,6 +23,25 @@ export function createConferenceService({ Conference, fileService }) {
 
     const metadataFilePath = await fileService.getFilePathById(conference.metadataFileId);
     return serializeConference(conference, metadataFilePath);
+  }
+
+  async function getConferencePublicationsById(conferenceId, { page, limit }) {
+    if (!conferenceId || Number.isNaN(Number(conferenceId))) {
+      throw new ErrorResponse(400, "Invalid conference ID");
+    }
+
+    const excludedConferenceStatuses = [
+      CONFERENCE_STATUS.INACTIVE,
+      CONFERENCE_STATUS.ACTIVE,
+    ];
+
+    return findConferencePublicationsById({
+      conferenceId: Number(conferenceId),
+      conferenceStatusExcluded: excludedConferenceStatuses,
+      approvedSubmissionStatus: CONTENT_SUBMISSION_STATUS.APPROVED,
+      page,
+      limit,
+    });
   }
 
   async function createConference(payload) {
@@ -143,6 +163,7 @@ export function createConferenceService({ Conference, fileService }) {
 
   return {
     getConferenceById,
+    getConferencePublicationsById,
     createConference,
     updateConferenceById,
     updateConferenceStatusById,

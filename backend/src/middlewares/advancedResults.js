@@ -1,10 +1,10 @@
 import { Op } from "sequelize";
-import { DEFAULT_PAGE_LIMIT } from "../utils/constants.js";
+import { DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO } from "../utils/constants.js";
 
 export const advancedResults = (model, { include = [], transform } = {}) => async (req, res, next) => {
   console.log(req.query);
 
-  const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+  const page = Math.max(1, Number.parseInt(req.query.page, 10) || DEFAULT_PAGE_NO);
   const limit = Math.max(1, Number.parseInt(req.query.limit, 10) || DEFAULT_PAGE_LIMIT);
   const offset = limit * (page - 1);
 

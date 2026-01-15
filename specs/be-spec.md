@@ -54,20 +54,30 @@
 **ContentSubmission:**
 
 - GET /api/v1/submissions authenticated, USER/REVIEWER sees his/her submissions, ADMIN sees all submissions
-- GET /api/v1/submissions/:id authenticated, USER/REVIEWER sees owning/assigned submission + version + message + reviews, ADMIN sees any submission
+- GET /api/v1/submissions/:id authenticated
 - POST /api/v1/submissions authenticated, for posting submission (+ first version)
 - PUT /api/v1/submissions/:id/status authenticated + ADMIN. for updating the status
 
 **ContentSubmissionVersion:**
 
 - POST /api/v1/submissions/:id/versions, authenticated, USER/REVIEWER adds new his/her submission version + message, ADMIN adds a version in any submission.
-- GET /api/v1/submissions/:id/versions, authenticated, USER/REVIEWER sees his/her owning/assigned submission versions + message, ADMIN sees versions of all submissions
+- GET /api/v1/submissions/:id/versions
+
+**ContentSubmissionMessage:**
+
+- GET /api/v1/submissions/:id/messages authenticated
+- POST /api/v1/submissions/:id/messages authenticated
+
+**ContentSubmissionReview:**
+
+- GET /api/v1/submissions/:id/reviews authenticated, REVIEWER/ADMIN
+- POST /api/v1/submissions/:id/reviews authenticated, REVIEWER/ADMIN
 
 **ContentReviewAssignment:**
 
-- GET /api/v1/reviewer-assignments ADMIN/REVIEWER, REVIEWER -> Mine, not required -> ADMIN -> ALL
-- PUT /api/v1/submissions/:submissionId/reviewers/me/status REVIEWER, updates current user review status. triggered when reviewer submits for review (along with creating new version).
-- GET /api/v1/submissions/:id/reviewers ADMIN, shows all assigned reviewers + status
+- GET /api/v1/reviewer-assignments REVIEWER, REVIEWER -> Mine / ADMIN -> All
+- PUT /api/v1/submissions/:submissionId/reviewers/me/status REVIEWER, updates current user review status. triggered when reviewer submits for review (along with creating new version). ? need two endpoints?
+- GET /api/v1/submissions/:id/reviewers ADMIN, shows all assigned reviewers + status, useful for showing msg boxes, to the ADMIN.
 - POST /api/v1/submissions/:id/reviewers ADMIN, assign an existing reviewer to the submission review.
 
 **ContentReview:**
@@ -77,5 +87,3 @@
 **TODOs:**
 
 - POST /api/v1/users/reviewer/submissions/:id ADMIN, creates a new reviewer, assigns a paper to him, sends mail with email, email + password + paper link
-
-- GET /api/v1/conferences/:id/publishes PUBLIC

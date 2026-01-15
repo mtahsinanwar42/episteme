@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import colors from "colors";
 import { sequelize, connectDb } from "../config/db.js";
 import { initModels } from "../models/index.js";
-import { CONTENT_SUBMISSION_UPLOADER_USER_TYPE, REVIEW_RECOMMENDATION, USER_STATUS } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, REVIEW_RECOMMENDATION, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 
 dotenv.config();
 await connectDb();
@@ -13,6 +13,7 @@ const {
   File,
   ContentSubmission,
   ContentSubmissionVersion,
+  ContentSubmissionMessage,
   ContentReviewAssignment,
   ContentReview,
   ContentSubmissionPayment,
@@ -72,6 +73,7 @@ const conferenceData = {
   endAt: "2026-05-15",
   submissionPeriodStartAt: "2026-04-15",
   submissionPeriodEndAt: "2026-04-30",
+  status: CONFERENCE_STATUS.FINISHED,
 };
 
 const blogData = {
@@ -100,6 +102,7 @@ async function destroyData() {
     await ContentReviewAssignment.destroy({ where: {} });
     await ContentSubmissionPayment.destroy({ where: {} });
     await ContentSubmissionVersion.destroy({ where: {} });
+    await ContentSubmissionMessage.destroy({ where: {} });
     await ContentSubmission.destroy({ where: {} });
     await File.destroy({ where: {} });
     await Conference.destroy({ where: {} });
@@ -155,13 +158,14 @@ async function importData() {
       title: "AI-Driven Knowledge Graphs for Open Science",
       topics: ["AI", "Open Science", "Knowledge Graphs"],
       conferenceId: conference.id,
+      currentStatus: CONTENT_SUBMISSION_STATUS.APPROVED,
     });
 
     const v1 = await ContentSubmissionVersion.create({
       contentSubmissionId: submission1.id,
       uploaderUsrId: author.id,
       uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.USER,
-      uploaderNotes: "Initial submission of the graph paper.",
+      changeLog: "Initial submission of the graph paper.",
       fileId: file1.id,
       versionNo: 1,
     });
@@ -170,7 +174,7 @@ async function importData() {
       contentSubmissionId: submission1.id,
       uploaderUsrId: author.id,
       uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.USER,
-      uploaderNotes: "Initial submission of the graph paper.",
+      changeLog: "Initial submission of the graph paper.",
       fileId: file2.id,
       versionNo: 2,
     });
@@ -184,10 +188,45 @@ async function importData() {
       assignedByUsrId: admin.id,
     });
 
+    await ContentSubmissionMessage.create({
+      contentSubmissionId: submission1.id,
+      senderUsrId: author.id,
+      senderUsrType: USER_ROLE.USER,
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Can you publish this?",
+    });
+
+    await ContentSubmissionMessage.create({
+      contentSubmissionId: submission1.id,
+      senderUsrId: admin.id,
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverUsrId: reviewer.id,
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
+      message: "Can you review this?",
+    });
+
+    await ContentSubmissionMessage.create({
+      contentSubmissionId: submission1.id,
+      senderUsrId: reviewer.id,
+      senderUsrType: USER_ROLE.REVIEWER,
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
+      message: "Done!",
+    });
+
+    const v3 = await ContentSubmissionVersion.create({
+      contentSubmissionId: submission1.id,
+      uploaderUsrId: reviewer.id,
+      uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.REVIEWER,
+      changeLog: "Looks good, added some suggestions",
+      fileId: file2.id,
+      versionNo: 3,
+    });
+
     await ContentReview.create({
       contentReviewAssignmentId: assignment1.id,
       contentSubmissionVersionId: v2.id,
-      comment: "Strong paper, well-written and relevant.",
+      reviewerContentSubmissionVersionId: v3.id,
+      comment: "Strong paper, well-written and relevant, Added some comments.",
       recommendation: 1,
     });
 
@@ -232,7 +271,7 @@ async function importData() {
       contentSubmissionId: submission2.id,
       uploaderUsrId: author.id,
       uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.USER,
-      uploaderNotes: "Initial submission of the graph paper.",
+      changeLog: "Initial submission of the graph paper.",
       fileId: file3.id,
       versionNo: 1,
     });
@@ -241,8 +280,9 @@ async function importData() {
       contentSubmissionId: submission2.id,
       uploaderUsrId: author.id,
       uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.USER,
-      uploaderNotes: "2nd submission of the graph paper.",
+      changeLog: "2nd submission of the graph paper.",
       fileId: file4.id,
+      currentStatus: CONTENT_SUBMISSION_STATUS.APPROVED,
       versionNo: 2,
     });
 

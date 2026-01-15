@@ -1,0 +1,42 @@
+import asyncHandler from "express-async-handler";
+import { DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO } from "../utils/constants.js";
+import { sequelize } from "../config/db.js";
+import { initModels } from "../models/index.js";
+import { createFileService } from "../services/file.js";
+import { createSubmissionService } from "../services/contentSubmission.js";
+
+const { ContentSubmission, File } = initModels(sequelize);
+const fileService = createFileService({ File });
+const submissionService = createSubmissionService({ ContentSubmission, fileService });
+
+// @desc    Get submissions
+// @route   GET /api/v1/submissions
+// @access  Private
+export const getSubmissions = asyncHandler(async (req, res, next) => {
+  const { page = DEFAULT_PAGE_NO, limit = DEFAULT_PAGE_LIMIT } = req.query;
+
+  const submissions = await submissionService.getSubmissionsByUserIdAndRoles(req.user, { page, limit, });
+
+  res.status(200).json({
+    success: true,
+    page: submissions.page,
+    limit: submissions.limit,
+    total: submissions.total,
+    count: submissions.data.length,
+    data: submissions.data,
+  });
+});
+
+
+// @desc    Get submission by id
+// @route   GET /api/v1/submissions/:id
+// @access  Private
+export const getSubmission = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const submission = await submissionService.getSubmissionById(req.user, { submissionId: id });
+
+  res.status(200).json({
+    success: true,
+    data: submission,
+  });
+});

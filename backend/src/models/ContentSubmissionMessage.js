@@ -1,6 +1,6 @@
 export default (sequelize, DataTypes) => {
-  const ContentReview = sequelize.define(
-    "ContentReview",
+  const ContentSubmissionMessage = sequelize.define(
+    "ContentSubmissionMessage",
     {
       id: {
         type: DataTypes.BIGINT,
@@ -8,25 +8,38 @@ export default (sequelize, DataTypes) => {
         autoIncrement: true,
         field: "id",
       },
-      contentReviewAssignmentId: {
+      contentSubmissionId: {
         type: DataTypes.BIGINT,
         allowNull: false,
-        field: "content_review_assignment_id",
+        field: "content_submission_id",
       },
-      contentSubmissionVersionId: {
+      senderUsrId: {
         type: DataTypes.BIGINT,
         allowNull: false,
-        field: "content_submission_version_id",
+        field: "sender_usr_id",
       },
-      reviewerContentSubmissionVersionId: {
-        type: DataTypes.BIGINT,
-        allowNull: true,
-        field: "reviewer_content_submission_version_id",
-      },
-      comment: {
+      senderUsrType: {
         type: DataTypes.TEXT,
         allowNull: false,
-        field: "comment",
+        field: "sender_usr_type",
+      },
+      receiverUsrId: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        field: "receiver_usr_id",
+      },
+      visibilityScope: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        field: "visibility_scope",
+        validate: {
+          isIn: [["USER_ADMIN", "ADMIN_REVIEWER"]],
+        },
+      },
+      message: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        field: "message",
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -34,15 +47,10 @@ export default (sequelize, DataTypes) => {
         field: "created_at",
         defaultValue: DataTypes.NOW,
       },
-      recommendation: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        field: "recommendation",
-      },
     },
     {
       schema: "episteme",
-      tableName: "content_review",
+      tableName: "content_submission_message",
       freezeTableName: true,
       timestamps: false,
       hooks: {
@@ -53,5 +61,5 @@ export default (sequelize, DataTypes) => {
     }
   );
 
-  return ContentReview;
+  return ContentSubmissionMessage;
 };

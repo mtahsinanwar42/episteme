@@ -23,10 +23,10 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         field: "uploader_usr_type",
       },
-      uploaderNotes: {
+      changeLog: {
         type: DataTypes.TEXT,
         allowNull: true,
-        field: "uploader_notes",
+        field: "change_log",
       },
       fileId: {
         type: DataTypes.BIGINT,

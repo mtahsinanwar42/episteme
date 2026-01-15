@@ -9,6 +9,7 @@ import BlogModel from "./Blog.js";
 import FileModel from "./File.js";
 import ContentSubmissionModel from "./ContentSubmission.js";
 import ContentSubmissionVersionModel from "./ContentSubmissionVersion.js";
+import ContentSubmissionMessageModel from "./ContentSubmissionMessage.js";
 import ContentReviewAssignmentModel from "./ContentReviewAssignment.js";
 import ContentReviewModel from "./ContentReview.js";
 import ContentSubmissionPaymentModel from "./ContentSubmissionPayment.js";
@@ -23,6 +24,7 @@ export const initModels = (sequelize) => {
   const File = FileModel(sequelize, DataTypes);
   const ContentSubmission = ContentSubmissionModel(sequelize, DataTypes);
   const ContentSubmissionVersion = ContentSubmissionVersionModel(sequelize, DataTypes);
+  const ContentSubmissionMessage = ContentSubmissionMessageModel(sequelize, DataTypes);
   const ContentReviewAssignment = ContentReviewAssignmentModel(sequelize, DataTypes);
   const ContentReview = ContentReviewModel(sequelize, DataTypes);
   const ContentSubmissionPayment = ContentSubmissionPaymentModel(sequelize, DataTypes);
@@ -66,6 +68,33 @@ export const initModels = (sequelize) => {
     constraints: false,
   });
 
+  ContentSubmission.hasMany(ContentSubmissionMessage, {
+    foreignKey: "contentSubmissionId",
+    as: "messages",
+  });
+  ContentSubmissionMessage.belongsTo(ContentSubmission, {
+    foreignKey: "contentSubmissionId",
+    as: "submission",
+  });
+
+  User.hasMany(ContentSubmissionMessage, {
+    foreignKey: "senderUsrId",
+    as: "sentSubmissionMessages",
+  });
+  ContentSubmissionMessage.belongsTo(User, {
+    foreignKey: "senderUsrId",
+    as: "sender",
+  });
+
+  User.hasMany(ContentSubmissionMessage, {
+    foreignKey: "receiverUsrId",
+    as: "receivedSubmissionMessages",
+  });
+  ContentSubmissionMessage.belongsTo(User, {
+    foreignKey: "receiverUsrId",
+    as: "receiver",
+  });
+
   ContentSubmission.hasMany(ContentReviewAssignment, {
     foreignKey: "contentSubmissionId",
     as: "reviewAssignments",
@@ -92,11 +121,20 @@ export const initModels = (sequelize) => {
 
   ContentSubmissionVersion.hasMany(ContentReview, {
     foreignKey: "contentSubmissionVersionId",
-    as: "reviews",
+    as: "reviewsAsReviewedVersion",
   });
   ContentReview.belongsTo(ContentSubmissionVersion, {
     foreignKey: "contentSubmissionVersionId",
-    as: "version",
+    as: "reviewedVersion",
+  });
+
+  ContentSubmissionVersion.hasMany(ContentReview, {
+    foreignKey: "reviewerContentSubmissionVersionId",
+    as: "reviewsAsReviewerUploadVersion",
+  });
+  ContentReview.belongsTo(ContentSubmissionVersion, {
+    foreignKey: "reviewerContentSubmissionVersionId",
+    as: "reviewerUploadVersion",
   });
 
   ContentSubmission.hasMany(ContentSubmissionPayment, {
@@ -117,6 +155,7 @@ export const initModels = (sequelize) => {
     File,
     ContentSubmission,
     ContentSubmissionVersion,
+    ContentSubmissionMessage,
     ContentReviewAssignment,
     ContentReview,
     ContentSubmissionPayment,
