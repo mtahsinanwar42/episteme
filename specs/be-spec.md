@@ -71,14 +71,15 @@
 **ContentSubmissionReview:**
 
 - GET /api/v1/submissions/:id/reviews authenticated, REVIEWER/ADMIN
+- GET /api/v1/submissions/:id/reviewers ADMIN
 - POST /api/v1/submissions/:id/reviews authenticated, REVIEWER/ADMIN
 
 **ContentReviewAssignment:**
 
-- GET /api/v1/reviewer-assignments REVIEWER, REVIEWER -> Mine / ADMIN -> All
-- PUT /api/v1/submissions/:submissionId/reviewers/me/status REVIEWER, updates current user review status. triggered when reviewer submits for review (along with creating new version). ? need two endpoints?
-- GET /api/v1/submissions/:id/reviewers ADMIN, shows all assigned reviewers + status, useful for showing msg boxes, to the ADMIN.
-- POST /api/v1/submissions/:id/reviewers ADMIN, assign an existing reviewer to the submission review.
+- GET /api/v1/review-assignments/me REVIEWER
+- GET /api/v1/review-assignments ADMIN
+- POST /api/v1/review-assignments ADMIN
+- PUT /api/v1/review-assignments/:id/status REVIEWER/ADMIN
 
 **ContentReview:**
 

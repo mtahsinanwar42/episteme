@@ -40,3 +40,16 @@ export const getSubmission = asyncHandler(async (req, res, next) => {
     data: submission,
   });
 });
+
+
+// @desc    Update submission status by id
+// @route   PUT /api/v1/submissions/:id/status
+// @access  Private
+export const updateSubmissionStatus = asyncHandler(async (req, res) => {
+  const submission = await submissionService.updateSubmissionStatusById(req.params.id, req.body.status);
+
+  return res.status(200).json({
+    success: true,
+    data: submission,
+  });
+});

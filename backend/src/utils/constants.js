@@ -68,7 +68,6 @@ export const REVIEW_ASSIGNMENT_STATUS = Object.freeze({
   ACCEPTED: 2,
   DECLINED: 3,
   COMPLETED: 4,
-  OVERDUE: 5,
   DELETED: 9,
 });
 export const REVIEW_RECOMMENDATION = Object.freeze({
