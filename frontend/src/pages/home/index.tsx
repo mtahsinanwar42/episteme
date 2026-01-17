@@ -1,7 +1,7 @@
 import useAuthStore from "@/stores/authStore";
 import { useNavigate } from "react-router-dom";
 
-function Dashboard() {
+function Home() {
   const { user, signOut } = useAuthStore();
   const navigate = useNavigate();
 
@@ -56,4 +56,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Home;
