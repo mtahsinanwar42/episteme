@@ -29,20 +29,13 @@ function App() {
     <BrowserRouter>
       <div className="h-screen w-screen bg-background text-center text-foreground flex flex-col justify-between">
         <div>
-          {user && <Navbar />}
+          {<Navbar />}
 
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
 
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/" element={<Home />} />
             <Route
               path="/users"
               element={

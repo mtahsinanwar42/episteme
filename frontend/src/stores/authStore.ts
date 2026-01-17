@@ -1,7 +1,17 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { supabase } from "../lib/supabase";
-import type { User, Session } from "@supabase/supabase-js";
+
+interface User {
+  id: string;
+  email: string | null;
+  user_metadata: Record<string, any>;
+}
+
+interface Session {
+  access_token: string;
+  refresh_token: string;
+  user: User;
+}
 
 interface AuthState {
   user: User | null;
@@ -26,15 +36,7 @@ const useAuthStore = create<AuthState>()(
 
       initialize: async () => {
         try {
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
-          set({ session, user: session?.user ?? null, loading: false });
-
-          // Listen for auth changes
-          supabase.auth.onAuthStateChange((_event, session) => {
-            set({ session, user: session?.user ?? null });
-          });
+          // set({ session, user: session?.user ?? null, loading: false });
         } catch (error) {
           console.error("Error initializing auth:", error);
           set({ loading: false });
@@ -43,13 +45,6 @@ const useAuthStore = create<AuthState>()(
 
       signInWithGoogle: async () => {
         try {
-          const { error } = await supabase.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-              redirectTo: `${window.location.origin}/auth/callback`,
-            },
-          });
-          if (error) throw error;
         } catch (error) {
           console.error("Error signing in with Google:", error);
           throw error;
@@ -58,8 +53,6 @@ const useAuthStore = create<AuthState>()(
 
       signOut: async () => {
         try {
-          const { error } = await supabase.auth.signOut();
-          if (error) throw error;
           set({ user: null, session: null });
         } catch (error) {
           console.error("Error signing out:", error);

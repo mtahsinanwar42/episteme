@@ -12,7 +12,7 @@ function Login() {
     }
   }, [user, navigate]);
 
-  const handleGoogleSignIn = async () => {
+  const handleSignIn = async () => {
     try {
       await signInWithGoogle();
     } catch (error) {
@@ -40,7 +40,7 @@ function Login() {
         </p>
 
         <button
-          onClick={handleGoogleSignIn}
+          onClick={handleSignIn}
           className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-lg font-semibold transition hover:opacity-90"
           style={{
             backgroundColor: "var(--color-primary)",
