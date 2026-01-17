@@ -1,4 +1,4 @@
-import { findSubmissionReviewsByIdAndUserDetails } from "../repositories/contentSubmissionReview.js";
+import { findSubmissionReviewersById, findSubmissionReviewsByIdAndUserDetails } from "../repositories/contentSubmissionReview.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 
 export function createSubmissionReviewService({ ContentReview, fileService }) {
@@ -22,7 +22,16 @@ export function createSubmissionReviewService({ ContentReview, fileService }) {
     });
   }
 
+  async function getSubmissionReviewersById(submissionId) {
+    if (!submissionId) {
+      throw new ErrorResponse(400, "id cannot be empty");
+    }
+
+    return findSubmissionReviewersById(submissionId);
+  }
+
   return {
     getSubmissionReviewsById,
+    getSubmissionReviewersById
   };
 }

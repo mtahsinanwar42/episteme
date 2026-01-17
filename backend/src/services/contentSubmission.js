@@ -1,4 +1,5 @@
 import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails } from "../repositories/contentSubmission.js";
+import { CONTENT_SUBMISSION_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 
 export function createSubmissionService({ ContentSubmission, fileService }) {
@@ -31,8 +32,25 @@ export function createSubmissionService({ ContentSubmission, fileService }) {
     });
   }
 
+  async function updateSubmissionStatusById(id, status) {
+    if (!Object.values(CONTENT_SUBMISSION_STATUS).includes(status)) {
+      throw new ErrorResponse(400, "Invalid ContentSubmission status");
+    }
+
+    const submission = await ContentSubmission.findByPk(id);
+
+    if (!submission) {
+      throw new ErrorResponse(404, "User not found");
+    }
+
+    await submission.update({ status });
+
+    return submission;
+  }
+
   return {
     getSubmissionsByUserIdAndRoles,
     getSubmissionById,
+    updateSubmissionStatusById
   };
 }

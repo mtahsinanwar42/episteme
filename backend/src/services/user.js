@@ -174,7 +174,7 @@ export function createUserService({ User, fileService }) {
 
     await user.update({ status });
 
-    return serializeUser(user)
+    return serializeUser(user);
   }
 
   return {
