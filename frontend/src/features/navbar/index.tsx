@@ -53,7 +53,36 @@ const navItems: NavItemConfig[] = [
   },
   {
     label: "About",
-    href: "/about",
+    children: [
+      {
+        label: "Mission & Vision",
+        href: "/about/mission",
+      },
+      {
+        label: "Ethics",
+        href: "/about/ethics",
+      },
+      {
+        label: "Sustainability",
+        href: "/about/sustainability",
+      },
+      {
+        label: "Executive Committee",
+        href: "/about/executive",
+      },
+      {
+        label: "Policies",
+        href: "/about/policies",
+      },
+      {
+        label: "Career",
+        href: "/about/career",
+      },
+      {
+        label: "Contact",
+        href: "/about/contact",
+      },
+    ],
   },
 ];
 

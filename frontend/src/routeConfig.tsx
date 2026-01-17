@@ -4,6 +4,13 @@ import AuthCallback from "@/pages/authCallback";
 import ProtectedRoute from "@/components/common/protectedRoute";
 import Users from "@/pages/users";
 import Home from "@/pages/home";
+import Mission from "@/pages/about/Mission";
+import Ethics from "@/pages/about/Ethics";
+import Sustainability from "@/pages/about/Sustainability";
+import Executive from "@/pages/about/Executive";
+import Policies from "@/pages/about/Policies";
+import Career from "@/pages/about/Career";
+import Contact from "@/pages/about/Contact";
 
 export default function RouteConfig() {
   return (
@@ -20,7 +27,13 @@ export default function RouteConfig() {
           </ProtectedRoute>
         }
       />
-      <Route path="/about" element={<div>About</div>} />
+      <Route path="/about/mission" element={<Mission />} />
+      <Route path="/about/ethics" element={<Ethics />} />
+      <Route path="/about/sustainability" element={<Sustainability />} />
+      <Route path="/about/executive" element={<Executive />} />
+      <Route path="/about/policies" element={<Policies />} />
+      <Route path="/about/career" element={<Career />} />
+      <Route path="/about/contact" element={<Contact />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
