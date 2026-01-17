@@ -44,7 +44,7 @@ export function NavItem({ item }: NavItemProps) {
     return (
       <Link
         to={item.href || "/"}
-        className="mx-2 px-3 py-2 rounded-md hover:bg-primary hover:bg-opacity-10 transition-colors duration-200"
+        className="mx-2 px-3 py-2 rounded-md flex items-center hover:bg-primary hover:bg-opacity-10 transition-colors duration-200"
       >
         {item.label}
       </Link>
