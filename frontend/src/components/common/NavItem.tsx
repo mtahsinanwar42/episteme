@@ -70,29 +70,37 @@ export function NavItem({ item }: NavItemProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div
-          className="absolute left-0 mt-0 w-48 bg-accent rounded-lg shadow-lg z-50 
-            animate-in fade-in slide-in-from-top-2 duration-200"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className="py-2">
-            {item.children?.map((child, index) => (
-              <div key={index}>
-                {child.children ? (
-                  <NestedNavItem item={child} />
-                ) : (
-                  <Link
-                    to={child.href || "/"}
-                    className="block px-4 py-2 hover:bg-primary hover:bg-opacity-20 transition-colors duration-150"
-                  >
-                    {child.label}
-                  </Link>
-                )}
-              </div>
-            ))}
+        <>
+          {/* Invisible bridge to prevent dropdown from closing */}
+          <div
+            className="absolute left-0 top-full w-48 h-2 z-40"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          />
+          <div
+            className="absolute left-0 mt-2 w-48 bg-accent rounded-lg shadow-lg z-50 
+              animate-in fade-in slide-in-from-top-2 duration-200"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className="py-2">
+              {item.children?.map((child, index) => (
+                <div key={index}>
+                  {child.children ? (
+                    <NestedNavItem item={child} />
+                  ) : (
+                    <Link
+                      to={child.href || "/"}
+                      className="block px-4 py-2 hover:bg-primary hover:bg-opacity-20 transition-colors duration-150"
+                    >
+                      {child.label}
+                    </Link>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
