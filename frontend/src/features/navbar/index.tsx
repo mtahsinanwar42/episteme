@@ -52,6 +52,22 @@ const navItems: NavItemConfig[] = [
     ],
   },
   {
+    label: "Conferences",
+    href: "/conferences",
+  },
+  {
+    label: "Trainings",
+    href: "/trainings",
+  },
+  {
+    label: "Announcements",
+    href: "/announcements",
+  },
+  {
+    label: "Blogs",
+    href: "/blogs",
+  },
+  {
     label: "About",
     children: [
       {
