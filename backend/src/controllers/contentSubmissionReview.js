@@ -20,3 +20,16 @@ export const getSubmissionReviews = asyncHandler(async (req, res, next) => {
     data: reviews,
   });
 });
+
+// @desc    Get submission reviewers by id
+// @route   GET /api/v1/submissions/:id/reviewers
+// @access  Private
+export const getSubmissionReviewers = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const reviewers = await submissionReviewService.getSubmissionReviewersById(id);
+
+  res.status(200).json({
+    success: true,
+    data: reviewers,
+  });
+});

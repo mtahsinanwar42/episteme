@@ -26,7 +26,7 @@ export async function findSubmissionMessagesByIdAndUserDetails({
         FROM episteme.content_review_assignment CRA
         WHERE CRA.content_submission_id = CS.id
           AND CRA.reviewer_usr_id = :loggedInUserId
-          AND CRA.status <> 9
+          AND CRA.status NOT IN (3, 9)
       )
     )
   `;
