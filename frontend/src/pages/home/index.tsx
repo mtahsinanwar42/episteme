@@ -1,12 +1,15 @@
-import useAuthStore from "@/stores/authStore";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { logout } from "@/stores/authSlice";
+import { type RootState } from "@/stores/store";
 
 function Home() {
-  const { user, signOut } = useAuthStore();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
-    await signOut();
+    dispatch(logout());
     navigate("/login");
   };
 

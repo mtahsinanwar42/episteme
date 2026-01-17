@@ -5,7 +5,7 @@ import ProtectedRoute from "@/components/common/protectedRoute";
 import Users from "@/pages/users";
 import Home from "@/pages/home";
 
-export default function routeConfig() {
+export default function RouteConfig() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />

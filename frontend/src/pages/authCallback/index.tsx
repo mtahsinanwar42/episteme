@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "@/stores/authStore";
+import { useSelector } from "react-redux";
+import { type RootState } from "@/stores/store";
 
 function AuthCallback() {
   const navigate = useNavigate();
-  const { user, loading } = useAuthStore();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const loading = useSelector((state: RootState) => state.auth.loading);
 
   useEffect(() => {
     if (!loading) {

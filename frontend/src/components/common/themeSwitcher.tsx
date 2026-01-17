@@ -1,4 +1,5 @@
-import { useThemeStore } from "@/stores/themeStore";
+import { useDispatch } from "react-redux";
+import { setTheme, type ThemeType } from "@/stores/themeSlice";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +8,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function ThemeSwitcher() {
-  const { setTheme } = useThemeStore();
+  const dispatch = useDispatch();
+
+  const handleThemeChange = (theme: ThemeType) => {
+    dispatch(setTheme(theme));
+  };
 
   return (
     <div className="flex gap-3 items-center">
@@ -16,13 +21,13 @@ export function ThemeSwitcher() {
           Choose Theme
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => setTheme("light")}>
+          <DropdownMenuItem onClick={() => handleThemeChange("light")}>
             Light
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("dark")}>
+          <DropdownMenuItem onClick={() => handleThemeChange("dark")}>
             Dark
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("emerald")}>
+          <DropdownMenuItem onClick={() => handleThemeChange("emerald")}>
             Emerald
           </DropdownMenuItem>
         </DropdownMenuContent>

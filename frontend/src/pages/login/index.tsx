@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "@/stores/authStore";
+import { useSelector } from "react-redux";
+import { type RootState } from "@/stores/store";
 
 function Login() {
-  const { signInWithGoogle, user } = useAuthStore();
+  const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,7 +15,8 @@ function Login() {
 
   const handleSignIn = async () => {
     try {
-      await signInWithGoogle();
+      // TODO: Implement Google sign-in logic and dispatch to Redux
+      console.log("Implement Google sign-in with Redux dispatch");
     } catch (error) {
       console.error("Login error:", error);
     }

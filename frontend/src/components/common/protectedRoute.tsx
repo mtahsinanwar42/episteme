@@ -1,12 +1,14 @@
 import { Navigate } from "react-router-dom";
-import useAuthStore from "@/stores/authStore";
+import { useSelector } from "react-redux";
+import { type RootState } from "@/stores/store";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuthStore();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const loading = useSelector((state: RootState) => state.auth.loading);
 
   if (loading) {
     return (

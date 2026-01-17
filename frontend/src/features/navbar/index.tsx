@@ -1,9 +1,10 @@
 import { ThemeSwitcher } from "@/components/common/themeSwitcher";
-import useAuthStore from "@/stores/authStore";
+import { useSelector } from "react-redux";
+import { type RootState } from "@/stores/store";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const { user } = useAuthStore();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   // const navLinkStyle = ({ isActive }: { isActive: boolean }) => ({
   //   textDecoration: isActive ? "underline" : "none",
