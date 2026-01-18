@@ -35,7 +35,9 @@ export default function RouteConfig() {
       <Route path="/conferences" element={<Conferences />} />
       <Route path="/trainings" element={<Trainings />} />
       <Route path="/announcements" element={<Announcements />} />
+
       <Route path="/blogs" element={<Blogs />} />
+      <Route path="/blogs/:id" element={<Blogs />} />
 
       <Route path="/about/mission" element={<Mission />} />
       <Route path="/about/ethics" element={<Ethics />} />
