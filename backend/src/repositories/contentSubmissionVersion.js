@@ -1,6 +1,6 @@
 import { sequelize } from "../config/db.js";
 import { QueryTypes } from "sequelize";
-import { CONTENT_SUBMISSION_STATUS, USER_ROLE } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, USER_ROLE } from "../utils/constants.js";
 
 export async function findSubmissionVersionsByIdAndUserDetails({
   submissionId,
@@ -15,6 +15,8 @@ export async function findSubmissionVersionsByIdAndUserDetails({
     submissionId: Number(submissionId),
     loggedInUserId: Number(loggedInUserId),
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
+    deletedConferenceStatus: CONFERENCE_STATUS.DELETED,
+    capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
   };
 
   const accessWhereUser = `CS.owner_usr_id = :loggedInUserId`;
@@ -34,13 +36,6 @@ export async function findSubmissionVersionsByIdAndUserDetails({
 
   const versionWhereUser = `V.uploader_usr_type IN ('USER', 'ADMIN')`;
   const versionWhereReviewer = `V.uploader_usr_type = 'USER'`;
-  // TODO: if I want to show the reviewer uploaded versions in the Versions tab
-  //   const versionWhereReviewer = `
-  //   (
-  //     V.uploader_usr_type = 'USER'
-  //     OR (V.uploader_usr_type = 'REVIEWER' AND V.uploader_usr_id = :loggedInUserId)
-  //   )
-  // `;
   const versionWhereAdmin = `V.uploader_usr_type IN ('USER', 'ADMIN')`;
 
   const accessWhere = isAdmin
@@ -78,7 +73,10 @@ export async function findSubmissionVersionsByIdAndUserDetails({
     FROM episteme.content_submission CS
     JOIN episteme.content_submission_version V
       ON V.content_submission_id = CS.id
-
+    JOIN episteme.conference C
+      ON C.id = CS.conference_id
+    LEFT JOIN episteme.content_submission_payment CSP
+      ON CSP.content_submission_id = CS.id
     LEFT JOIN episteme.user UU
       ON UU.id = V.uploader_usr_id
 
@@ -88,6 +86,8 @@ export async function findSubmissionVersionsByIdAndUserDetails({
     WHERE
       CS.id = :submissionId
       AND CS.current_status <> :deletedSubmissionStatus
+      AND C.status <> :deletedConferenceStatus
+      AND CSP.status = :capturedPaymentStatus
       AND (${accessWhere})
       AND (${versionWhere})
 

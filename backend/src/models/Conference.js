@@ -1,5 +1,3 @@
-import { CONFERENCE_STATUS } from "../utils/constants.js";
-
 export default (sequelize, DataTypes) => {
   const Conference = sequelize.define(
     "Conference",
@@ -50,7 +48,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "status",
-        defaultValue: CONFERENCE_STATUS.INACTIVE,
+        defaultValue: 0,
       },
       createdAt: {
         type: DataTypes.DATE,

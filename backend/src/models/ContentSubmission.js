@@ -1,5 +1,3 @@
-import { CONTENT_SUBMISSION_STATUS } from "../utils/constants.js";
-
 export default (sequelize, DataTypes) => {
   const ContentSubmission = sequelize.define(
     "ContentSubmission",
@@ -47,7 +45,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "current_status",
-        defaultValue: CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL,
+        defaultValue: 1,
       },
       createdAt: {
         type: DataTypes.DATE,

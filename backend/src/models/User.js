@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
-import { USER_STATUS, USER_ROLE } from "../utils/constants.js";
 import { generateHash } from "../utils/hashing.js";
 
 export default (sequelize, DataTypes) => {
@@ -70,7 +69,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.ARRAY(DataTypes.TEXT),
         allowNull: false,
         field: "roles",
-        defaultValue: [USER_ROLE.USER],
+        defaultValue: ["USER"],
         validate: {
           isValidRoles(value) {
             if (!Array.isArray(value) || value.some((r) => r == null)) {
@@ -83,7 +82,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "status",
-        defaultValue: USER_STATUS.INACTIVE,
+        defaultValue: 0,
       },
       cvFileId: {
         type: DataTypes.BIGINT,

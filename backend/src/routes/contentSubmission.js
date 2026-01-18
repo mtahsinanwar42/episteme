@@ -1,26 +1,27 @@
 import express from 'express';
-import { getSubmissions, getSubmission } from '../controllers/contentSubmission.js';
+import { getSubmissions, getSubmission, updateSubmissionStatus, saveSubmission } from '../controllers/contentSubmission.js';
 import { getSubmissionVersions } from '../controllers/contentSubmissionVersion.js';
 import { authenticate, authorize } from '../middlewares/auth.js';
-import { getSubmissionMessages } from '../controllers/contentSubmissionMessage.js';
+import { getSubmissionMessages, saveSubmissionMessage } from '../controllers/contentSubmissionMessage.js';
 import { getSubmissionReviewers, getSubmissionReviews } from '../controllers/contentSubmissionReview.js';
 import { USER_ROLE } from '../utils/constants.js';
-import { updateReviewAssignmentStatus } from '../controllers/contentReviewAssignment.js';
 const router = express.Router();
 
 router.use(authenticate);
 
 router
   .route('/')
-  .get(getSubmissions);
+  .get(getSubmissions)
+  .post(authorize(USER_ROLE.USER), saveSubmission);
 
 router
   .route('/:id')
-  .get(getSubmission);
+  .get(getSubmission)
+  .put(authorize(USER_ROLE.ADMIN, USER_ROLE.USER), updateSubmissionStatus);
 
 router
   .route('/:id/status')
-  .put(updateReviewAssignmentStatus);
+  .put(updateSubmissionStatus);
 
 router
   .route('/:id/versions')
@@ -28,7 +29,8 @@ router
 
 router
   .route('/:id/messages')
-  .get(getSubmissionMessages);
+  .get(getSubmissionMessages)
+  .post(saveSubmissionMessage);
 
 router
   .route('/:id/reviews')

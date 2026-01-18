@@ -22,16 +22,16 @@ export function createSubmissionReviewService({ ContentReview, fileService }) {
     });
   }
 
-  async function getSubmissionReviewersById(submissionId) {
+  async function getSubmissionReviewersById(submissionId, page, limit) {
     if (!submissionId) {
       throw new ErrorResponse(400, "id cannot be empty");
     }
 
-    return findSubmissionReviewersById(submissionId);
+    return findSubmissionReviewersById({ submissionId, page, limit });
   }
 
   return {
     getSubmissionReviewsById,
-    getSubmissionReviewersById
+    getSubmissionReviewersById,
   };
 }

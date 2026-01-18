@@ -1,6 +1,6 @@
 import { sequelize } from "../config/db.js";
 import { QueryTypes } from "sequelize";
-import { CONTENT_SUBMISSION_STATUS, REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
+import { CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
 
 export async function findSubmissionReviewsByIdAndUserDetails({
   submissionId,
@@ -14,6 +14,7 @@ export async function findSubmissionReviewsByIdAndUserDetails({
     submissionId: Number(submissionId),
     loggedInUserId: Number(loggedInUserId),
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
+    excludedAssignmentStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
   };
 
   const selectAndJoins = `
@@ -76,7 +77,7 @@ export async function findSubmissionReviewsByIdAndUserDetails({
     WHERE
       CS.id = :submissionId
       AND CS.current_status <> :deletedSubmissionStatus
-      AND CRA.status NOT IN (3, 9)
+      AND CRA.status NOT IN (:excludedAssignmentStatuses)
   `;
 
   const reviewWhereReviewer = `AND CRA.reviewer_usr_id = :loggedInUserId`;
@@ -97,9 +98,18 @@ export async function findSubmissionReviewsByIdAndUserDetails({
   });
 }
 
-export async function findSubmissionReviewersById(submissionId) {
+export async function findSubmissionReviewersById({
+  submissionId,
+  page,
+  limit,
+}) {
+  const pageNum = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
+  const limitNum = Math.max(1, Math.max(1, Number(limit) || DEFAULT_PAGE_LIMIT));
+  const offset = (pageNum - 1) * limitNum;
+
   const sql = `
     SELECT
+      COUNT(*) OVER()     AS "total",
       U.id                AS "id",
       U.email             AS "email",
       U.first_name        AS "firstName",
@@ -116,19 +126,29 @@ export async function findSubmissionReviewersById(submissionId) {
       CRA.assigned_by_usr_id AS "assignedByUserId",
       CRA.assigned_by_notes  AS "assignedByNotes"
     FROM episteme.content_review_assignment CRA
-    JOIN episteme."user" U
+    JOIN episteme.user U
       ON U.id = CRA.reviewer_usr_id
     WHERE
       CRA.content_submission_id = :submissionId
-      AND CRA.status NOT IN (:excludedStatuses)
-    ORDER BY CRA.assigned_at DESC, U.last_name ASC, U.first_name ASC;
+      AND CRA.status NOT IN (:excludedAssignmentStatuses)
+    ORDER BY CRA.assigned_at DESC, U.last_name ASC, U.first_name ASC
+    LIMIT :limit OFFSET :offset;
   `;
 
-  return sequelize.query(sql, {
+  const rows = await sequelize.query(sql, {
     type: QueryTypes.SELECT,
     replacements: {
       submissionId: Number(submissionId),
-      excludedStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+      excludedAssignmentStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+      limit: limitNum,
+      offset,
     },
   });
+
+  return {
+    page: pageNum,
+    limit: limitNum,
+    total: rows.length ? Number(rows[0].total) : 0,
+    data: rows.map(({ total, ...row }) => row),
+  };
 }

@@ -1,10 +1,13 @@
+import { sequelize } from "../config/db.js";
 import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails } from "../repositories/contentSubmission.js";
-import { CONTENT_SUBMISSION_STATUS } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
+import { serializeContentSubmission } from "../utils/serializers.js";
+import { isEmpty } from "../utils/string.js";
 
-export function createSubmissionService({ ContentSubmission, fileService }) {
-  if (!ContentSubmission) {
-    throw new Error("createSubmissionService requires { ContentSubmission } model");
+export function createSubmissionService({ ContentSubmission, ContentSubmissionVersion, conferenceService, fileService }) {
+  if (!ContentSubmission || !ContentSubmissionVersion) {
+    throw new Error("createSubmissionService requires { ContentSubmission, ContentSubmissionVersion } model");
   }
 
   if (!fileService) {
@@ -32,18 +35,85 @@ export function createSubmissionService({ ContentSubmission, fileService }) {
     });
   }
 
-  async function updateSubmissionStatusById(id, status) {
+  async function saveSubmission(user, payload) {
+    const { title, topics, conferenceId, contentFilePath, changeLog, } = payload;
+
+    if (isEmpty(title) || !conferenceId || isEmpty(contentFilePath)) {
+      throw new ErrorResponse(400, "title, conferenceId, contentFilePath are required");
+    }
+
+    if (!Array.isArray(topics) || topics.length === 0) {
+      throw new ErrorResponse(400, "topics is required");
+    }
+
+    const conference = await conferenceService.getConferenceById(conferenceId);
+
+    if (!conference || conference.status !== CONFERENCE_STATUS.ACTIVE) {
+      throw new ErrorResponse(400, "Invalid Conference ID");
+    }
+
+    const contentFileId = await fileService.getFileIdByPath(contentFilePath, { fieldName: "contentFilePath" });
+
+    return sequelize.transaction(async (t) => {
+      const submission = await ContentSubmission.create(
+        {
+          title,
+          topics,
+          conferenceId,
+          currentStatus: CONTENT_SUBMISSION_STATUS.DRAFT,
+          ownerUsrId: user.id,
+        },
+        { transaction: t }
+      );
+
+      const version = await ContentSubmissionVersion.create(
+        {
+          contentSubmissionId: submission.id,
+          changeLog,
+          fileId: contentFileId,
+          uploaderUsrId: user.id,
+          uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.USER,
+          versionNo: CONTENT_SUBMISSION_VERSION_INITIAL,
+        },
+        { transaction: t }
+      );
+
+      await submission.update(
+        { currentContentSubmissionVersionId: version.id },
+        { transaction: t }
+      );
+
+      return serializeContentSubmission(submission, version, contentFilePath);
+    });
+  }
+
+  async function updateSubmissionStatusById(user, id, status) {
     if (!Object.values(CONTENT_SUBMISSION_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid ContentSubmission status");
     }
 
-    const submission = await ContentSubmission.findByPk(id);
+    const roles = Array.isArray(user.roles) ? user.roles : [];
+    const isUser = roles.includes(USER_ROLE.USER);
 
-    if (!submission) {
-      throw new ErrorResponse(404, "User not found");
+    if (isUser && status !== CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL) {
+      throw new ErrorResponse(400, "Invalid ContentSubmission status");
     }
 
-    await submission.update({ status });
+    const where = { id };
+
+    if (isUser) {
+      where.ownerUsrId = Number(user.id);
+    }
+
+    const submission = await ContentSubmission.findOne({
+      where,
+    });
+
+    if (!submission) {
+      throw new ErrorResponse(404, "ContentSubmission not found");
+    }
+
+    await submission.update({ currentStatus: status });
 
     return submission;
   }
@@ -51,6 +121,7 @@ export function createSubmissionService({ ContentSubmission, fileService }) {
   return {
     getSubmissionsByUserIdAndRoles,
     getSubmissionById,
+    saveSubmission,
     updateSubmissionStatusById
   };
 }

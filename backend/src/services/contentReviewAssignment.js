@@ -11,12 +11,12 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
     throw new ErrorResponse("createReviewAssignmentService requires { fileService }");
   }
 
-  async function getMyReviewAssignments(user) {
-    return findReviewAssignmentsByUserId(user.id);
+  async function getMyReviewAssignments(user, page, limit) {
+    return findReviewAssignmentsByUserId({ userId: user.id, page, limit });
   }
 
-  async function getReviewAssignments() {
-    return findReviewAssignments();
+  async function getReviewAssignments(page, limit) {
+    return findReviewAssignments({ page, limit });
   }
 
   async function saveReviewAssignment(user, payload) {
