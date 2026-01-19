@@ -16,7 +16,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="h-screen w-[100vw] bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-100 text-center text-foreground flex flex-col justify-between">
+      <div className="h-screen w-screen bg-linear-to-br from-slate-100 via-slate-50 to-indigo-100 text-center text-foreground flex flex-col justify-between">
         <Navbar />
 
         <RouteConfig />
