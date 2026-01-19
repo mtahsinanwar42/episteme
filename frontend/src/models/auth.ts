@@ -8,6 +8,26 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface RegisterRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone: string;
+  institution: string;
+  occupation: string;
+  country: string;
+  linkedinUrl: string;
+  photoFilePath: string;
+  cvFilePath: string;
+  roles: string[];
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message?: string;
+}
+
 export interface UserDetails {
   id: string;
   firstName: string;

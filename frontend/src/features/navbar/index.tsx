@@ -122,7 +122,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full py-2 px-4 bg-accent text-foreground flex justify-between items-center">
+    <nav className="py-2 px-4 bg-accent text-foreground flex justify-between items-center">
       <div>
         <Link to="/" className="text-white text-3xl">
           EPISTEME

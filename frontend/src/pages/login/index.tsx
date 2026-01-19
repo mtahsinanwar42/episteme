@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { Input } from "@/components/ui/input";
@@ -68,7 +68,7 @@ function Login() {
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-100 text-slate-900 flex items-center justify-center px-4 py-10">
+    <div className="flex-1 text-slate-900 flex items-center justify-center px-4">
       <div className="relative max-w-lg w-full">
         <div className="absolute -inset-[1px] bg-gradient-to-br from-indigo-300/35 via-sky-200/30 to-emerald-200/25 rounded-3xl blur opacity-70" />
         <div className="relative rounded-3xl border border-slate-200 bg-white/90 backdrop-blur-md shadow-2xl p-10 text-slate-900">
@@ -127,15 +127,22 @@ function Login() {
 
             <Button
               type="submit"
-              className="w-full text-white! bg-linear-to-r from-indigo-500 via-violet-500 to-indigo-500"
-              // style={{
-              //   background:
-              //     "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
-              // }}
+              className="w-full text-white! shadow-lg shadow-indigo-200/50 hover:brightness-105"
+              style={{
+                background:
+                  "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
+              }}
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
+
+            <div>
+              New here?{" "}
+              <Link to="/register" className="text-accent hover:brightness-80">
+                Register here
+              </Link>
+            </div>
           </form>
         </div>
       </div>

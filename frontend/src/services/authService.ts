@@ -2,6 +2,8 @@ import { config } from "@/config/config";
 import type {
   LoginRequest,
   LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
   UserDetailsResponse,
 } from "@/models/auth";
 import Cookies from "js-cookie";
@@ -19,6 +21,23 @@ export const authService = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || "Login failed");
+    }
+
+    return response.json();
+  },
+
+  register: async (userData: RegisterRequest): Promise<RegisterResponse> => {
+    const response = await fetch(`${config.baseUrl}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Registration failed");
     }
 
     return response.json();
