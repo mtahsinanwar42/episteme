@@ -24,22 +24,12 @@ export function createFileService({ File }) {
     return serializeFile(file);
   }
 
-  async function getAccessCheckedFile(req) {
-    const userId = req.user?.id;
-    const userRoles = req.user?.roles || [];
-
+  async function getFile(req) {
     const fileIdParam = req.params?.id;
     const storageKeyOrPath = req.query?.path;
 
     if (!fileIdParam && !storageKeyOrPath) {
       throw new ErrorResponse(400, "Provide req.params.id for /files/:id or req.query.path for /files/download");
-    }
-
-    if (storageKeyOrPath
-      && process.env.FILE_STORAGE_PUBLIC_PATH
-      && storageKeyOrPath.startsWith(process.env.FILE_STORAGE_PUBLIC_PATH)) {
-
-      return null;
     }
 
     const file = fileIdParam
@@ -50,30 +40,6 @@ export function createFileService({ File }) {
       throw new ErrorResponse(
         404,
         fileIdParam ? `file not found for id: ${fileIdParam}` : `file not found for path/storageKey: ${storageKeyOrPath}`
-      );
-    }
-
-    if (process.env.FILE_STORAGE_PUBLIC_PATH
-      && typeof file.storageKey === "string"
-      && file.storageKey.startsWith(process.env.FILE_STORAGE_PUBLIC_PATH)) {
-
-      return file;
-    }
-
-    if (!userId) {
-      throw new ErrorResponse(401, "Not Authorized");
-    }
-
-    const isOwner = Number(file.uploadedBy) === Number(userId);
-    const isAdmin = userRoles.includes(USER_ROLE.ADMIN);
-    const isReviewer = userRoles.includes(USER_ROLE.REVIEWER);
-
-    if (!isOwner && !isAdmin && !isReviewer) {
-      throw new ErrorResponse(
-        403,
-        fileIdParam
-          ? `Access denied to file id: ${fileIdParam}`
-          : `Access denied to file: ${storageKeyOrPath}`
       );
     }
 
@@ -112,7 +78,7 @@ export function createFileService({ File }) {
 
   return {
     save,
-    getAccessCheckedFile,
+    getFile,
     getFileIdByPath,
     getFilePathById,
   };
