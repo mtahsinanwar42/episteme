@@ -29,7 +29,8 @@ function Home() {
 
           <div className="mb-6">
             <p className="mb-2" style={{ color: "var(--color-text)" }}>
-              <strong>Name:</strong> {user?.user_metadata?.full_name || "N/A"}
+              <strong>Name:</strong> {user?.firstName || "N/A"}{" "}
+              {user?.lastName || "N/A"}
             </p>
             <p className="mb-2" style={{ color: "var(--color-text)" }}>
               <strong>Email:</strong> {user?.email}
@@ -39,9 +40,9 @@ function Home() {
             </p>
           </div>
 
-          {user?.user_metadata?.avatar_url && (
+          {user?.photoFilePath && (
             <img
-              src={user.user_metadata.avatar_url}
+              src={user.photoFilePath}
               alt="Profile"
               className="w-20 h-20 rounded-full mb-4"
             />

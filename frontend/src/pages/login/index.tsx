@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { setLoading, setToken, setUser } from "@/stores/authSlice";
+import { authService } from "@/services/authService";
+import Cookies from "js-cookie";
 
 function Login() {
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -28,11 +34,36 @@ function Login() {
 
   const handleEmailPasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
     try {
-      // TODO: Implement email/password login logic and dispatch to Redux
-      console.log("Login with email:", email, "password:", password);
+      const response = await authService.login({ email, password });
+
+      if (response.success && response.token) {
+        Cookies.set("token", response.token, {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+        });
+
+        await dispatch(setToken(response.token));
+
+        // Fetch user details
+        const userDetailsResponse = await authService.getLoggedInUserDetails();
+        if (userDetailsResponse.success && userDetailsResponse.data) {
+          dispatch(setUser(userDetailsResponse.data));
+          dispatch(setLoading(false));
+          navigate("/home");
+        }
+      }
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Login failed";
+      setError(errorMessage);
       console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -77,7 +108,7 @@ function Login() {
           <div className="flex flex-col space-y-2">
             <label
               htmlFor="password"
-              className="text-sm font-medium"
+              className="text-left text-sm font-medium"
               style={{ color: "var(--color-text)" }}
             >
               Password
@@ -92,8 +123,25 @@ function Login() {
             />
           </div>
 
-          <Button type="submit" className="w-full text-white">
-            Sign In
+          {error && (
+            <div
+              className="p-3 mb-6 rounded-md text-sm"
+              style={{
+                backgroundColor: "#fee2e2",
+                color: "#991b1b",
+                borderLeft: "4px solid #dc2626",
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            className="w-full text-white"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
 
