@@ -5,7 +5,7 @@ button {
   font-size: var(--text-base);
   font-weight: 500;
   background-color: var(--color-accent);
-  color: var(--color-foreground);
+  color: var(--accent-foreground);
   cursor: pointer;
   transition: border-color 0.25s;
 }

@@ -1,11 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { type RootState } from "@/stores/store";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 function Login() {
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -17,6 +21,16 @@ function Login() {
     try {
       // TODO: Implement Google sign-in logic and dispatch to Redux
       console.log("Implement Google sign-in with Redux dispatch");
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  };
+
+  const handleEmailPasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // TODO: Implement email/password login logic and dispatch to Redux
+      console.log("Login with email:", email, "password:", password);
     } catch (error) {
       console.error("Login error:", error);
     }
@@ -41,12 +55,74 @@ function Login() {
           Sign in to access your account
         </p>
 
+        <form onSubmit={handleEmailPasswordLogin} className="space-y-4 mb-6">
+          <div className="flex flex-col space-y-2">
+            <label
+              htmlFor="email"
+              className="text-left text-sm font-medium"
+              style={{ color: "var(--color-text)" }}
+            >
+              Email
+            </label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="flex flex-col space-y-2">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium"
+              style={{ color: "var(--color-text)" }}
+            >
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <Button type="submit" className="w-full text-white">
+            Sign In
+          </Button>
+        </form>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div
+              className="w-full border-t"
+              style={{ borderColor: "var(--color-border)" }}
+            />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span
+              className="px-2"
+              style={{
+                backgroundColor: "var(--color-background)",
+                color: "var(--color-text)",
+              }}
+            >
+              Or continue with
+            </span>
+          </div>
+        </div>
+
         <button
           onClick={handleSignIn}
-          className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-lg font-semibold transition hover:opacity-90"
+          className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-lg font-semibold transition hover:opacity-90 border"
           style={{
-            backgroundColor: "var(--color-primary)",
-            color: "white",
+            borderColor: "var(--color-primary)",
+            color: "var(--color-primary)",
           }}
         >
           <svg className="w-6 h-6" viewBox="0 0 24 24">
