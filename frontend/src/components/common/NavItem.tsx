@@ -42,10 +42,7 @@ export function NavItem({ item }: NavItemProps) {
 
   if (!hasChildren) {
     return (
-      <Link
-        to={item.href || "/"}
-        className="mx-2 px-3 py-2 rounded-md flex items-center hover:bg-primary hover:bg-opacity-10 transition-colors duration-200"
-      >
+      <Link to={item.href || "/"} className="flex items-center text-white">
         {item.label}
       </Link>
     );
@@ -58,7 +55,7 @@ export function NavItem({ item }: NavItemProps) {
       onMouseLeave={handleMouseLeave}
     >
       {/* Parent Item */}
-      <button className="mx-2 px-3 py-2 rounded-md hover:bg-primary hover:bg-opacity-10 transition-colors duration-200 flex items-center gap-1 group-hover:bg-primary group-hover:bg-opacity-10">
+      <div className="flex items-center gap-1 text-white cursor-pointer">
         {item.label}
         <ChevronDown
           size={16}
@@ -66,7 +63,7 @@ export function NavItem({ item }: NavItemProps) {
             isOpen ? "rotate-180" : ""
           }`}
         />
-      </button>
+      </div>
 
       {/* Dropdown Menu */}
       {isOpen && (
@@ -78,7 +75,7 @@ export function NavItem({ item }: NavItemProps) {
             onMouseLeave={handleMouseLeave}
           />
           <div
-            className="absolute left-0 mt-2 w-48 bg-accent rounded-lg shadow-lg z-50 
+            className="absolute left-0 mt-2 w-48 text-white bg-accent rounded-lg shadow-lg z-50 
               animate-in fade-in slide-in-from-top-2 duration-200"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -91,7 +88,7 @@ export function NavItem({ item }: NavItemProps) {
                   ) : (
                     <Link
                       to={child.href || "/"}
-                      className="block px-4 py-2 hover:bg-primary hover:bg-opacity-20 transition-colors duration-150"
+                      className="block text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150"
                     >
                       {child.label}
                     </Link>
@@ -138,7 +135,7 @@ function NestedNavItem({ item }: { item: NavItemConfig }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <button className="w-full text-left px-4 py-2 hover:bg-primary hover:bg-opacity-20 transition-colors duration-150 flex items-center justify-between group-hover:bg-primary group-hover:bg-opacity-20">
+      <div className="w-full text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150 flex items-center justify-between group-hover:text-gray-200">
         {item.label}
         <ChevronDown
           size={14}
@@ -146,7 +143,7 @@ function NestedNavItem({ item }: { item: NavItemConfig }) {
             isOpen ? "rotate-180" : ""
           }`}
         />
-      </button>
+      </div>
 
       {/* Nested Dropdown */}
       {isOpen && (
@@ -161,7 +158,7 @@ function NestedNavItem({ item }: { item: NavItemConfig }) {
               <Link
                 key={index}
                 to={child.href || "/"}
-                className="block px-4 py-2 hover:bg-primary hover:bg-opacity-20 transition-colors duration-150"
+                className="block text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150"
               >
                 {child.label}
               </Link>

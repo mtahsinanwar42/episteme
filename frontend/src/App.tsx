@@ -16,7 +16,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="h-screen w-screen bg-background text-center text-foreground flex flex-col justify-between">
+      <div className="h-screen w-full bg-background text-center text-foreground flex flex-col justify-between">
         <div>
           {<Navbar />}
 
