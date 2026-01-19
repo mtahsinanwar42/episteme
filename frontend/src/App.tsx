@@ -16,12 +16,10 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="h-screen w-full bg-background text-center text-foreground flex flex-col justify-between">
-        <div>
-          {<Navbar />}
+      <div className="h-screen w-[100vw] bg-gradient-to-br from-slate-100 via-slate-50 to-indigo-100 text-center text-foreground flex flex-col justify-between">
+        <Navbar />
 
-          <RouteConfig />
-        </div>
+        <RouteConfig />
 
         <Footer />
       </div>

@@ -35,6 +35,10 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+
+  --shadow-small: 0 0 4px 4px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 0 8px 8px rgba(0, 0, 0, 0.05);
+  --shadow-large: 0 0 16px 16px rgba(0, 0, 0, 0.05);
 }
 
 @layer base {
@@ -57,7 +61,6 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--color-background);
   color: var(--color-foreground);
   font-size: var(--text-base);
   font-family: "Trebuchet MS", Arial, sans-serif;
