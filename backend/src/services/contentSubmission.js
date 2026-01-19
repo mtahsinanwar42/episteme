@@ -1,13 +1,13 @@
 import { sequelize } from "../config/db.js";
 import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails } from "../repositories/contentSubmission.js";
-import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { serializeContentSubmission } from "../utils/serializers.js";
 import { isEmpty } from "../utils/string.js";
 
-export function createSubmissionService({ ContentSubmission, ContentSubmissionVersion, conferenceService, fileService }) {
+export function createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, conferenceService, fileService }) {
   if (!ContentSubmission || !ContentSubmissionVersion) {
-    throw new Error("createSubmissionService requires { ContentSubmission, ContentSubmissionVersion } model");
+    throw new Error("createSubmissionService requires { ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion } model");
   }
 
   if (!fileService) {
@@ -60,8 +60,22 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionVe
           title,
           topics,
           conferenceId,
-          currentStatus: CONTENT_SUBMISSION_STATUS.DRAFT,
+          currentStatus: CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, // TODO: change it to DRAFT after real payment integration
           ownerUsrId: user.id,
+        },
+        { transaction: t }
+      );
+
+      // TODO: Remove it after real payment integration
+      const payment = await ContentSubmissionPayment.create(
+        {
+          contentSubmissionId: submission.id,
+          usrId: user.id,
+          amount: 500.0,
+          currency: "BDT",
+          provider: "bKash",
+          providerPaymentId: "bKash_test_xyz",
+          status: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
         },
         { transaction: t }
       );

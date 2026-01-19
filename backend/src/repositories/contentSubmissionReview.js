@@ -1,6 +1,6 @@
 import { sequelize } from "../config/db.js";
 import { QueryTypes } from "sequelize";
-import { CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
 
 export async function findSubmissionReviewsByIdAndUserDetails({
   submissionId,
@@ -152,3 +152,46 @@ export async function findSubmissionReviewersById({
     data: rows.map(({ total, ...row }) => row),
   };
 }
+
+export async function canCreateSubmissionReview({
+  submissionId,
+  loggedInUserId,
+}) {
+  const sql = `
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM episteme.content_submission CS
+        JOIN episteme.content_submission_payment CSP
+          ON CSP.content_submission_id = CS.id
+        JOIN episteme.conference C
+          ON C.id = CS.conference_id
+        WHERE CS.id = :submissionId
+          AND CSP.status = :capturedPaymentStatus
+          AND C.status NOT IN (:conferenceStatusExcluded)
+          AND CS.current_status IN (:allowedSubmissionStatuses)
+      ) AS "submissionExists",
+      EXISTS (
+        SELECT 1
+        FROM episteme.content_review_assignment CRA
+        WHERE CRA.content_submission_id = :submissionId
+          AND CRA.reviewer_usr_id = :loggedInUserId
+          AND CRA.status = :allowedAssignmentStatus
+      ) AS "isAssignedReviewer";
+  `;
+
+  const [row] = await sequelize.query(sql, {
+    type: QueryTypes.SELECT,
+    replacements: {
+      submissionId: Number(submissionId),
+      loggedInUserId: Number(loggedInUserId),
+      allowedSubmissionStatuses: [CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, CONTENT_SUBMISSION_STATUS.RETURNED,],
+      capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
+      conferenceStatusExcluded: [CONFERENCE_STATUS.DELETED, CONFERENCE_STATUS.INACTIVE],
+      allowedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
+    },
+  });
+
+  return row;
+}
+

@@ -15,7 +15,7 @@ export async function findSubmissionMessagesByIdAndUserDetails({
     submissionId: Number(submissionId),
     loggedInUserId: Number(loggedInUserId),
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
-    deletedConferenceStatus: CONFERENCE_STATUS.DELETED,
+    excludedConferenceStatus: [CONFERENCE_STATUS.INACTIVE, CONFERENCE_STATUS.DELETED],
     capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
   };
 
@@ -86,7 +86,7 @@ export async function findSubmissionMessagesByIdAndUserDetails({
     WHERE
       CS.id = :submissionId
       AND CS.current_status <> :deletedSubmissionStatus
-      AND C.status <> :deletedConferenceStatus
+      AND C.status NOT IN (:excludedConferenceStatus)
       AND CSP.status = :capturedPaymentStatus
       AND (${accessWhere})
       AND (${msgWhere})
@@ -100,8 +100,7 @@ export async function findSubmissionMessagesByIdAndUserDetails({
   });
 }
 
-export async function canCreateSubmissionMessage({
-  submissionId,
+export async function canCreateSubmissionMessage({ submissionId,
   loggedInUserId,
   receiverUsrId = null,
 }) {

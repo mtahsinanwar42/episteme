@@ -6,10 +6,10 @@ import { createFileService } from "../services/file.js";
 import { createSubmissionService } from "../services/contentSubmission.js";
 import { createConferenceService } from "../services/conference.js";
 
-const { ContentSubmission, ContentSubmissionVersion, Conference, File } = initModels(sequelize);
+const { ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, Conference, File } = initModels(sequelize);
 const fileService = createFileService({ File });
 const conferenceService = createConferenceService({ Conference, fileService });
-const submissionService = createSubmissionService({ ContentSubmission, ContentSubmissionVersion, conferenceService, fileService });
+const submissionService = createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, conferenceService, fileService });
 
 // @desc    Get submissions
 // @route   GET /api/v1/submissions

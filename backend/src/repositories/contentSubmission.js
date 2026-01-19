@@ -24,7 +24,7 @@ export async function findSubmissionsByUserDetails({
   const baseWhere = `
     ${ownershipPredicate}
     AND CS.current_status <> :deletedSubmissionStatus
-    AND C.status <> :deletedConferenceStatus
+    AND C.status NOT IN (:excludedConferenceStatus)
     ${paymentWhere}
   `;
 
@@ -70,7 +70,7 @@ export async function findSubmissionsByUserDetails({
     replacements: {
       loggedInUserId,
       deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
-      deletedConferenceStatus: CONFERENCE_STATUS.DELETED,
+      excludedConferenceStatus: [CONFERENCE_STATUS.INACTIVE, CONFERENCE_STATUS.DELETED],
       capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
       limit: safeLimit,
       offset
@@ -98,7 +98,7 @@ export async function findSubmissionByIdAndUserDetails({
     submissionId: submissionId,
     loggedInUserId,
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
-    deletedConferenceStatus: CONFERENCE_STATUS.DELETED,
+    excludedConferenceStatus: [CONFERENCE_STATUS.INACTIVE, CONFERENCE_STATUS.DELETED],
     capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
     excludedAssignmentStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
   };
@@ -124,7 +124,7 @@ export async function findSubmissionByIdAndUserDetails({
     WHERE
       CS.id = :submissionId
       AND CS.current_status <> :deletedSubmissionStatus
-      AND C.status <> :deletedConferenceStatus
+      AND C.status NOT IN (:excludedConferenceStatus)
   `;
 
   const whereUser = `

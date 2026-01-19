@@ -152,3 +152,16 @@ export async function canCreateReviewAssignment({
 
   return row;
 }
+
+export async function findReviewAssignmentBySubmissionIdAndReviewerUsrId({
+  ContentReviewAssignment,
+  contentSubmissionId,
+  reviewerUsrId
+}) {
+  return await ContentReviewAssignment.findOne({
+    where: {
+      contentSubmissionId: Number(contentSubmissionId),
+      reviewerUsrId: Number(reviewerUsrId),
+    }
+  });
+}
