@@ -2,12 +2,9 @@ import { ThemeSwitcher } from "@/components/common/themeSwitcher";
 import { useSelector } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { NavItem, type NavItemConfig } from "@/components/common/NavItem";
+import { Link } from "react-router-dom";
 
 const navItems: NavItemConfig[] = [
-  {
-    label: "Home",
-    href: "/",
-  },
   {
     label: "Resources",
     children: [
@@ -106,23 +103,47 @@ export default function Navbar() {
   const user = useSelector((state: RootState) => state.auth.user);
 
   return (
-    <nav className="w-full py-1 px-4 bg-accent text-foreground flex justify-between items-center">
-      <div className="flex gap-2">
+    <nav className="w-full py-2 px-4 bg-accent text-foreground flex justify-between items-center">
+      <div>
+        <Link to="/" className="text-white text-3xl">
+          EPISTEME
+        </Link>
+      </div>
+
+      <div className="flex gap-8">
         {navItems.map((item, index) => (
           <NavItem key={index} item={item} />
         ))}
       </div>
 
       <div className="flex items-center gap-4">
-        {user?.user_metadata?.avatar_url && (
+        {user?.user_metadata?.avatar_url ? (
           <img
             src={user.user_metadata.avatar_url}
             alt="Profile"
             className="w-8 h-8 rounded-full"
           />
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link
+              to="/login"
+              className="block text-left px-2 py-2 text-white hover:text-gray-200 transition-colors duration-150"
+            >
+              Login
+            </Link>
+
+            <div className="text-white">|</div>
+
+            <Link
+              to="/register"
+              className="block text-left px-2 py-2 text-white hover:text-gray-200 transition-colors duration-150"
+            >
+              Register
+            </Link>
+          </div>
         )}
-        <span className="text-sm">{user?.user_metadata?.full_name}</span>
-        <ThemeSwitcher />
+        {/* <span className="text-sm">{user?.user_metadata?.full_name}</span> */}
+        {/* <ThemeSwitcher /> */}
       </div>
     </nav>
   );
