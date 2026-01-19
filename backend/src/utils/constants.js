@@ -45,12 +45,14 @@ export const ACTIVITY_STATUS = Object.freeze({
 });
 
 export const CONTENT_SUBMISSION_STATUS = Object.freeze({
+  DRAFT: 0,
   PENDING_APPROVAL: 1,
   RETURNED: 2,
   APPROVED: 3,
   REJECTED: 4,
   DELETED: 9,
 });
+export const CONTENT_SUBMISSION_VERSION_INITIAL = 1;
 
 export const CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE = Object.freeze({
   USER_ADMIN: "USER_ADMIN",
@@ -76,7 +78,7 @@ export const REVIEW_RECOMMENDATION = Object.freeze({
   NEEDS_REVISION: 3,
 });
 
-export const PAYMENT_STATUS = Object.freeze({
+export const CONTENT_SUBMISSION_PAYMENT_STATUS = Object.freeze({
   PENDING: 0,
   AUTHORIZED: 1,
   CAPTURED: 2,

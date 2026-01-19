@@ -66,6 +66,11 @@ export function createActivityService({ Activity, fileService }) {
       updates.status = status;
     }
 
+    if (isNotEmpty(metadataFilePath)) {
+      const metadataFileId = await fileService.getFileIdByPath(metadataFilePath, { fieldName: "metadataFilePath" });
+      updates.metadataFileId = metadataFileId;
+    }
+
     await activity.update(updates);
 
     return serializeActivity(activity, metadataFilePath);

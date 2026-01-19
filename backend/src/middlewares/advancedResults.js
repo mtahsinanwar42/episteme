@@ -2,14 +2,13 @@ import { Op } from "sequelize";
 import { DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO } from "../utils/constants.js";
 
 export const advancedResults = (model, { include = [], transform } = {}) => async (req, res, next) => {
-  console.log(req.query);
-
+  const paginate = !/^(false|0|no)$/i.test(String(req.query.paginate ?? "true"));
   const page = Math.max(1, Number.parseInt(req.query.page, 10) || DEFAULT_PAGE_NO);
   const limit = Math.max(1, Number.parseInt(req.query.limit, 10) || DEFAULT_PAGE_LIMIT);
   const offset = limit * (page - 1);
 
   const queryObj = { ...req.query };
-  ["select", "sort", "page", "limit"].forEach((k) => delete queryObj[k]);
+  ["select", "sort", "page", "limit", "paginate"].forEach((k) => delete queryObj[k]);
 
   const where = buildWhere(queryObj);
   const attributes = req.query.select
@@ -23,29 +22,35 @@ export const advancedResults = (model, { include = [], transform } = {}) => asyn
       include,
       attributes,
       order,
-      limit,
-      offset,
+      ...(paginate ? { limit, offset } : {}),
       distinct: true,
     });
 
-    const totalCount = result.count;
+    const total = result.count;
     let data = result.rows;
+
+    const pagination = {};
+
+    if (paginate) {
+      const endIndex = page * limit;
+
+      if (endIndex < total) {
+        pagination.next = { page: page + 1, limit };
+      }
+
+      if (offset > 0) {
+        pagination.prev = { page: page - 1, limit };
+      }
+    }
 
     if (typeof transform === "function") {
       data = await Promise.resolve(transform(data, { req }));
     }
 
-    const pagination = {};
-    const endIndex = page * limit;
-
-    if (endIndex < totalCount) pagination.next = { page: page + 1, limit };
-    if (offset > 0) pagination.prev = { page: page - 1, limit };
-
     res.advancedResults = {
       success: true,
-      dataCount: data.length,
-      totalCount,
-      pagination,
+      total,
+      pagination: paginate ? pagination : undefined,
       data,
     };
 

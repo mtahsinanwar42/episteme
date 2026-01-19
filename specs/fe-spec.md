@@ -109,6 +109,9 @@ All pages use:
 - Activities
   - New
   - All
+- Assets
+  - New
+  - All
 - Me
   - Profile
   - Logout

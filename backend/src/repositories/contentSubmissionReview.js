@@ -1,6 +1,6 @@
 import { sequelize } from "../config/db.js";
 import { QueryTypes } from "sequelize";
-import { CONTENT_SUBMISSION_STATUS, REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
 
 export async function findSubmissionReviewsByIdAndUserDetails({
   submissionId,
@@ -14,6 +14,7 @@ export async function findSubmissionReviewsByIdAndUserDetails({
     submissionId: Number(submissionId),
     loggedInUserId: Number(loggedInUserId),
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
+    excludedAssignmentStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
   };
 
   const selectAndJoins = `
@@ -76,7 +77,7 @@ export async function findSubmissionReviewsByIdAndUserDetails({
     WHERE
       CS.id = :submissionId
       AND CS.current_status <> :deletedSubmissionStatus
-      AND CRA.status NOT IN (3, 9)
+      AND CRA.status NOT IN (:excludedAssignmentStatuses)
   `;
 
   const reviewWhereReviewer = `AND CRA.reviewer_usr_id = :loggedInUserId`;
@@ -97,9 +98,18 @@ export async function findSubmissionReviewsByIdAndUserDetails({
   });
 }
 
-export async function findSubmissionReviewersById(submissionId) {
+export async function findSubmissionReviewersById({
+  submissionId,
+  page,
+  limit,
+}) {
+  const pageNum = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
+  const limitNum = Math.max(1, Math.max(1, Number(limit) || DEFAULT_PAGE_LIMIT));
+  const offset = (pageNum - 1) * limitNum;
+
   const sql = `
     SELECT
+      COUNT(*) OVER()     AS "total",
       U.id                AS "id",
       U.email             AS "email",
       U.first_name        AS "firstName",
@@ -116,19 +126,72 @@ export async function findSubmissionReviewersById(submissionId) {
       CRA.assigned_by_usr_id AS "assignedByUserId",
       CRA.assigned_by_notes  AS "assignedByNotes"
     FROM episteme.content_review_assignment CRA
-    JOIN episteme."user" U
+    JOIN episteme.user U
       ON U.id = CRA.reviewer_usr_id
     WHERE
       CRA.content_submission_id = :submissionId
-      AND CRA.status NOT IN (:excludedStatuses)
-    ORDER BY CRA.assigned_at DESC, U.last_name ASC, U.first_name ASC;
+      AND CRA.status NOT IN (:excludedAssignmentStatuses)
+    ORDER BY CRA.assigned_at DESC, U.last_name ASC, U.first_name ASC
+    LIMIT :limit OFFSET :offset;
   `;
 
-  return sequelize.query(sql, {
+  const rows = await sequelize.query(sql, {
     type: QueryTypes.SELECT,
     replacements: {
       submissionId: Number(submissionId),
-      excludedStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+      excludedAssignmentStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+      limit: limitNum,
+      offset,
     },
   });
+
+  return {
+    page: pageNum,
+    limit: limitNum,
+    total: rows.length ? Number(rows[0].total) : 0,
+    data: rows.map(({ total, ...row }) => row),
+  };
 }
+
+export async function canCreateSubmissionReview({
+  submissionId,
+  loggedInUserId,
+}) {
+  const sql = `
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM episteme.content_submission CS
+        JOIN episteme.content_submission_payment CSP
+          ON CSP.content_submission_id = CS.id
+        JOIN episteme.conference C
+          ON C.id = CS.conference_id
+        WHERE CS.id = :submissionId
+          AND CSP.status = :capturedPaymentStatus
+          AND C.status NOT IN (:conferenceStatusExcluded)
+          AND CS.current_status IN (:allowedSubmissionStatuses)
+      ) AS "submissionExists",
+      EXISTS (
+        SELECT 1
+        FROM episteme.content_review_assignment CRA
+        WHERE CRA.content_submission_id = :submissionId
+          AND CRA.reviewer_usr_id = :loggedInUserId
+          AND CRA.status = :allowedAssignmentStatus
+      ) AS "isAssignedReviewer";
+  `;
+
+  const [row] = await sequelize.query(sql, {
+    type: QueryTypes.SELECT,
+    replacements: {
+      submissionId: Number(submissionId),
+      loggedInUserId: Number(loggedInUserId),
+      allowedSubmissionStatuses: [CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, CONTENT_SUBMISSION_STATUS.RETURNED,],
+      capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
+      conferenceStatusExcluded: [CONFERENCE_STATUS.DELETED, CONFERENCE_STATUS.INACTIVE],
+      allowedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
+    },
+  });
+
+  return row;
+}
+
