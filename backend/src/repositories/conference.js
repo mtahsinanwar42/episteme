@@ -10,34 +10,13 @@ export async function findConferencePublicationsById({
   page = DEFAULT_PAGE_NO,
   limit = DEFAULT_PAGE_LIMIT,
 }) {
-  const safePage = Math.max(1, Number.parseInt(page, 10) || DEFAULT_PAGE_NO);
-  const safeLimit = Math.max(1, Number.parseInt(limit, 10) || DEFAULT_PAGE_LIMIT);
+  const safePage = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
+  const safeLimit = Math.max(1, Number(limit) || DEFAULT_PAGE_LIMIT);
   const offset = (safePage - 1) * safeLimit;
-
-  const countSql = `
-    SELECT COUNT(*)::BIGINT AS total
-    FROM episteme.conference C
-    JOIN episteme.content_submission CS ON (CS.conference_id = C.id)
-    JOIN episteme.content_submission_version CSV ON (CSV.id = CS.current_content_submission_version_id)
-    JOIN episteme.user U ON (U.id = CS.owner_usr_id)
-    JOIN episteme.file F ON (F.id = CSV.file_id)
-    WHERE
-      C.id = :conferenceId
-      AND C.status NOT IN (:conferenceStatusExcluded)
-      AND CS.current_status = :approvedSubmissionStatus
-  `;
-
-  const [{ total }] = await sequelize.query(countSql, {
-    type: QueryTypes.SELECT,
-    replacements: {
-      conferenceId,
-      conferenceStatusExcluded,
-      approvedSubmissionStatus,
-    },
-  });
 
   const dataSql = `
     SELECT
+      COUNT(*) OVER()                AS "total",
       CS.id                          AS "submissionId",
       CS.title                       AS "title",
       CS.topics                      AS "topics",
@@ -89,7 +68,7 @@ export async function findConferencePublicationsById({
   return {
     page: safePage,
     limit: safeLimit,
-    total: Number(total ?? 0),
-    data: rows,
+    total: rows.length ? Number(rows[0].total) : 0,
+    data: rows.map(({ total, ...row }) => row),
   };
 }

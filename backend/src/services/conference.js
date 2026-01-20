@@ -33,6 +33,7 @@ export function createConferenceService({ Conference, fileService }) {
     const excludedConferenceStatuses = [
       CONFERENCE_STATUS.INACTIVE,
       CONFERENCE_STATUS.ACTIVE,
+      CONFERENCE_STATUS.DELETED,
     ];
 
     return findConferencePublicationsById({

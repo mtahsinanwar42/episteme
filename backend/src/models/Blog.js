@@ -1,5 +1,3 @@
-import { BLOG_STATUS } from "../utils/constants.js";
-
 export default (sequelize, DataTypes) => {
   const Blog = sequelize.define(
     "Blog",
@@ -24,7 +22,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "status",
-        defaultValue: BLOG_STATUS.INACTIVE,
+        defaultValue: 0,
       },
       createdAt: {
         type: DataTypes.DATE,

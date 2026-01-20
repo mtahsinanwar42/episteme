@@ -3,6 +3,7 @@ import { sequelize } from "../config/db.js";
 import { initModels } from "../models/index.js";
 import { createFileService } from "../services/file.js";
 import { createReviewAssignmentService } from "../services/contentReviewAssignment.js";
+import { DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO } from "../utils/constants.js";
 
 const { ContentReviewAssignment, File } = initModels(sequelize);
 const fileService = createFileService({ File });
@@ -12,11 +13,15 @@ const reviewAssignmentService = createReviewAssignmentService({ ContentReviewAss
 // @route   GET /api/v1/review-assignments
 // @access  Private
 export const getReviewAssignments = asyncHandler(async (req, res, next) => {
-  const assignments = await reviewAssignmentService.getReviewAssignments();
+  const { page = DEFAULT_PAGE_NO, limit = DEFAULT_PAGE_LIMIT } = req.query;
+  const assignments = await reviewAssignmentService.getReviewAssignments(page, limit);
 
   res.status(200).json({
     success: true,
-    data: assignments,
+    page: assignments.page,
+    limit: assignments.limit,
+    total: assignments.total,
+    data: assignments.data,
   });
 });
 
@@ -24,11 +29,15 @@ export const getReviewAssignments = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/review-assignments/me
 // @access  Private
 export const getMyReviewAssignments = asyncHandler(async (req, res, next) => {
-  const assignments = await reviewAssignmentService.getMyReviewAssignments(req.user);
+  const { page = DEFAULT_PAGE_NO, limit = DEFAULT_PAGE_LIMIT } = req.query;
+  const assignments = await reviewAssignmentService.getMyReviewAssignments(req.user, page, limit);
 
   res.status(200).json({
     success: true,
-    data: assignments,
+    page: assignments.page,
+    limit: assignments.limit,
+    total: assignments.total,
+    data: assignments.data,
   });
 });
 

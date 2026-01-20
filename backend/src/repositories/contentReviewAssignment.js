@@ -1,9 +1,10 @@
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
-import { REVIEW_ASSIGNMENT_STATUS } from "../utils/constants.js";
+import { REVIEW_ASSIGNMENT_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS } from "../utils/constants.js";
 
 const GET_REVIEW_ASSIGNMENTS_BASE_SELECT = `
   SELECT
+    COUNT(*) OVER()           AS "total",
     CRA.id                    AS "assignmentId",
     CRA.content_submission_id AS "submissionId",
     CRA.reviewer_usr_id       AS "reviewerUserId",
@@ -46,35 +47,68 @@ const GET_REVIEW_ASSIGNMENTS_BASE_FROM_JOINS = `
     ON OW.id = CS.owner_usr_id
 `;
 
-export async function findReviewAssignmentsByUserId(userId) {
+export async function findReviewAssignmentsByUserId({
+  userId,
+  page,
+  limit,
+}) {
+  const pageNum = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
+  const limitNum = Math.max(1, Math.max(1, Number(limit) || DEFAULT_PAGE_LIMIT));
+  const offset = (pageNum - 1) * limitNum;
+
   const sql = `
     ${GET_REVIEW_ASSIGNMENTS_BASE_SELECT}
     ${GET_REVIEW_ASSIGNMENTS_BASE_FROM_JOINS}
     WHERE
       CRA.reviewer_usr_id = :reviewerUserId
       AND CRA.status NOT IN (:excludedStatuses)
-    ORDER BY CRA.assigned_at DESC;
+    ORDER BY CRA.assigned_at DESC
+    LIMIT :limit OFFSET :offset;
   `;
 
-  return sequelize.query(sql, {
+  const rows = await sequelize.query(sql, {
     type: QueryTypes.SELECT,
     replacements: {
       reviewerUserId: Number(userId),
       excludedStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+      limit: limitNum,
+      offset,
     },
   });
-}
 
-export async function findReviewAssignments() {
+  return {
+    page: pageNum,
+    limit: limitNum,
+    total: rows.length ? Number(rows[0].total) : 0,
+    data: rows.map(({ total, ...row }) => row),
+  };
+}
+export async function findReviewAssignments({ page, limit }) {
+  const pageNum = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
+  const limitNum = Math.min(100, Math.max(1, Number(limit) || DEFAULT_PAGE_LIMIT));
+  const offset = (pageNum - 1) * limitNum;
+
   const sql = `
     ${GET_REVIEW_ASSIGNMENTS_BASE_SELECT}
     ${GET_REVIEW_ASSIGNMENTS_BASE_FROM_JOINS}
-    ORDER BY CRA.assigned_at DESC;
+    ORDER BY CRA.assigned_at DESC
+    LIMIT :limit OFFSET :offset;
   `;
 
-  return sequelize.query(sql, {
+  const rows = await sequelize.query(sql, {
     type: QueryTypes.SELECT,
+    replacements: {
+      limit: limitNum,
+      offset,
+    },
   });
+
+  return {
+    page: pageNum,
+    limit: limitNum,
+    total: rows.length ? Number(rows[0].total) : 0,
+    data: rows.map(({ total, ...row }) => row),
+  };
 }
 
 export async function canCreateReviewAssignment({
@@ -92,7 +126,11 @@ export async function canCreateReviewAssignment({
       EXISTS (
         SELECT 1
         FROM episteme.content_submission CS
+        LEFT JOIN episteme.content_submission_payment CSP
+          ON CSP.content_submission_id = CS.id
         WHERE CS.id = :contentSubmissionId
+        AND CS.current_status <> :deletedSubmissionStatus
+        AND CSP.status = :capturedPaymentStatus
       ) AS "submissionExists",
       EXISTS (
         SELECT 1
@@ -106,9 +144,24 @@ export async function canCreateReviewAssignment({
     type: QueryTypes.SELECT,
     replacements: {
       contentSubmissionId: Number(contentSubmissionId),
+      deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
+      capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
       reviewerUsrId: Number(reviewerUsrId),
     },
   });
 
   return row;
+}
+
+export async function findReviewAssignmentBySubmissionIdAndReviewerUsrId({
+  ContentReviewAssignment,
+  contentSubmissionId,
+  reviewerUsrId
+}) {
+  return await ContentReviewAssignment.findOne({
+    where: {
+      contentSubmissionId: Number(contentSubmissionId),
+      reviewerUsrId: Number(reviewerUsrId),
+    }
+  });
 }

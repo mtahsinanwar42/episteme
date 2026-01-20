@@ -40,7 +40,7 @@ export function createAuthService({ User, fileService }) {
       throw new ErrorResponse(400, "Please provide an email and password");
     }
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email, status: USER_STATUS.ACTIVE } });
     if (!user || !(await user.matchPassword(password))) {
       throw new ErrorResponse(401, "Invalid Email or Password!");
     }
@@ -51,7 +51,7 @@ export function createAuthService({ User, fileService }) {
 
   async function register(payload) {
     const { email, password, roles, firstName, lastName, phone,
-      country, institution, occupation, cvFilePath, photoFilePath, linkedinUrl } = payload;
+      country, institution, occupation, linkedinUrl } = payload;
 
     if (isEmpty(email) || isEmpty(password)) {
       throw new ErrorResponse(400, "Please provide an email and password");
@@ -73,17 +73,6 @@ export function createAuthService({ User, fileService }) {
 
     const status = determineStatus(normalizedRoles);
 
-    let cvFileId = null;
-    let photoFileId = null;
-
-    if (isNotEmpty(cvFilePath)) {
-      cvFileId = await fileService.getFileIdByPath(cvFilePath, { fieldName: "cvFilePath" });
-    }
-
-    if (isNotEmpty(photoFilePath)) {
-      photoFileId = await fileService.getFileIdByPath(photoFilePath, { fieldName: "photoFilePath" });
-    }
-
     const [user] = await User.bulkCreate([{
       email,
       password,
@@ -95,14 +84,12 @@ export function createAuthService({ User, fileService }) {
       occupation,
       country,
       phone,
-      cvFileId,
-      photoFileId,
       linkedinUrl,
     }], { individualHooks: true, returning: true });
 
     const token = buildJwtToken(user);
 
-    return { user: serializeUser(user, cvFilePath, photoFilePath), token };
+    return { user: serializeUser(user), token };
   }
 
   async function getMe(user) {

@@ -82,81 +82,103 @@ export function DataTable<TData, TValue = unknown>({
 
   return (
     <div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  key={headerGroup.id}
+                  className="bg-accent border-b border-slate-200 dark:border-slate-700"
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead
+                        key={header.id}
+                        className="font-semibold transition-colors cursor-pointer"
+                        style={{ color: "var(--color-foreground)" }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row, index) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="border-b border-slate-100 dark:border-slate-700 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-colors duration-200 group"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center text-slate-500 dark:text-slate-400"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Pagination Controls */}
       {pageCount > 1 && (
-        <div className="flex items-center justify-between mt-6 p-4 bg-gray-50 rounded-lg">
-          <div className="text-sm text-gray-600">
-            Page {table.getState().pagination.pageIndex + 1} of {pageCount}
+        <div className="flex items-center justify-between mt-8 p-4 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-900/50 dark:to-slate-800/30 rounded-2xl border border-slate-200 dark:border-slate-700">
+          <div className="text-sm font-medium text-slate-600 dark:text-slate-300">
+            Showing page{" "}
+            <span className="font-bold text-blue-600 dark:text-blue-400">
+              {table.getState().pagination.pageIndex + 1}
+            </span>{" "}
+            of{" "}
+            <span className="font-bold text-slate-700 dark:text-slate-200">
+              {pageCount}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon-sm"
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
               title="First page"
+              className="hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
             >
               <ChevronsLeft className="size-4" />
             </Button>
 
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon-sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
               title="Previous page"
+              className="hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
             >
               <ChevronLeft className="size-4" />
             </Button>
@@ -184,11 +206,15 @@ export function DataTable<TData, TValue = unknown>({
                       variant={
                         page === table.getState().pagination.pageIndex + 1
                           ? "default"
-                          : "outline"
+                          : "ghost"
                       }
                       size="sm"
                       onClick={() => table.setPageIndex(page - 1)}
-                      className="min-w-9"
+                      className={`min-w-9 transition-all ${
+                        page === table.getState().pagination.pageIndex + 1
+                          ? "bg-gradient-to-r from-blue-500 to-blue-600 shadow-md"
+                          : "hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
+                      }`}
                     >
                       {page}
                     </Button>
@@ -197,21 +223,23 @@ export function DataTable<TData, TValue = unknown>({
             </div>
 
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon-sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
               title="Next page"
+              className="hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
             >
               <ChevronRight className="size-4" />
             </Button>
 
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon-sm"
               onClick={() => table.setPageIndex(pageCount - 1)}
               disabled={!table.getCanNextPage()}
               title="Last page"
+              className="hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
             >
               <ChevronsRight className="size-4" />
             </Button>

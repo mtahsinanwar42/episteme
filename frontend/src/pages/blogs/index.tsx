@@ -17,7 +17,7 @@ export default function Blogs() {
       header: ({ column }) => (
         <div
           onClick={() => column.toggleSorting()}
-          className="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none"
+          className="flex items-center gap-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 select-none transition-colors font-semibold"
         >
           Title
           {column.getIsSorted() && (
@@ -34,7 +34,7 @@ export default function Blogs() {
       cell: ({ row }) => (
         <div
           onClick={() => navigate(`/blogs/${row.original.id}`)}
-          className="hover:text-blue-600 hover:underline cursor-pointer text-left"
+          className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer text-left font-medium transition-colors"
         >
           {row.getValue("title")}
         </div>
@@ -52,7 +52,7 @@ export default function Blogs() {
       header: ({ column }) => (
         <div
           onClick={() => column.toggleSorting()}
-          className="flex items-center gap-2 cursor-pointer hover:text-blue-600 select-none"
+          className="flex items-center gap-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 select-none transition-colors font-semibold"
         >
           Date
           {column.getIsSorted() && (
@@ -79,8 +79,15 @@ export default function Blogs() {
   ];
 
   return (
-    <div className="mx-auto p-6">
-      <h1 className="text-4xl font-bold mb-6">Blogs</h1>
+    <div className="">
+      <div className="mb-8">
+        <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          Blogs
+        </h1>
+        <p className="text-slate-600 dark:text-slate-400">
+          Explore and discover our latest articles
+        </p>
+      </div>
       <DataTable
         columns={columns}
         data={(blogs || []).filter((blog): blog is BlogData => !!blog.title)}

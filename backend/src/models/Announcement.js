@@ -1,5 +1,3 @@
-import { ANNOUNCEMENT_STATUS } from "../utils/constants.js";
-
 export default (sequelize, DataTypes) => {
   const Announcement = sequelize.define(
     "Announcement",
@@ -24,7 +22,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "status",
-        defaultValue: ANNOUNCEMENT_STATUS.INACTIVE,
+        defaultValue: 0,
       },
       createdAt: {
         type: DataTypes.DATE,

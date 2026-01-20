@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import type { UserRole } from "@/models/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/stores/store";
 
 export interface NavItemConfig {
   label: string;
   href?: string;
   children?: NavItemConfig[];
+  visibleTo?: "ALL" | UserRole;
 }
 
 interface NavItemProps {
@@ -13,8 +17,14 @@ interface NavItemProps {
 }
 
 export function NavItem({ item }: NavItemProps) {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [isOpen, setIsOpen] = useState(false);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const canView = (visibleTo?: "ALL" | UserRole) => {
+    if (!visibleTo || visibleTo === "ALL") return true;
+    return Boolean(user?.roles?.includes(visibleTo));
+  };
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
@@ -42,10 +52,7 @@ export function NavItem({ item }: NavItemProps) {
 
   if (!hasChildren) {
     return (
-      <Link
-        to={item.href || "/"}
-        className="mx-2 px-3 py-2 rounded-md flex items-center hover:bg-primary hover:bg-opacity-10 transition-colors duration-200"
-      >
+      <Link to={item.href || "/"} className="flex items-center text-white">
         {item.label}
       </Link>
     );
@@ -58,7 +65,7 @@ export function NavItem({ item }: NavItemProps) {
       onMouseLeave={handleMouseLeave}
     >
       {/* Parent Item */}
-      <button className="mx-2 px-3 py-2 rounded-md hover:bg-primary hover:bg-opacity-10 transition-colors duration-200 flex items-center gap-1 group-hover:bg-primary group-hover:bg-opacity-10">
+      <div className="flex items-center gap-1 text-white cursor-pointer">
         {item.label}
         <ChevronDown
           size={16}
@@ -66,7 +73,7 @@ export function NavItem({ item }: NavItemProps) {
             isOpen ? "rotate-180" : ""
           }`}
         />
-      </button>
+      </div>
 
       {/* Dropdown Menu */}
       {isOpen && (
@@ -78,26 +85,30 @@ export function NavItem({ item }: NavItemProps) {
             onMouseLeave={handleMouseLeave}
           />
           <div
-            className="absolute left-0 mt-2 w-48 bg-accent rounded-lg shadow-lg z-50 
+            className="absolute left-0 mt-2 w-48 text-white bg-accent rounded-lg shadow-lg z-50 
               animate-in fade-in slide-in-from-top-2 duration-200"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
             <div className="py-2">
-              {item.children?.map((child, index) => (
-                <div key={index}>
-                  {child.children ? (
-                    <NestedNavItem item={child} />
-                  ) : (
-                    <Link
-                      to={child.href || "/"}
-                      className="block px-4 py-2 hover:bg-primary hover:bg-opacity-20 transition-colors duration-150"
-                    >
-                      {child.label}
-                    </Link>
-                  )}
-                </div>
-              ))}
+              {item.children?.map((child, index) => {
+                if (!canView(child.visibleTo)) return null;
+
+                return (
+                  <div key={index}>
+                    {child.children ? (
+                      <NestedNavItem item={child} />
+                    ) : (
+                      <Link
+                        to={child.href || "/"}
+                        className="block text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150"
+                      >
+                        {child.label}
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </>
@@ -107,8 +118,14 @@ export function NavItem({ item }: NavItemProps) {
 }
 
 function NestedNavItem({ item }: { item: NavItemConfig }) {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [isOpen, setIsOpen] = useState(false);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const canView = (visibleTo?: "ALL" | UserRole) => {
+    if (!visibleTo || visibleTo === "ALL") return true;
+    return Boolean(user?.roles?.includes(visibleTo));
+  };
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
@@ -138,7 +155,7 @@ function NestedNavItem({ item }: { item: NavItemConfig }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <button className="w-full text-left px-4 py-2 hover:bg-primary hover:bg-opacity-20 transition-colors duration-150 flex items-center justify-between group-hover:bg-primary group-hover:bg-opacity-20">
+      <div className="w-full text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150 flex items-center justify-between group-hover:text-gray-200">
         {item.label}
         <ChevronDown
           size={14}
@@ -146,7 +163,7 @@ function NestedNavItem({ item }: { item: NavItemConfig }) {
             isOpen ? "rotate-180" : ""
           }`}
         />
-      </button>
+      </div>
 
       {/* Nested Dropdown */}
       {isOpen && (
@@ -157,15 +174,17 @@ function NestedNavItem({ item }: { item: NavItemConfig }) {
           onMouseLeave={handleMouseLeave}
         >
           <div className="py-2">
-            {item.children?.map((child, index) => (
-              <Link
-                key={index}
-                to={child.href || "/"}
-                className="block px-4 py-2 hover:bg-primary hover:bg-opacity-20 transition-colors duration-150"
-              >
-                {child.label}
-              </Link>
-            ))}
+            {item.children?.map((child, index) =>
+              canView(child.visibleTo) ? (
+                <Link
+                  key={index}
+                  to={child.href || "/"}
+                  className="block text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150"
+                >
+                  {child.label}
+                </Link>
+              ) : null,
+            )}
           </div>
         </div>
       )}

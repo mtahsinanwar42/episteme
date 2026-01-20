@@ -6,3 +6,9 @@ export interface User {
   phone: string;
   website: string;
 }
+
+export enum UserRole {
+  ADMIN = "ADMIN",
+  USER = "USER",
+  REVIEWER = "REVIEWER",
+}

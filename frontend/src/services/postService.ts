@@ -1,47 +1,28 @@
-import { config } from "@/config/config";
+import { api } from "@/services/api";
 import type { Post } from "@/models/post";
 
 export const postService = {
   getPosts: async (): Promise<Post[]> => {
-    const response = await fetch(`${config.baseUrl}/posts`);
-    if (!response.ok) throw new Error("Failed to fetch posts");
-    return response.json();
+    return api.get<Post[]>("/posts", false);
   },
 
   // Get posts by user
   getUserPosts: async (userId: number): Promise<Post[]> => {
-    const response = await fetch(`${config.baseUrl}/posts?userId=${userId}`);
-    if (!response.ok) throw new Error("Failed to fetch user posts");
-    return response.json();
+    return api.get<Post[]>(`/posts?userId=${userId}`, false);
   },
 
   // Create post
   createPost: async (post: Omit<Post, "id">): Promise<Post> => {
-    const response = await fetch(`${config.baseUrl}/posts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(post),
-    });
-    if (!response.ok) throw new Error("Failed to create post");
-    return response.json();
+    return api.post<Post>("/posts", post, true);
   },
 
   // Update post
   updatePost: async (id: number, post: Partial<Post>): Promise<Post> => {
-    const response = await fetch(`${config.baseUrl}/posts/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(post),
-    });
-    if (!response.ok) throw new Error("Failed to update post");
-    return response.json();
+    return api.patch<Post>(`/posts/${id}`, post, true);
   },
 
   // Delete post
   deletePost: async (id: number): Promise<void> => {
-    const response = await fetch(`${config.baseUrl}/posts/${id}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) throw new Error("Failed to delete post");
+    return api.delete<void>(`/posts/${id}`, true);
   },
 };

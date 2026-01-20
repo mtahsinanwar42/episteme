@@ -4,10 +4,12 @@ import { sequelize } from "../config/db.js";
 import { initModels } from "../models/index.js";
 import { createFileService } from "../services/file.js";
 import { createSubmissionService } from "../services/contentSubmission.js";
+import { createConferenceService } from "../services/conference.js";
 
-const { ContentSubmission, File } = initModels(sequelize);
+const { ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, Conference, File } = initModels(sequelize);
 const fileService = createFileService({ File });
-const submissionService = createSubmissionService({ ContentSubmission, fileService });
+const conferenceService = createConferenceService({ Conference, fileService });
+const submissionService = createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, conferenceService, fileService });
 
 // @desc    Get submissions
 // @route   GET /api/v1/submissions
@@ -22,11 +24,9 @@ export const getSubmissions = asyncHandler(async (req, res, next) => {
     page: submissions.page,
     limit: submissions.limit,
     total: submissions.total,
-    count: submissions.data.length,
     data: submissions.data,
   });
 });
-
 
 // @desc    Get submission by id
 // @route   GET /api/v1/submissions/:id
@@ -41,12 +41,23 @@ export const getSubmission = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Save submission
+// @route   PUT /api/v1/submissions
+// @access  Private
+export const saveSubmission = asyncHandler(async (req, res) => {
+  const submission = await submissionService.saveSubmission(req.user, req.body);
+
+  return res.status(200).json({
+    success: true,
+    data: submission,
+  });
+});
 
 // @desc    Update submission status by id
 // @route   PUT /api/v1/submissions/:id/status
 // @access  Private
 export const updateSubmissionStatus = asyncHandler(async (req, res) => {
-  const submission = await submissionService.updateSubmissionStatusById(req.params.id, req.body.status);
+  const submission = await submissionService.updateSubmissionStatusById(req.user, req.params.id, req.body.status);
 
   return res.status(200).json({
     success: true,

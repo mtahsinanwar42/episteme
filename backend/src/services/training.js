@@ -67,6 +67,11 @@ export function createTrainingService({ Training, fileService }) {
       updates.status = status;
     }
 
+    if (isNotEmpty(metadataFilePath)) {
+      const metadataFileId = await fileService.getFileIdByPath(metadataFilePath, { fieldName: "metadataFilePath" });
+      updates.metadataFileId = metadataFileId;
+    }
+
     await training.update(updates);
 
     return serializeTraining(training, metadataFilePath);

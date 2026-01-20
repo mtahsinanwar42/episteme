@@ -1,5 +1,3 @@
-import { PAYMENT_STATUS } from "../utils/constants.js";
-
 export default (sequelize, DataTypes) => {
   const ContentSubmissionPayment = sequelize.define(
     "ContentSubmissionPayment",
@@ -47,7 +45,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "status",
-        defaultValue: PAYMENT_STATUS.PENDING,
+        defaultValue: 0,
       },
       createdAt: {
         type: DataTypes.DATE,

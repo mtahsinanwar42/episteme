@@ -1,5 +1,3 @@
-import { ACTIVITY_STATUS } from "../utils/constants.js";
-
 export default (sequelize, DataTypes) => {
   const Activity = sequelize.define(
     "Activity",
@@ -24,7 +22,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "status",
-        defaultValue: ACTIVITY_STATUS.INACTIVE,
+        defaultValue: 0,
       },
       createdAt: {
         type: DataTypes.DATE,
