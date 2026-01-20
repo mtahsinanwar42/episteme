@@ -62,6 +62,7 @@ const navItems: NavItemConfig[] = [
       {
         label: "Mission & Vision",
         href: "/about/mission",
+        visibleTo: UserRole.ADMIN,
       },
       {
         label: "Ethics",

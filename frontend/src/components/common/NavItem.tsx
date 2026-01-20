@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import type { UserRole } from "@/models/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/stores/store";
 
 export interface NavItemConfig {
   label: string;
@@ -15,8 +17,14 @@ interface NavItemProps {
 }
 
 export function NavItem({ item }: NavItemProps) {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [isOpen, setIsOpen] = useState(false);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const canView = (visibleTo?: "ALL" | UserRole) => {
+    if (!visibleTo || visibleTo === "ALL") return true;
+    return Boolean(user?.roles?.includes(visibleTo));
+  };
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
@@ -83,20 +91,24 @@ export function NavItem({ item }: NavItemProps) {
             onMouseLeave={handleMouseLeave}
           >
             <div className="py-2">
-              {item.children?.map((child, index) => (
-                <div key={index}>
-                  {child.children ? (
-                    <NestedNavItem item={child} />
-                  ) : (
-                    <Link
-                      to={child.href || "/"}
-                      className="block text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150"
-                    >
-                      {child.label}
-                    </Link>
-                  )}
-                </div>
-              ))}
+              {item.children?.map((child, index) => {
+                if (!canView(child.visibleTo)) return null;
+
+                return (
+                  <div key={index}>
+                    {child.children ? (
+                      <NestedNavItem item={child} />
+                    ) : (
+                      <Link
+                        to={child.href || "/"}
+                        className="block text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150"
+                      >
+                        {child.label}
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </>
@@ -106,8 +118,14 @@ export function NavItem({ item }: NavItemProps) {
 }
 
 function NestedNavItem({ item }: { item: NavItemConfig }) {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [isOpen, setIsOpen] = useState(false);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const canView = (visibleTo?: "ALL" | UserRole) => {
+    if (!visibleTo || visibleTo === "ALL") return true;
+    return Boolean(user?.roles?.includes(visibleTo));
+  };
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
@@ -156,15 +174,17 @@ function NestedNavItem({ item }: { item: NavItemConfig }) {
           onMouseLeave={handleMouseLeave}
         >
           <div className="py-2">
-            {item.children?.map((child, index) => (
-              <Link
-                key={index}
-                to={child.href || "/"}
-                className="block text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150"
-              >
-                {child.label}
-              </Link>
-            ))}
+            {item.children?.map((child, index) =>
+              canView(child.visibleTo) ? (
+                <Link
+                  key={index}
+                  to={child.href || "/"}
+                  className="block text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150"
+                >
+                  {child.label}
+                </Link>
+              ) : null,
+            )}
           </div>
         </div>
       )}
