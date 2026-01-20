@@ -16,13 +16,15 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-linear-to-br from-slate-100 via-slate-50 to-indigo-100 text-foreground flex flex-col justify-between">
-        <div className="flex-1 flex flex-col">
+      <div className="min-h-screen bg-linear-to-br from-slate-100 via-slate-50 to-indigo-100 text-foreground grid grid-rows-[1fr_auto]">
+        <div className="h-full flex flex-col">
           <div className="sticky top-0 left-0 z-100">
             <Navbar />
           </div>
 
-          <RouteConfig />
+          <main className="h-full p-4 mx-auto w-full 2xl:max-w-7xl 2xl:px-0">
+            <RouteConfig />
+          </main>
         </div>
 
         <Footer />

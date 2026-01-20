@@ -68,7 +68,7 @@ function Login() {
   };
 
   return (
-    <div className="flex-1 text-slate-900 flex items-center justify-center px-4">
+    <div className="h-full text-slate-900 flex items-center justify-center">
       <div className="relative max-w-lg w-full">
         <div className="absolute -inset-[1px] bg-gradient-to-br from-indigo-300/35 via-sky-200/30 to-emerald-200/25 rounded-3xl blur opacity-70" />
         <div className="relative rounded-3xl border border-slate-200 bg-white/90 backdrop-blur-md shadow-2xl p-10 text-slate-900">
@@ -137,7 +137,7 @@ function Login() {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
 
-            <div>
+            <div className="text-center">
               New here?{" "}
               <Link to="/register" className="text-accent hover:brightness-80">
                 Register here

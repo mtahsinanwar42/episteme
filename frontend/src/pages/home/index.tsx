@@ -14,8 +14,8 @@ function Home() {
   };
 
   return (
-    <div className="p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="">
+      <div className="max-w-3xl mx-auto">
         <div
           className="p-6 rounded-lg shadow-lg mb-6"
           style={{ border: "2px solid var(--color-primary)" }}
