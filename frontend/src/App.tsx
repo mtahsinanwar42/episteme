@@ -1,8 +1,8 @@
 import { BrowserRouter } from "react-router-dom";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import Footer from "@/features/footer";
-import Navbar from "@/features/navbar";
+import Footer from "@/components/footer";
+import Navbar from "@/components/navbar";
 import RouteConfig from "@/routeConfig";
 import { type RootState } from "@/stores/store";
 import "@/App.css";
