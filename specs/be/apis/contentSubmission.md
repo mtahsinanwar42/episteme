@@ -7,7 +7,7 @@ Base Path: **/api/v1/submissions**
 ## 1. Get Submissions
 
 **GET /**
-Access: USER/REVIEWER/ADMIN
+Access: USER/ADMIN
 
 ### Request Params
 
