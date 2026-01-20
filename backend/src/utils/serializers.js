@@ -78,6 +78,24 @@ export const serializeActivity = (activity, metadataFilePath) => {
   };
 };
 
+export const serializeContentSubmission = (submission, version, contentFilePath) => {
+  return {
+    id: submission.id,
+    title: submission.title,
+    topics: submission.topics,
+    status: submission.currentStatus,
+    createdAt: submission.createdAt,
+    updatedAt: submission.updatedAt,
+    version: {
+      id: version.id,
+      changeLog: version.changeLog,
+      filePath: contentFilePath,
+      createdAt: version.createdAt,
+      versionNo: version.versionNo,
+    }
+  };
+};
+
 export const serializeFile = (file) => {
   return {
     id: file.id,

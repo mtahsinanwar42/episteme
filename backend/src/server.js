@@ -22,6 +22,7 @@ import blogRoutes from "./routes/blog.js";
 import activityRoutes from "./routes/activity.js";
 import announcementRoutes from "./routes/announcement.js";
 import submissionRoutes from "./routes/contentSubmission.js";
+import reviewAssignmentRoutes from "./routes/contentReviewAssignment.js";
 
 dotenv.config();
 
@@ -74,6 +75,7 @@ app.use('/api/v1/blogs', blogRoutes);
 app.use('/api/v1/activities', activityRoutes);
 app.use('/api/v1/announcements', announcementRoutes);
 app.use('/api/v1/submissions', submissionRoutes);
+app.use('/api/v1/review-assignments', reviewAssignmentRoutes);
 
 if (process.env.FILE_STORAGE_PATH) {
   const storageBaseAbs = path.resolve(__dirname, process.env.FILE_STORAGE_PATH);

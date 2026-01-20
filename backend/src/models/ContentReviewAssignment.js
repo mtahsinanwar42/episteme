@@ -1,5 +1,3 @@
-import { REVIEW_ASSIGNMENT_STATUS } from "../utils/constants.js";
-
 export default (sequelize, DataTypes) => {
   const ContentReviewAssignment = sequelize.define(
     "ContentReviewAssignment",
@@ -40,7 +38,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "status",
-        defaultValue: REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
+        defaultValue: 1,
       },
     },
     {

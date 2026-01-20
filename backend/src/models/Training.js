@@ -1,5 +1,3 @@
-import { TRAINING_STATUS } from "../utils/constants.js";
-
 export default (sequelize, DataTypes) => {
   const Training = sequelize.define(
     "Training",
@@ -24,7 +22,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "status",
-        defaultValue: TRAINING_STATUS.INACTIVE,
+        defaultValue: 0,
       },
       createdAt: {
         type: DataTypes.DATE,

@@ -55,8 +55,8 @@
 
 - GET /api/v1/submissions authenticated, USER/REVIEWER sees his/her submissions, ADMIN sees all submissions
 - GET /api/v1/submissions/:id authenticated
-- POST /api/v1/submissions authenticated, for posting submission (+ first version)
-- PUT /api/v1/submissions/:id/status authenticated + ADMIN. for updating the status
+- POST /api/v1/submissions authenticated
+- PUT /api/v1/submissions/:id/status authenticated
 
 **ContentSubmissionVersion:**
 
@@ -71,19 +71,47 @@
 **ContentSubmissionReview:**
 
 - GET /api/v1/submissions/:id/reviews authenticated, REVIEWER/ADMIN
-- POST /api/v1/submissions/:id/reviews authenticated, REVIEWER/ADMIN
+- GET /api/v1/submissions/:id/reviewers ADMIN
+- POST /api/v1/submissions/:id/reviews authenticated, REVIEWER
 
 **ContentReviewAssignment:**
 
-- GET /api/v1/reviewer-assignments REVIEWER, REVIEWER -> Mine / ADMIN -> All
-- PUT /api/v1/submissions/:submissionId/reviewers/me/status REVIEWER, updates current user review status. triggered when reviewer submits for review (along with creating new version). ? need two endpoints?
-- GET /api/v1/submissions/:id/reviewers ADMIN, shows all assigned reviewers + status, useful for showing msg boxes, to the ADMIN.
-- POST /api/v1/submissions/:id/reviewers ADMIN, assign an existing reviewer to the submission review.
-
-**ContentReview:**
-
-- POST /api/v1/submissions/:submissionId/reviews, REVIEWER
+- GET /api/v1/review-assignments/me REVIEWER
+- GET /api/v1/review-assignments ADMIN
+- POST /api/v1/review-assignments ADMIN
+- PUT /api/v1/review-assignments/:id/status REVIEWER/ADMIN
 
 **TODOs:**
+
+- POST /api/v1/submissions/:id/versions, authenticated
+
+  - authenticate
+  - For USER,
+    -
+  - For ADMIN,
+  - For REVIEWER,
+
+- POST /api/v1/submissions/:id/messages authenticated
+
+  - only authenticate
+  - For USER,
+
+    - Check By ID + By Paid Submission + By OWNER_USR_ID + By NON-DELETED Active CONFERENCE + By Status PENDING APPROVAL, RETURNED
+    - If all true, Add MSG as USER_ADMIN, receiver ID null
+
+  - For REVIEWER,
+
+    - Check By ID + By Paid Submission + By ASSIGNED_USR_ID (from CRA) + By NON-DELETED Active CONFERENCE + By Status PENDING APPROVAL, RETURNED
+    - If all true, Add MSG as REVIEWER_ADMIN, receiver ID null
+
+  - For ADMIN,
+    - Check By ID + By Paid Submission + By NON-DELETED CONFERENCE + By Status PENDING APPROVAL, RETURNED
+      - If all true, Add MSG as
+      - USER_ADMIN (from payload), senderId the admin, receiverId the submission owner
+      - REVIEWER_ADMIN (from payload), senderId the admin, receiverId the reviewer ID
+
+- POST /api/v1/submissions/:id/reviews authenticated, REVIEWER
+
+- Add Payment Events?
 
 - POST /api/v1/users/reviewer/submissions/:id ADMIN, creates a new reviewer, assigns a paper to him, sends mail with email, email + password + paper link

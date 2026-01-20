@@ -42,7 +42,6 @@ export const getConferencePublications = asyncHandler(async (req, res, next) => 
     page: publications.page,
     limit: publications.limit,
     total: publications.total,
-    count: publications.data.length,
     data: publications.data,
   });
 });

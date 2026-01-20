@@ -66,6 +66,11 @@ export function createAnnouncementService({ Announcement, fileService }) {
       updates.status = status;
     }
 
+    if (isNotEmpty(metadataFilePath)) {
+      const metadataFileId = await fileService.getFileIdByPath(metadataFilePath, { fieldName: "metadataFilePath" });
+      updates.metadataFileId = metadataFileId;
+    }
+
     await announcement.update(updates);
 
     return serializeAnnouncement(announcement, metadataFilePath);

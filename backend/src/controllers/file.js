@@ -8,11 +8,18 @@ import { createFileService } from "../services/file.js";
 const { File } = initModels(sequelize);
 const fileService = createFileService({ File });
 
+// @desc    Get Files
+// @route   GET /api/v1/files
+// @access  Private
+export const getFiles = asyncHandler(async (req, res) => {
+  return res.status(200).json(res.advancedResults);
+});
+
 // @desc    Get File by id
 // @route   GET /api/v1/files/:id
 // @access  Private
 export const getFile = asyncHandler(async (req, res, next) => {
-  const file = await fileService.getAccessCheckedFile(req);
+  const file = await fileService.getFile(req);
 
   return res.status(200).json({
     success: true,
@@ -31,7 +38,7 @@ export const downloadFile = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(400, "path must be present in payload"));
   }
 
-  const file = await fileService.getAccessCheckedFile(req);
+  const file = await fileService.getFile(req);
 
   return res.download(filePath);
 });

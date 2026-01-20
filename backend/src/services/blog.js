@@ -67,6 +67,11 @@ export function createBlogService({ Blog, fileService }) {
       updates.status = status;
     }
 
+    if (isNotEmpty(metadataFilePath)) {
+      const metadataFileId = await fileService.getFileIdByPath(metadataFilePath, { fieldName: "metadataFilePath" });
+      updates.metadataFileId = metadataFileId;
+    }
+
     await blog.update(updates);
 
     return serializeBlog(blog, metadataFilePath);
