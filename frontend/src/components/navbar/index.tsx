@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut } from "lucide-react";
+import { UserRole } from "@/models/user";
 
 const navItems: NavItemConfig[] = [
   {
@@ -20,42 +21,24 @@ const navItems: NavItemConfig[] = [
       {
         label: "Users",
         href: "/users",
+        visibleTo: UserRole.ADMIN,
       },
       {
         label: "Documentation",
         href: "/docs",
+        visibleTo: "ALL",
       },
       {
         label: "Blog",
         href: "/blog",
+        visibleTo: "ALL",
       },
     ],
+    visibleTo: "ALL",
   },
   {
-    label: "Admin",
-    children: [
-      {
-        label: "Dashboard",
-        href: "/admin",
-      },
-      {
-        label: "Settings",
-        children: [
-          {
-            label: "General",
-            href: "/admin/settings/general",
-          },
-          {
-            label: "Users",
-            href: "/admin/settings/users",
-          },
-        ],
-      },
-      {
-        label: "Reports",
-        href: "/admin/reports",
-      },
-    ],
+    label: "Users",
+    visibleTo: UserRole.ADMIN,
   },
   {
     label: "Conferences",
@@ -131,9 +114,13 @@ export default function Navbar() {
         </div>
 
         <div className="flex gap-8">
-          {navItems.map((item, index) => (
-            <NavItem key={index} item={item} />
-          ))}
+          {navItems.map((item, index) =>
+            !item.visibleTo ||
+            item.visibleTo === "ALL" ||
+            user?.roles?.includes(item.visibleTo) ? (
+              <NavItem key={index} item={item} />
+            ) : null,
+          )}
         </div>
 
         <div className="flex items-center gap-4">

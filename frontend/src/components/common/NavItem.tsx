@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import type { UserRole } from "@/models/user";
 
 export interface NavItemConfig {
   label: string;
   href?: string;
   children?: NavItemConfig[];
+  visibleTo?: "ALL" | UserRole;
 }
 
 interface NavItemProps {
