@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../services/api";
+import { userService } from "@/services/userService";
 
 // Get all users
 export function useUsers() {
   return useQuery({
     queryKey: ["users"],
-    queryFn: api.getUsers,
+    queryFn: userService.getUsers,
   });
 }

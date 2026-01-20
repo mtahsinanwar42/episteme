@@ -1,53 +1,92 @@
 import { useUsers } from "@/hooks/useUsers";
-import { Link } from "react-router-dom";
+import type { User } from "@/models/user";
+import { DataTable } from "@/components/ui/data-table";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Badge } from "@/components/ui/badge";
 
-function Users() {
-  const { data: users, isLoading, error } = useUsers();
+const columns: ColumnDef<User>[] = [
+  {
+    id: "serial",
+    header: "SL",
+    cell: ({ row }) => <span className="text-sm">{row.index + 1}</span>,
+  },
+  {
+    accessorKey: "firstName",
+    header: "First Name",
+    cell: ({ row }) => {
+      const firstName = row.getValue("firstName") as string;
+      return <span className="font-medium">{firstName}</span>;
+    },
+  },
+  {
+    accessorKey: "lastName",
+    header: "Last Name",
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => <span className="text-sm">{row.getValue("email")}</span>,
+  },
+  {
+    accessorKey: "phone",
+    header: "Phone",
+    cell: ({ row }) => <span className="text-sm">{row.getValue("phone")}</span>,
+  },
+  {
+    accessorKey: "roles",
+    header: "Roles",
+    cell: ({ row }) => {
+      const roles = row.getValue("roles") as string[];
+      return (
+        <div className="flex gap-1 flex-wrap">
+          {roles?.map((role) => (
+            <Badge key={role} variant="outline" className="text-xs">
+              {role}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as number;
+      return (
+        <Badge
+          variant={status === 1 ? "default" : "destructive"}
+          className="text-xs"
+        >
+          {status === 1 ? "Active" : "Inactive"}
+        </Badge>
+      );
+    },
+  },
+];
 
-  if (isLoading) {
-    return (
-      <div className="p-8 text-center" style={{ color: "var(--color-text)" }}>
-        Loading users...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-8 text-center text-red-500">
-        Error: {(error as Error).message}
-      </div>
-    );
-  }
+export default function Users() {
+  const { data: response, isLoading, error } = useUsers();
+  const users = response?.data || [];
 
   return (
     <div className="p-8">
-      <h1
-        className="text-4xl font-bold mb-6"
-        style={{ color: "var(--color-primary)" }}
-      >
-        Users
-      </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {users?.map((user) => (
-          <Link
-            key={user.id}
-            to={`/users/${user.id}`}
-            className="p-4 rounded shadow hover:shadow-lg transition"
-            style={{
-              backgroundColor: "var(--color-background)",
-              color: "var(--color-text)",
-              border: "1px solid var(--color-primary)",
-            }}
-          >
-            <h2 className="text-xl font-bold mb-2">{user.name}</h2>
-            <p className="text-sm">{user.email}</p>
-            <p className="text-sm">{user.phone}</p>
-          </Link>
-        ))}
+      <div className="mb-8">
+        <h1
+          className="text-4xl font-bold mb-2"
+          style={{ color: "var(--color-primary)" }}
+        >
+          Users
+        </h1>
+        <p className="text-slate-600">View and manage all registered users</p>
       </div>
+      <DataTable
+        columns={columns}
+        data={users}
+        isLoading={isLoading}
+        error={error ? (error as Error).message : null}
+        pageSize={10}
+      />
     </div>
   );
 }
-
-export default Users;

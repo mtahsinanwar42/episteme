@@ -38,6 +38,7 @@ const navItems: NavItemConfig[] = [
   },
   {
     label: "Users",
+    href: "/users",
     visibleTo: UserRole.ADMIN,
   },
   {
