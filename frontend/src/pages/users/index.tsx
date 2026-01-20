@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useUsers } from "@/hooks/useUsers";
 import type { User } from "@/models/user";
 import { DataTable } from "@/components/ui/data-table";
+import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 
@@ -66,11 +68,39 @@ const columns: ColumnDef<User>[] = [
 ];
 
 export default function Users() {
-  const { data: response, isLoading, error } = useUsers();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useUsers({
+    page,
+    limit: pageSize,
+    // sort: "-createdAt",
+    paginate: true,
+  });
+
   const users = response?.data || [];
+  const total = response?.total || 0;
+
+  // Calculate pagination info from API response
+  const currentPage = page;
+  const currentLimit = response?.pagination?.next?.limit || pageSize;
+  const totalPages = Math.ceil(total / currentLimit);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPage(1); // Reset to first page when page size changes
+  };
 
   return (
-    <div className="p-8">
+    <div>
       <div className="mb-8">
         <h1
           className="text-4xl font-bold mb-2"
@@ -80,13 +110,27 @@ export default function Users() {
         </h1>
         <p className="text-slate-600">View and manage all registered users</p>
       </div>
-      <DataTable
-        columns={columns}
-        data={users}
-        isLoading={isLoading}
-        error={error ? (error as Error).message : null}
-        pageSize={10}
-      />
+
+      <div className="flex flex-col gap-4">
+        <DataTable
+          columns={columns}
+          data={users}
+          isLoading={isLoading}
+          error={error ? (error as Error).message : null}
+          pageSize={pageSize}
+        />
+
+        {!isLoading && !error && total > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={currentLimit}
+            totalItems={total}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        )}
+      </div>
     </div>
   );
 }

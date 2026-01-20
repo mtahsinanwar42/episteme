@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { userService } from "@/services/userService";
+import { userService, type GetUsersParams } from "@/services/userService";
 
-// Get all users
-export function useUsers() {
+// Get all users with optional pagination and filtering
+export function useUsers(params?: GetUsersParams) {
   return useQuery({
-    queryKey: ["users"],
-    queryFn: userService.getUsers,
+    queryKey: ["users", params],
+    queryFn: () => userService.getUsers(params),
+    staleTime: 30000, // Keep data fresh for 30 seconds
   });
 }

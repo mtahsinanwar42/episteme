@@ -2,10 +2,15 @@ export interface UserResponse {
   data: User[];
   success: boolean;
   total: number;
-  pagination: {
-    page: number;
-    limit: number;
-    pages: number;
+  pagination?: {
+    next?: {
+      page: number;
+      limit: number;
+    };
+    prev?: {
+      page: number;
+      limit: number;
+    };
   };
 }
 
