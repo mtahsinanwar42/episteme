@@ -148,7 +148,7 @@ export default function Navbar() {
                       className="w-12 h-12 rounded-full border-2 border-indigo-600"
                     />
                   ) : (
-                    <div className="w-12 h-12 border-2 border-indigo-600 rounded-full flex items-center justify-center bg-accent text-indigo-800 text-2xl font-bold hover:border-indigo-700 transition-colors">
+                    <div className="w-12 h-12 border-2 border-indigo-600 rounded-full flex items-center justify-center bg-accent text-indigo-800 uppercase text-2xl font-bold hover:border-indigo-700 transition-colors">
                       {user?.firstName?.charAt(0)}
                     </div>
                   )}
@@ -165,7 +165,7 @@ export default function Navbar() {
                         className="w-12 h-12 rounded-full"
                       />
                     ) : (
-                      <div className="w-12 h-12 border-2 border-indigo-600 rounded-full flex items-center justify-center bg-accent text-indigo-800 text-xl font-bold">
+                      <div className="w-12 h-12 border-2 border-indigo-600 rounded-full flex items-center justify-center bg-accent text-indigo-800 uppercase text-xl font-bold">
                         {user?.firstName?.charAt(0)}
                       </div>
                     )}
