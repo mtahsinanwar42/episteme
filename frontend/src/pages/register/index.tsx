@@ -151,7 +151,7 @@ export default function Register() {
             <p className="text-sm text-slate-500 tracking-[0.12em] uppercase">
               Join Us
             </p>
-            <h1 className="text-4xl font-semibold leading-tight bg-linear-to-r from-indigo-700 via-slate-800 to-sky-700 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-semibold leading-tight bg-linear-to-r from-indigo-500 via-violet-500 to-indigo-500 bg-clip-text text-transparent">
               Create Your Account
             </h1>
             <p className="text-base text-slate-600">

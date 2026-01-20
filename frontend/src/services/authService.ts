@@ -1,4 +1,4 @@
-import { config } from "@/config/config";
+import { api } from "@/services/api";
 import type {
   LoginRequest,
   LoginResponse,
@@ -6,63 +6,17 @@ import type {
   RegisterResponse,
   UserDetailsResponse,
 } from "@/models/auth";
-import Cookies from "js-cookie";
 
 export const authService = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await fetch(`${config.baseUrl}/auth/login/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Login failed");
-    }
-
-    return response.json();
+    return api.post<LoginResponse>("/auth/login", credentials, false);
   },
 
   register: async (userData: RegisterRequest): Promise<RegisterResponse> => {
-    const response = await fetch(`${config.baseUrl}/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Registration failed");
-    }
-
-    return response.json();
+    return api.post<RegisterResponse>("/auth/register", userData, false);
   },
 
   getLoggedInUserDetails: async (): Promise<UserDetailsResponse> => {
-    const token = Cookies.get("token");
-
-    if (!token) {
-      throw new Error("No authentication token found");
-    }
-
-    const response = await fetch(`${config.baseUrl}/auth/me`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to fetch user details");
-    }
-
-    return response.json();
+    return api.get<UserDetailsResponse>("/auth/me", true);
   },
 };

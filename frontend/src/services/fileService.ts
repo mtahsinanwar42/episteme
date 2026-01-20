@@ -1,29 +1,15 @@
-import { config } from "@/config/config";
-
+import { api } from "@/services/api";
 import type { FileUploadRequest, FileUploadResponse } from "@/models/file";
-import Cookies from "js-cookie";
 
 export const fileService = {
   uploadFile: async (
     bucketName: string,
     formData: FileUploadRequest["file"],
   ): Promise<FileUploadResponse> => {
-    const response = await fetch(
-      `${config.baseUrl}/files/upload/${bucketName}`,
-      {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${Cookies.get("token") || ""}`,
-        },
-        body: formData,
-      },
+    return api.uploadFile<FileUploadResponse>(
+      `/files/upload/${bucketName}`,
+      formData,
+      true,
     );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "File upload failed");
-    }
-
-    return response.json();
   },
 };
