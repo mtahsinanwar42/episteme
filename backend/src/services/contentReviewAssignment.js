@@ -22,6 +22,10 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
   async function saveReviewAssignment(user, payload) {
     const { contentSubmissionId, reviewerUsrId, assignedByNotes } = payload;
 
+    if (isNaN(contentSubmissionId) || isNaN(reviewerUsrId)) {
+      throw new ErrorResponse(404, "contentSubmissionId and reviewerUsrId are required");
+    }
+
     const { assignmentExists, submissionExists, reviewerExists } = await canCreateReviewAssignment({ contentSubmissionId, reviewerUsrId });
 
     if (!submissionExists) {
