@@ -7,7 +7,6 @@ import themeReducer from "@/stores//themeSlice";
 const authPersistConfig = {
   key: "auth-storage",
   storage,
-  whitelist: ["session"],
 };
 
 const themePersistConfig = {
@@ -27,7 +26,7 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
-        ignoredPaths: ["auth.session"],
+        ignoredPaths: ["auth"],
       },
     }),
 });

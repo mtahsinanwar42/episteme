@@ -15,11 +15,14 @@ import Conferences from "@/pages/conferences";
 import Trainings from "@/pages/trainings";
 import Announcements from "@/pages/announcements";
 import Blogs from "@/pages/blogs";
+import Register from "@/pages/register";
 
 export default function RouteConfig() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
       <Route path="/auth/callback" element={<AuthCallback />} />
 
       <Route path="/" element={<Home />} />
