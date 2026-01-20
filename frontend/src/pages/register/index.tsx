@@ -4,9 +4,10 @@ import { useSelector } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 
-function Register() {
+export default function Register() {
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -22,6 +23,7 @@ function Register() {
     photoFilePath: "",
     cvFilePath: "",
   });
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(["USER"]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -37,6 +39,17 @@ function Register() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleRoleToggle = (role: string) => {
+    setSelectedRoles((prev) => {
+      if (prev.includes(role)) {
+        // Don't allow deselecting if it's the only role
+        if (prev.length === 1) return prev;
+        return prev.filter((r) => r !== role);
+      }
+      return [...prev, role];
+    });
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -45,7 +58,7 @@ function Register() {
     try {
       const response = await authService.register({
         ...formData,
-        roles: ["USER"],
+        roles: selectedRoles,
       });
 
       if (response.success) {
@@ -67,13 +80,13 @@ function Register() {
   return (
     <div className="h-full text-slate-900 flex items-center justify-center">
       <div className="relative max-w-2xl w-full">
-        <div className="absolute -inset-[1px] bg-gradient-to-br from-indigo-300/35 via-sky-200/30 to-emerald-200/25 rounded-3xl blur opacity-70" />
+        <div className="absolute -inset-px bg-linear-to-br from-indigo-300/35 via-sky-200/30 to-emerald-200/25 rounded-3xl blur opacity-70" />
         <div className="relative rounded-3xl border border-slate-200 bg-white/90 backdrop-blur-md shadow-2xl p-10 text-slate-900">
           <div className="flex flex-col gap-3 text-center mb-8">
             <p className="text-sm text-slate-500 tracking-[0.12em] uppercase">
               Join Us
             </p>
-            <h1 className="text-4xl font-semibold leading-tight bg-gradient-to-r from-indigo-700 via-slate-800 to-sky-700 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-semibold leading-tight bg-linear-to-r from-indigo-700 via-slate-800 to-sky-700 bg-clip-text text-transparent">
               Create Your Account
             </h1>
             <p className="text-base text-slate-600">
@@ -249,6 +262,43 @@ function Register() {
               />
             </div>
 
+            <div className="flex flex-col space-y-3">
+              <label className="text-sm font-medium text-slate-700">
+                Select Roles *
+              </label>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="role-user"
+                    checked={selectedRoles.includes("USER")}
+                    onCheckedChange={() => handleRoleToggle("USER")}
+                  />
+                  <label
+                    htmlFor="role-user"
+                    className="text-sm text-slate-700 cursor-pointer"
+                  >
+                    User
+                  </label>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="role-reviewer"
+                    checked={selectedRoles.includes("REVIEWER")}
+                    onCheckedChange={() => handleRoleToggle("REVIEWER")}
+                  />
+                  <label
+                    htmlFor="role-reviewer"
+                    className="text-sm text-slate-700 cursor-pointer"
+                  >
+                    Reviewer
+                  </label>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500">
+                Select at least one role for your account
+              </p>
+            </div>
+
             {error && (
               <div className="p-3 rounded-md text-sm border border-red-500/30 bg-red-500/10 text-red-800">
                 {error}
@@ -288,5 +338,3 @@ function Register() {
     </div>
   );
 }
-
-export default Register;
