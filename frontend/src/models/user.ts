@@ -37,3 +37,8 @@ export enum UserRole {
   USER = "USER",
   REVIEWER = "REVIEWER",
 }
+
+export interface UserDeleteResponse {
+  success: boolean;
+  message: string;
+}

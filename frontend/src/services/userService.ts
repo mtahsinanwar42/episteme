@@ -1,6 +1,6 @@
 // User service can be used for user-related operations other than auth
 
-import type { UserResponse } from "@/models/user";
+import type { UserDeleteResponse, UserResponse } from "@/models/user";
 import { api } from "./api";
 
 export interface GetUsersParams {
@@ -34,5 +34,8 @@ export const userService = {
     const endpoint = queryString ? `/users?${queryString}` : "/users";
 
     return api.get<UserResponse>(endpoint, true);
+  },
+  deleteUser: async (userId: string | number): Promise<UserDeleteResponse> => {
+    return api.delete<UserDeleteResponse>(`/users/${userId}`, true);
   },
 };

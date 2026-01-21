@@ -95,8 +95,7 @@ export function DataTable<TData, TValue = unknown>({
                     return (
                       <TableHead
                         key={header.id}
-                        className="font-semibold transition-colors cursor-pointer"
-                        style={{ color: "var(--color-foreground)" }}
+                        className="font-semibold transition-colors cursor-pointer text-accent-foreground"
                       >
                         {header.isPlaceholder
                           ? null
@@ -116,12 +115,12 @@ export function DataTable<TData, TValue = unknown>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="border-b border-slate-100 dark:border-slate-700 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-colors duration-200 group"
+                    className="border-b border-slate-300! dark:border-slate-700 hover:bg-slate-100! dark:hover:bg-blue-950/20 transition-colors duration-200 group"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                        className="group-hover:text-accent dark:group-hover:text-accent transition-colors"
                       >
                         {flexRender(
                           cell.column.columnDef.cell,

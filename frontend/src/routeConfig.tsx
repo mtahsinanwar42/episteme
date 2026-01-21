@@ -16,6 +16,7 @@ import Trainings from "@/pages/trainings";
 import Announcements from "@/pages/announcements";
 import Blogs from "@/pages/blogs";
 import Register from "@/pages/register";
+import UserDetails from "@/pages/users/details";
 
 export default function RouteConfig() {
   return (
@@ -31,6 +32,15 @@ export default function RouteConfig() {
         element={
           <ProtectedRoute>
             <Users />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/users/:userId"
+        element={
+          <ProtectedRoute>
+            <UserDetails />
           </ProtectedRoute>
         }
       />
