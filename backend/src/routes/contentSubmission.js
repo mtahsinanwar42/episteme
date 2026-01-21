@@ -11,7 +11,7 @@ router.use(authenticate);
 
 router
   .route('/')
-  .get(getSubmissions)
+  .get(authorize(USER_ROLE.USER, USER_ROLE.ADMIN), getSubmissions)
   .post(authorize(USER_ROLE.USER), saveSubmission);
 
 router

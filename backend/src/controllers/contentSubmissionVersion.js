@@ -13,7 +13,6 @@ const submissionVersionService = createSubmissionVersionService({ ContentSubmiss
 // @access  Private
 export const getSubmissionVersions = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  console.log(id)
   const versions = await submissionVersionService.getSubmissionVersionsById(req.user, { submissionId: id });
 
   res.status(200).json({
