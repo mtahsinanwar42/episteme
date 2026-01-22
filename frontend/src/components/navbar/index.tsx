@@ -16,25 +16,22 @@ import { UserRole } from "@/models/user";
 
 const navItems: NavItemConfig[] = [
   {
-    label: "Resources",
-    children: [
-      {
-        label: "Users",
-        href: "/users",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "Documentation",
-        href: "/docs",
-        visibleTo: "ALL",
-      },
-      {
-        label: "Blog",
-        href: "/blog",
-        visibleTo: "ALL",
-      },
-    ],
+    label: "Activities",
+    href: "/activities",
     visibleTo: "ALL",
+  },
+  {
+    label: "Announcements",
+    href: "/announcements",
+  },
+  { label: "Trainings", href: "/trainings" },
+  {
+    label: "Blogs",
+    href: "/blogs",
+  },
+  {
+    label: "Conferences",
+    href: "/conferences",
   },
   {
     label: "Users",
@@ -42,20 +39,55 @@ const navItems: NavItemConfig[] = [
     visibleTo: UserRole.ADMIN,
   },
   {
+    label: "Files",
+    href: "/files",
+    visibleTo: UserRole.ADMIN,
+  },
+  {
+    label: "Content Management",
+    children: [
+      {
+        label: "Activities",
+        href: "/admin/activities",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "Blogs",
+        href: "/admin/blogs",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "Trainings",
+        href: "/admin/trainings",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "Announcements",
+        href: "/admin/announcements",
+        visibleTo: UserRole.ADMIN,
+      },
+    ],
+    visibleTo: UserRole.ADMIN,
+  },
+  {
     label: "Conferences",
-    href: "/conferences",
+    href: "/admin/conferences",
+    visibleTo: UserRole.ADMIN,
   },
   {
-    label: "Trainings",
-    href: "/trainings",
+    label: "Submissions",
+    href: "/user/submissions",
+    visibleTo: UserRole.USER,
   },
   {
-    label: "Announcements",
-    href: "/announcements",
+    label: "Submissions",
+    href: "/admin/submissions",
+    visibleTo: UserRole.ADMIN,
   },
   {
-    label: "Blogs",
-    href: "/blogs",
+    label: "Review Assignments",
+    href: "/reviewer/review-assignments",
+    visibleTo: UserRole.REVIEWER,
   },
   {
     label: "About",
@@ -63,7 +95,6 @@ const navItems: NavItemConfig[] = [
       {
         label: "Mission & Vision",
         href: "/about/mission",
-        visibleTo: UserRole.ADMIN,
       },
       {
         label: "Ethics",
