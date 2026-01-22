@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useUsers } from "@/hooks/useUsers";
-import type { User } from "@/models/user";
+import { UserStatus, type User } from "@/models/user";
 import { DataTable } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -71,14 +71,7 @@ export default function Users() {
       cell: ({ row }) => {
         const status = row.getValue("status") as number;
         return (
-          <div className="flex place-self-center">
-            <Badge
-              variant={status === 1 ? "default" : "destructive"}
-              className="text-xs"
-            >
-              {status === 1 ? "Active" : "Inactive"}
-            </Badge>
-          </div>
+          <div className="flex place-self-center">{getStatusBadge(status)}</div>
         );
       },
     },
@@ -104,6 +97,24 @@ export default function Users() {
       },
     },
   ];
+
+  const getStatusBadge = (status: number) => {
+    // if (status === 1) {
+    //   return <Badge variant="default">Active</Badge>;
+    // }
+    switch (status) {
+      case 0:
+        return <Badge variant="destructive">{UserStatus[status]}</Badge>;
+      case 1:
+        return <Badge variant="default">{UserStatus[status]}</Badge>;
+      case 2:
+        return <Badge variant="secondary">{UserStatus[status]}</Badge>;
+      case 9:
+        return <Badge variant="disabled">{UserStatus[status]}</Badge>;
+      default:
+        return <Badge variant="default">{UserStatus[status]}</Badge>;
+    }
+  };
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -156,12 +167,7 @@ export default function Users() {
   return (
     <div>
       <div className="mb-8">
-        <h1
-          className="text-4xl font-bold mb-2"
-          style={{ color: "var(--color-primary)" }}
-        >
-          Users
-        </h1>
+        <h1 className="text-4xl text-accent font-bold mb-2">Users</h1>
         <p className="text-slate-600">View and manage all registered users</p>
       </div>
 

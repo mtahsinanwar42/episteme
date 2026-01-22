@@ -38,6 +38,18 @@ export enum UserRole {
   REVIEWER = "REVIEWER",
 }
 
+export enum UserStatus {
+  INACTIVE = 0,
+  ACTIVE = 1,
+  SUSPENDED = 2,
+  DELETED = 9,
+}
+
+export interface UserDetailsResponse {
+  data: User;
+  success: boolean;
+}
+
 export interface UserDeleteResponse {
   success: boolean;
   message: string;

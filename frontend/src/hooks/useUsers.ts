@@ -9,3 +9,13 @@ export function useUsers(params?: GetUsersParams) {
     staleTime: 30000, // Keep data fresh for 30 seconds
   });
 }
+
+// Get user details by ID
+export function useUserById(userId: string | number | undefined) {
+  return useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => userService.getUserById(userId!),
+    enabled: !!userId, // Only run query if userId is provided
+    staleTime: 30000, // Keep data fresh for 30 seconds
+  });
+}
