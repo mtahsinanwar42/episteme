@@ -1,3 +1,5 @@
+import type { UserRole } from "./user";
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -34,7 +36,7 @@ export interface UserDetails {
   lastName: string;
   email: string;
   phone: string;
-  roles: string[];
+  roles: UserRole[];
   status: number;
   institution: string;
   occupation: string;

@@ -36,6 +36,7 @@ export enum UserRole {
   ADMIN = "ADMIN",
   USER = "USER",
   REVIEWER = "REVIEWER",
+  PUBLIC = "PUBLIC",
 }
 
 export enum UserStatus {

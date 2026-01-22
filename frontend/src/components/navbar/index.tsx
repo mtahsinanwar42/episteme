@@ -1,6 +1,10 @@
 import { useSelector, useDispatch } from "react-redux";
 import { type RootState } from "@/stores/store";
-import { NavItem, type NavItemConfig } from "@/components/common/NavItem";
+import {
+  NavItem,
+  type NavItemConfig,
+  canViewNavItem,
+} from "@/components/common/NavItem";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "@/stores/authSlice";
 import {
@@ -18,20 +22,27 @@ const navItems: NavItemConfig[] = [
   {
     label: "Activities",
     href: "/activities",
-    visibleTo: "ALL",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
   },
   {
     label: "Announcements",
     href: "/announcements",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
   },
-  { label: "Trainings", href: "/trainings" },
+  {
+    label: "Trainings",
+    href: "/trainings",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
+  },
   {
     label: "Blogs",
     href: "/blogs",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
   },
   {
     label: "Conferences",
     href: "/conferences",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
   },
   {
     label: "Users",
@@ -126,9 +137,7 @@ const navItems: NavItemConfig[] = [
 
 export default function Navbar() {
   const user = useSelector((state: RootState) => state.auth.user);
-  const isLoggedIn = useSelector(
-    (state: RootState) => state.auth.user !== null,
-  );
+  const isLoggedIn = user !== null;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -148,9 +157,7 @@ export default function Navbar() {
 
         <div className="flex gap-8">
           {navItems.map((item, index) =>
-            !item.visibleTo ||
-            item.visibleTo === "ALL" ||
-            user?.roles?.includes(item.visibleTo) ? (
+            canViewNavItem(item.visibleTo, user?.roles, isLoggedIn) ? (
               <NavItem key={index} item={item} />
             ) : null,
           )}
