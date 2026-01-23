@@ -20,8 +20,8 @@ export interface RegisterRequest {
   occupation: string;
   country: string;
   linkedinUrl: string;
-  photoFilePath: string;
-  cvFilePath: string;
+  photoFilePath?: string;
+  cvFilePath?: string;
   roles: string[];
 }
 
