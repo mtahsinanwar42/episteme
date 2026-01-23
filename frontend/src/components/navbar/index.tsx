@@ -237,15 +237,6 @@ export default function Navbar() {
               >
                 Login
               </Link>
-
-              <div className="text-white">|</div>
-
-              <Link
-                to="/register"
-                className="block text-left px-2 py-2 text-white hover:text-gray-200 transition-colors duration-150"
-              >
-                Register
-              </Link>
             </div>
           )}
           {/* <span className="text-sm">{user?.user_metadata?.full_name}</span> */}
