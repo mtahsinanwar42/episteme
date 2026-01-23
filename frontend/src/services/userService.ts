@@ -44,7 +44,14 @@ export const userService = {
   ): Promise<UserDetailsResponse> => {
     return api.get<UserDetailsResponse>(`/users/${userId}`, true);
   },
-  deleteUser: async (userId: string | number): Promise<UserDeleteResponse> => {
-    return api.delete<UserDeleteResponse>(`/users/${userId}`, true);
+  updateUserById: async (
+    userId: string | number,
+    postData: any,
+  ): Promise<{ success: boolean; data: any }> => {
+    return api.put<{ success: boolean; data: any }>(
+      `/users/${userId}`,
+      postData,
+      true,
+    );
   },
 };

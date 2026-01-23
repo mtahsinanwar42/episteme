@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { userService, type GetUsersParams } from "@/services/userService";
 
 // Get all users with optional pagination and filtering
@@ -17,5 +17,22 @@ export function useUserById(userId: string | number | undefined) {
     queryFn: () => userService.getUserById(userId!),
     enabled: !!userId, // Only run query if userId is provided
     staleTime: 30000, // Keep data fresh for 30 seconds
+  });
+}
+
+export function useUserDetailsMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userId,
+      postData,
+    }: {
+      userId: string | number;
+      postData: any;
+    }) => userService.updateUserById(userId, postData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
   });
 }

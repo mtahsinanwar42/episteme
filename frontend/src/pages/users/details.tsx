@@ -64,9 +64,6 @@ export default function UserDetails() {
   const user = data.data;
 
   const getStatusBadge = (status: number) => {
-    // if (status === 1) {
-    //   return <Badge variant="default">Active</Badge>;
-    // }
     switch (status) {
       case 0:
         return <Badge variant="destructive">{UserStatus[status]}</Badge>;

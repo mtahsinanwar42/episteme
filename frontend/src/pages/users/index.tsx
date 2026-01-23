@@ -5,11 +5,32 @@ import { DataTable } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Eye, Trash } from "lucide-react";
+import { Edit, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
-import { userService } from "@/services/userService";
+import { useUserDetailsMutation } from "@/hooks/useUsers";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Users() {
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<number>(1);
+  const updateStatusMutation = useUserDetailsMutation();
+
   const columns: ColumnDef<User>[] = [
     {
       id: "serial",
@@ -84,13 +105,11 @@ export default function Users() {
         return (
           <div className="flex gap-4 place-self-center">
             <Link to={`/users/${row?.original?.id}`}>
-              <Eye className="size-4 text-accent hover:brightness-70 cursor-pointer" />
+              <Edit className="size-4 text-gray-600 hover:text-gray-800 cursor-pointer" />
             </Link>
 
-            <Edit className="size-4 text-gray-600 hover:text-gray-800 cursor-pointer" />
-            <div onClick={() => handleDeleteUser(row?.original?.id)}>
-              {" "}
-              <Trash className="size-4 text-red-600 hover:text-red-800 cursor-pointer" />
+            <div onClick={() => handleOpenStatusModal(row?.original)}>
+              <RefreshCw className="size-4 text-blue-600 hover:text-blue-800 cursor-pointer" />
             </div>
           </div>
         );
@@ -99,9 +118,6 @@ export default function Users() {
   ];
 
   const getStatusBadge = (status: number) => {
-    // if (status === 1) {
-    //   return <Badge variant="default">Active</Badge>;
-    // }
     switch (status) {
       case 0:
         return <Badge variant="destructive">{UserStatus[status]}</Badge>;
@@ -147,21 +163,35 @@ export default function Users() {
     setPage(1); // Reset to first page when page size changes
   };
 
-  const handleDeleteUser = async (userId: string | number) => {
-    try {
-      let deleteResponse = await userService.deleteUser(userId);
+  const handleOpenStatusModal = (user: User) => {
+    setSelectedUser(user);
+    setSelectedStatus(user.status);
+    setIsStatusModalOpen(true);
+  };
 
-      if (deleteResponse.success) {
-        // Optionally, refetch the users list or update the state to remove the deleted user
-        console.log("User deleted successfully");
-      }
-    } catch (error) {
-      console.error("Error deleting user:", error);
-    }
-    return () => {
-      // Implement user deletion logic here
-      console.log("Delete user with ID:", userId);
-    };
+  const handleCloseStatusModal = () => {
+    setIsStatusModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleUpdateStatus = () => {
+    if (!selectedUser) return;
+
+    updateStatusMutation.mutate(
+      {
+        userId: selectedUser.id,
+        postData: { status: selectedStatus },
+      },
+      {
+        onSuccess: () => {
+          handleCloseStatusModal();
+          console.log("User status updated successfully");
+        },
+        onError: (error) => {
+          console.error("Error updating user status:", error);
+        },
+      },
+    );
   };
 
   return (
@@ -191,6 +221,69 @@ export default function Users() {
           />
         )}
       </div>
+
+      <Dialog open={isStatusModalOpen} onOpenChange={setIsStatusModalOpen}>
+        <DialogContent onClose={handleCloseStatusModal}>
+          <DialogHeader>
+            <DialogTitle>Update user status</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-2">
+                  Name: {selectedUser?.firstName} {selectedUser?.lastName}
+                </p>
+                <p className="text-sm text-gray-600 mb-4">
+                  Current status:{" "}
+                  {selectedUser && UserStatus[selectedUser.status]}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Select new status
+                </label>
+                <Select
+                  value={selectedStatus.toString()}
+                  onValueChange={(value) => setSelectedStatus(Number(value))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={UserStatus.INACTIVE.toString()}>
+                      Inactive
+                    </SelectItem>
+                    <SelectItem value={UserStatus.ACTIVE.toString()}>
+                      Active
+                    </SelectItem>
+                    <SelectItem value={UserStatus.SUSPENDED.toString()}>
+                      Suspended
+                    </SelectItem>
+                    <SelectItem value={UserStatus.DELETED.toString()}>
+                      Deleted
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCloseStatusModal}
+              disabled={updateStatusMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateStatus}
+              disabled={updateStatusMutation.isPending}
+            >
+              {updateStatusMutation.isPending ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
