@@ -31,7 +31,8 @@ export function useUserDetailsMutation() {
       userId: string | number;
       postData: any;
     }) => userService.updateUserById(userId, postData),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["user", variables.userId] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
