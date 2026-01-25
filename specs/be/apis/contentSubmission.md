@@ -47,7 +47,7 @@ Example:
   "title": "Graph Theory Unleashed",
   "conferenceId": 5,
   "topics": ["Graph"],
-  "contentFilePath": "storage/private/papers/paper1_b32e94f6_20260118T225541_911.docx",
+  "contentFilePath": "storage/private/submissions/paper1_b32e94f6_20260118T225541_911.docx",
   "message": "Please approve this for the conference 2026, I've really worked hard for it!."
 }
 ```

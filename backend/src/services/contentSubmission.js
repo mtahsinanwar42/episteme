@@ -109,15 +109,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     const roles = Array.isArray(user.roles) ? user.roles : [];
     const isUser = roles.includes(USER_ROLE.USER);
 
-    if (isUser && status !== CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL) {
-      throw new ErrorResponse(400, "Invalid ContentSubmission status");
-    }
-
     const where = { id };
-
-    if (isUser) {
-      where.ownerUsrId = Number(user.id);
-    }
 
     const submission = await ContentSubmission.findOne({
       where,

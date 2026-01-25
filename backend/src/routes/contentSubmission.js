@@ -20,7 +20,7 @@ router
 
 router
   .route('/:id/status')
-  .put(authorize(USER_ROLE.ADMIN, USER_ROLE.USER), updateSubmissionStatus);
+  .put(authorize(USER_ROLE.ADMIN), updateSubmissionStatus);
 
 router
   .route('/:id/versions')

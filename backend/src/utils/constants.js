@@ -52,7 +52,7 @@ export const CONTENT_SUBMISSION_STATUS = Object.freeze({
   REJECTED: 4,
   DELETED: 9,
 });
-export const CONTENT_SUBMISSION_VERSION_INITIAL = 1;
+export const CONTENT_SUBMISSION_VERSION_INITIAL = CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL;
 
 export const CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE = Object.freeze({
   USER_ADMIN: "USER_ADMIN",
@@ -90,7 +90,7 @@ export const CONTENT_SUBMISSION_PAYMENT_STATUS = Object.freeze({
 export const FILE_BUCKETS = {
   cvs: { visibility: "private", maxSize: 10_000_000, types: /docx|pdf/ },
   profile_photos: { visibility: "public", maxSize: 5_000_000, types: /jpg|jpeg|png/ },
-  papers: { visibility: "private", maxSize: 20_000_000, types: /docx|pdf/ },
+  submissions: { visibility: "private", maxSize: 20_000_000, types: /docx|pdf/ },
   assets: { visibility: "public", maxSize: 5_000_000, types: /jpg|jpeg|png|svg|json/ },
 };
 
