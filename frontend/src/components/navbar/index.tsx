@@ -63,8 +63,20 @@ const navItems: NavItemConfig[] = [
     visibleTo: UserRole.ADMIN,
   },
   {
-    label: "Files",
-    href: "/files",
+    label: "Assets",
+    href: "/assets",
+    children: [
+      {
+        label: "All",
+        href: "/assets",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "New",
+        href: "/assets/new",
+        visibleTo: UserRole.ADMIN,
+      },
+    ],
     visibleTo: UserRole.ADMIN,
   },
   {
