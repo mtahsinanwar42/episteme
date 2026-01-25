@@ -17,6 +17,7 @@ import Announcements from "@/pages/announcements";
 import Blogs from "@/pages/blogs";
 import Register from "@/pages/register";
 import UserDetails from "@/pages/users/details";
+import NewUser from "./pages/users/new";
 
 export default function RouteConfig() {
   return (
@@ -27,11 +28,20 @@ export default function RouteConfig() {
       <Route path="/auth/callback" element={<AuthCallback />} />
 
       <Route path="/" element={<Home />} />
+
       <Route
         path="/users"
         element={
           <ProtectedRoute>
             <Users />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users/new"
+        element={
+          <ProtectedRoute>
+            <NewUser />
           </ProtectedRoute>
         }
       />

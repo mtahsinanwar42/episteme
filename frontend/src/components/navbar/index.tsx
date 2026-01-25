@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut } from "lucide-react";
 import { UserRole } from "@/models/user";
+import { config } from "@/config/config";
 
 const navItems: NavItemConfig[] = [
   {
@@ -47,6 +48,18 @@ const navItems: NavItemConfig[] = [
   {
     label: "Users",
     href: "/users",
+    children: [
+      {
+        label: "All",
+        href: "/users",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "New",
+        href: "/users/new",
+        visibleTo: UserRole.ADMIN,
+      },
+    ],
     visibleTo: UserRole.ADMIN,
   },
   {
@@ -170,8 +183,9 @@ export default function Navbar() {
                 <div className="focus:outline-none cursor-pointer">
                   {user?.photoFilePath ? (
                     <img
-                      src={user.photoFilePath}
+                      src={`${config.baseUrl}/files/download?path=${user.photoFilePath}`}
                       alt="Profile"
+                      crossOrigin="anonymous"
                       className="w-12 h-12 rounded-full border-2 border-indigo-600"
                     />
                   ) : (
@@ -187,9 +201,10 @@ export default function Navbar() {
                   <div className="flex items-center gap-3 py-2">
                     {user?.photoFilePath ? (
                       <img
-                        src={user.photoFilePath}
+                        src={`${config.baseUrl}/files/download?path=${user.photoFilePath}`}
                         alt="Profile"
-                        className="w-12 h-12 rounded-full"
+                        crossOrigin="anonymous"
+                        className="w-12 h-12 rounded-full object-cover"
                       />
                     ) : (
                       <div className="w-12 h-12 border-2 border-indigo-600 rounded-full flex items-center justify-center bg-accent text-indigo-800 uppercase text-xl font-bold">

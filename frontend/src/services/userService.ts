@@ -54,4 +54,9 @@ export const userService = {
       true,
     );
   },
+  createUser: async (
+    postData: any,
+  ): Promise<{ success: boolean; data: any }> => {
+    return api.post<{ success: boolean; data: any }>("/users", postData, true);
+  },
 };

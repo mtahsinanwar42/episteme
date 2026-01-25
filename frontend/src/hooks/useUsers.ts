@@ -37,3 +37,14 @@ export function useUserDetailsMutation() {
     },
   });
 }
+
+export function useCreateUserMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postData: any) => userService.createUser(postData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+}
