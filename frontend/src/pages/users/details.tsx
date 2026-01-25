@@ -199,7 +199,7 @@ export default function UserDetails() {
             <div className="flex gap-4 z-0">
               {user.photoFilePath ? (
                 <img
-                  src={`${config.baseUrl}/files/download?path=${user.photoFilePath}`}
+                  src={`${new URL(config.baseUrl).origin}/${user.photoFilePath}`}
                   alt={`${user.firstName}'s photo`}
                   crossOrigin="anonymous"
                   className="w-20 h-20 rounded-full object-cover border-4 border-border mb-4"

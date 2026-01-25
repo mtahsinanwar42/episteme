@@ -268,7 +268,7 @@ export default function AssetDetails() {
 
                   <p className="font-medium">
                     <img
-                      src={`http://localhost:5000/${file.storageKey}`}
+                      src={`${new URL(config.baseUrl).origin}${file.storageKey}`}
                       alt="Asset Image"
                       crossOrigin="anonymous"
                       className="w-24 h-24 object-cover"

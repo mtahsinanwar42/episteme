@@ -195,7 +195,7 @@ export default function Navbar() {
                 <div className="focus:outline-none cursor-pointer">
                   {user?.photoFilePath ? (
                     <img
-                      src={`${config.baseUrl}/files/download?path=${user.photoFilePath}`}
+                      src={`${new URL(config.baseUrl).origin}/${user.photoFilePath}`}
                       alt="Profile"
                       crossOrigin="anonymous"
                       className="w-12 h-12 rounded-full border-2 border-indigo-600"
@@ -213,7 +213,7 @@ export default function Navbar() {
                   <div className="flex items-center gap-3 py-2">
                     {user?.photoFilePath ? (
                       <img
-                        src={`${config.baseUrl}/files/download?path=${user.photoFilePath}`}
+                        src={`${new URL(config.baseUrl).origin}/${user.photoFilePath}`}
                         alt="Profile"
                         crossOrigin="anonymous"
                         className="w-12 h-12 rounded-full object-cover"
