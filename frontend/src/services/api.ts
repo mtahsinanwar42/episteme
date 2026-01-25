@@ -1,16 +1,50 @@
 import { config } from "@/config/config";
 import type { FileUploadRequest } from "@/models/file";
+import { isTokenExpired } from "@/utils/tokenValidator";
 import Cookies from "js-cookie";
 
 interface RequestOptions extends RequestInit {
   requiresAuth?: boolean;
 }
 
+interface ApiError extends Error {
+  status?: number;
+}
+
 class BaseApiService {
   private baseUrl: string;
+  private onUnauthorized?: () => void;
 
   constructor() {
     this.baseUrl = config.baseUrl;
+  }
+
+  /**
+   * Set callback function to be called when token is unauthorized/expired
+   * This is used to dispatch logout action from Redux
+   */
+  setUnauthorizedCallback(callback: () => void) {
+    this.onUnauthorized = callback;
+  }
+
+  /**
+   * Check if token is valid before making authenticated requests
+   */
+  private checkTokenValidity(): boolean {
+    const token = Cookies.get("token");
+
+    if (!token) {
+      return false;
+    }
+
+    if (isTokenExpired(token)) {
+      // Token is expired, remove it and trigger unauthorized callback
+      Cookies.remove("token");
+      this.onUnauthorized?.();
+      return false;
+    }
+
+    return true;
   }
 
   private getHeaders(
@@ -24,7 +58,7 @@ class BaseApiService {
 
     if (requiresAuth) {
       const token = Cookies.get("token");
-      if (token) {
+      if (token && !isTokenExpired(token)) {
         headers = {
           ...headers,
           Authorization: `Bearer ${token}`,
@@ -41,6 +75,13 @@ class BaseApiService {
       headers: customHeaders,
       ...fetchOptions
     } = options;
+
+    // Check token validity for authenticated requests
+    if (requiresAuth && !this.checkTokenValidity()) {
+      const error: ApiError = new Error("Token is expired or invalid");
+      error.status = 401;
+      throw error;
+    }
 
     const url = `${this.baseUrl}${endpoint}`;
     const headers = this.getHeaders(requiresAuth, customHeaders);
@@ -117,6 +158,39 @@ class BaseApiService {
       method: "DELETE",
       requiresAuth,
     });
+  }
+
+  async getBlob(endpoint: string, requiresAuth: boolean = false): Promise<Blob> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    // Check token validity for authenticated requests
+    if (requiresAuth && !this.checkTokenValidity()) {
+      const error: ApiError = new Error("Token is expired or invalid");
+      error.status = 401;
+      throw error;
+    }
+
+    const headers = this.getHeaders(requiresAuth, {});
+
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Request failed with status ${response.status}`,
+        );
+      }
+
+      return response.blob();
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("An unexpected error occurred");
+    }
   }
 
   async uploadFile<T>(

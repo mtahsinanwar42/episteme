@@ -4,11 +4,15 @@ import { useSelector } from "react-redux";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import RouteConfig from "@/routeConfig";
+import { useAuthInitialization } from "@/hooks/useAuthInitialization";
 import { type RootState } from "@/stores/store";
 import "@/App.css";
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.theme);
+
+  // Initialize authentication on app mount
+  useAuthInitialization();
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);

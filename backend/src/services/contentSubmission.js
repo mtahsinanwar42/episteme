@@ -36,7 +36,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
   }
 
   async function saveSubmission(user, payload) {
-    const { title, topics, conferenceId, contentFilePath, changeLog, } = payload;
+    const { title, topics, conferenceId, contentFilePath, message, } = payload;
 
     if (isEmpty(title) || !conferenceId || isEmpty(contentFilePath)) {
       throw new ErrorResponse(400, "title, conferenceId, contentFilePath are required");
@@ -83,7 +83,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       const version = await ContentSubmissionVersion.create(
         {
           contentSubmissionId: submission.id,
-          changeLog,
+          changeLog: message,
           fileId: contentFileId,
           uploaderUsrId: user.id,
           uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.USER,
