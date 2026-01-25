@@ -5,12 +5,57 @@ import type { UserRole } from "@/models/user";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/store";
 
+export type NavVisibility = "PUBLIC" | UserRole | UserRole[];
+
 export interface NavItemConfig {
   label: string;
   href?: string;
   children?: NavItemConfig[];
-  visibleTo?: "ALL" | UserRole;
+  visibleTo?: NavVisibility;
 }
+
+export const canViewNavItem = (
+  visibleTo?: NavVisibility,
+  roles?: UserRole[],
+  isLoggedIn?: boolean,
+) => {
+  // No visibility restriction: visible to everyone
+  if (!visibleTo) {
+    return true;
+  }
+
+  // PUBLIC: only visible to unauthenticated users
+  if (visibleTo === "PUBLIC") {
+    return !isLoggedIn;
+  }
+
+  // Array handling: can include "PUBLIC" and/or role names
+  if (Array.isArray(visibleTo)) {
+    // Check if "PUBLIC" is in array (visible to non-logged-in users)
+    if (visibleTo.includes("PUBLIC" as any) && !isLoggedIn) {
+      return true;
+    }
+
+    // Check if user is logged in and has required roles
+    if (isLoggedIn && roles && roles.length > 0) {
+      const roleArray = visibleTo.filter(
+        (v) => v !== ("PUBLIC" as any),
+      ) as UserRole[];
+      if (roleArray.length > 0) {
+        return roleArray.some((role) => roles.includes(role));
+      }
+    }
+
+    return false;
+  }
+
+  // Single role: requires login
+  if (!isLoggedIn || !roles || roles.length === 0) {
+    return false;
+  }
+
+  return roles.includes(visibleTo);
+};
 
 interface NavItemProps {
   item: NavItemConfig;
@@ -18,13 +63,10 @@ interface NavItemProps {
 
 export function NavItem({ item }: NavItemProps) {
   const user = useSelector((state: RootState) => state.auth.user);
+  const isLoggedIn = user !== null;
   const [isOpen, setIsOpen] = useState(false);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const canView = (visibleTo?: "ALL" | UserRole) => {
-    if (!visibleTo || visibleTo === "ALL") return true;
-    return Boolean(user?.roles?.includes(visibleTo));
-  };
+  const userRoles = user?.roles;
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
@@ -92,7 +134,8 @@ export function NavItem({ item }: NavItemProps) {
           >
             <div className="py-2">
               {item.children?.map((child, index) => {
-                if (!canView(child.visibleTo)) return null;
+                if (!canViewNavItem(child.visibleTo, userRoles, isLoggedIn))
+                  return null;
 
                 return (
                   <div key={index}>
@@ -119,13 +162,10 @@ export function NavItem({ item }: NavItemProps) {
 
 function NestedNavItem({ item }: { item: NavItemConfig }) {
   const user = useSelector((state: RootState) => state.auth.user);
+  const isLoggedIn = user !== null;
   const [isOpen, setIsOpen] = useState(false);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const canView = (visibleTo?: "ALL" | UserRole) => {
-    if (!visibleTo || visibleTo === "ALL") return true;
-    return Boolean(user?.roles?.includes(visibleTo));
-  };
+  const userRoles = user?.roles;
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
@@ -175,7 +215,7 @@ function NestedNavItem({ item }: { item: NavItemConfig }) {
         >
           <div className="py-2">
             {item.children?.map((child, index) =>
-              canView(child.visibleTo) ? (
+              canViewNavItem(child.visibleTo, userRoles, isLoggedIn) ? (
                 <Link
                   key={index}
                   to={child.href || "/"}

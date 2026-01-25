@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
-import { fileService } from "@/services/fileService";
-import { FileTypeEnum } from "@/models/file";
+// import { fileService } from "@/services/fileService";
+// import { FileTypeEnum } from "@/models/file";
 
 export default function Register() {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -22,11 +22,7 @@ export default function Register() {
     occupation: "",
     country: "",
     linkedinUrl: "",
-    photoFilePath: "",
-    cvFilePath: "",
   });
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [cvFile, setCvFile] = useState<File | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<string[]>(["USER"]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -35,67 +31,6 @@ export default function Register() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: FileTypeEnum,
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (type === FileTypeEnum.PROFILE_PHOTOS) {
-        setPhotoFile(file);
-        try {
-          let formData = new FormData();
-          await formData.append("file", file);
-
-          let fileUploadResponse = await fileService.uploadFile(type, formData);
-
-          if (
-            fileUploadResponse.success &&
-            fileUploadResponse.data.file.storageKey
-          ) {
-            setFormData((prev) => ({
-              ...prev,
-              photoFilePath: fileUploadResponse.data.file.storageKey,
-            }));
-          }
-        } catch (error) {
-          console.error("Photo upload error:", error);
-          setPhotoFile(null);
-          setFormData((prev) => ({
-            ...prev,
-            photoFilePath: "",
-          }));
-        }
-      } else {
-        setCvFile(file);
-
-        try {
-          let formData = new FormData();
-          await formData.append("file", file);
-
-          let fileUploadResponse = await fileService.uploadFile(type, formData);
-
-          if (
-            fileUploadResponse.success &&
-            fileUploadResponse.data.file.storageKey
-          ) {
-            setFormData((prev) => ({
-              ...prev,
-              cvFilePath: fileUploadResponse.data.file.storageKey,
-            }));
-          }
-        } catch (error) {
-          console.error("CV upload error:", error);
-          setCvFile(null);
-          setFormData((prev) => ({
-            ...prev,
-            cvFilePath: "",
-          }));
-        }
-      }
-    }
   };
 
   const handleRoleToggle = (role: string) => {
@@ -138,7 +73,7 @@ export default function Register() {
 
   useEffect(() => {
     if (user) {
-      // navigate("/home");
+      navigate("/home");
     }
   }, [user, navigate]);
 
@@ -362,54 +297,6 @@ export default function Register() {
               <p className="text-xs text-slate-500">
                 Select at least one role for your account
               </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="photo"
-                  className="text-sm font-medium text-slate-700"
-                >
-                  Profile Photo
-                </label>
-                <Input
-                  id="photo"
-                  name="photo"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleFileChange(e, FileTypeEnum.PROFILE_PHOTOS)
-                  }
-                  className="cursor-pointer"
-                />
-                {photoFile && (
-                  <p className="text-xs text-slate-500">
-                    Selected: {photoFile.name}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="cv"
-                  className="text-sm font-medium text-slate-700"
-                >
-                  CV/Resume
-                </label>
-                <Input
-                  id="cv"
-                  name="cv"
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => handleFileChange(e, FileTypeEnum.CVS)}
-                  className="cursor-pointer"
-                />
-                {cvFile && (
-                  <p className="text-xs text-slate-500">
-                    Selected: {cvFile.name}
-                  </p>
-                )}
-              </div>
             </div>
 
             {error && (

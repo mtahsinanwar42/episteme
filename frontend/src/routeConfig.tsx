@@ -16,6 +16,11 @@ import Trainings from "@/pages/trainings";
 import Announcements from "@/pages/announcements";
 import Blogs from "@/pages/blogs";
 import Register from "@/pages/register";
+import UserDetails from "@/pages/users/details";
+import NewUser from "./pages/users/new";
+import Assets from "./pages/assets";
+import AssetDetails from "./pages/assets/details";
+import NewAsset from "./pages/assets/new";
 
 export default function RouteConfig() {
   return (
@@ -26,11 +31,54 @@ export default function RouteConfig() {
       <Route path="/auth/callback" element={<AuthCallback />} />
 
       <Route path="/" element={<Home />} />
+
       <Route
         path="/users"
         element={
           <ProtectedRoute>
             <Users />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users/new"
+        element={
+          <ProtectedRoute>
+            <NewUser />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/users/:userId"
+        element={
+          <ProtectedRoute>
+            <UserDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/assets"
+        element={
+          <ProtectedRoute>
+            <Assets />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/assets/:fileId"
+        element={
+          <ProtectedRoute>
+            <AssetDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/assets/new"
+        element={
+          <ProtectedRoute>
+            <NewAsset />
           </ProtectedRoute>
         }
       />

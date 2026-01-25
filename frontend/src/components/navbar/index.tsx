@@ -1,6 +1,10 @@
 import { useSelector, useDispatch } from "react-redux";
 import { type RootState } from "@/stores/store";
-import { NavItem, type NavItemConfig } from "@/components/common/NavItem";
+import {
+  NavItem,
+  type NavItemConfig,
+  canViewNavItem,
+} from "@/components/common/NavItem";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "@/stores/authSlice";
 import {
@@ -13,48 +17,113 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut } from "lucide-react";
 import { UserRole } from "@/models/user";
+import { config } from "@/config/config";
 
 const navItems: NavItemConfig[] = [
   {
-    label: "Resources",
-    children: [
-      {
-        label: "Users",
-        href: "/users",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "Documentation",
-        href: "/docs",
-        visibleTo: "ALL",
-      },
-      {
-        label: "Blog",
-        href: "/blog",
-        visibleTo: "ALL",
-      },
-    ],
-    visibleTo: "ALL",
-  },
-  {
-    label: "Users",
-    visibleTo: UserRole.ADMIN,
-  },
-  {
-    label: "Conferences",
-    href: "/conferences",
-  },
-  {
-    label: "Trainings",
-    href: "/trainings",
+    label: "Activities",
+    href: "/activities",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
   },
   {
     label: "Announcements",
     href: "/announcements",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
+  },
+  {
+    label: "Trainings",
+    href: "/trainings",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
   },
   {
     label: "Blogs",
     href: "/blogs",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
+  },
+  {
+    label: "Conferences",
+    href: "/conferences",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER],
+  },
+  {
+    label: "Users",
+    href: "/users",
+    children: [
+      {
+        label: "All",
+        href: "/users",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "New",
+        href: "/users/new",
+        visibleTo: UserRole.ADMIN,
+      },
+    ],
+    visibleTo: UserRole.ADMIN,
+  },
+  {
+    label: "Assets",
+    href: "/assets",
+    children: [
+      {
+        label: "All",
+        href: "/assets",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "New",
+        href: "/assets/new",
+        visibleTo: UserRole.ADMIN,
+      },
+    ],
+    visibleTo: UserRole.ADMIN,
+  },
+  {
+    label: "Content Management",
+    children: [
+      {
+        label: "Activities",
+        href: "/admin/activities",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "Blogs",
+        href: "/admin/blogs",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "Trainings",
+        href: "/admin/trainings",
+        visibleTo: UserRole.ADMIN,
+      },
+      {
+        label: "Announcements",
+        href: "/admin/announcements",
+        visibleTo: UserRole.ADMIN,
+      },
+    ],
+    visibleTo: UserRole.ADMIN,
+  },
+  {
+    label: "Conferences",
+    href: "/admin/conferences",
+    visibleTo: UserRole.ADMIN,
+  },
+  {
+    label: "Submissions",
+    href: "/user/submissions",
+    visibleTo: UserRole.USER,
+  },
+  {
+    label: "Submissions",
+    href: "/admin/submissions",
+    visibleTo: UserRole.ADMIN,
+  },
+  {
+    label: "Review Assignments",
+    href: "/reviewer/review-assignments",
+    visibleTo: UserRole.REVIEWER,
   },
   {
     label: "About",
@@ -62,7 +131,6 @@ const navItems: NavItemConfig[] = [
       {
         label: "Mission & Vision",
         href: "/about/mission",
-        visibleTo: UserRole.ADMIN,
       },
       {
         label: "Ethics",
@@ -94,9 +162,7 @@ const navItems: NavItemConfig[] = [
 
 export default function Navbar() {
   const user = useSelector((state: RootState) => state.auth.user);
-  const isLoggedIn = useSelector(
-    (state: RootState) => state.auth.user !== null,
-  );
+  const isLoggedIn = user !== null;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -116,9 +182,7 @@ export default function Navbar() {
 
         <div className="flex gap-8">
           {navItems.map((item, index) =>
-            !item.visibleTo ||
-            item.visibleTo === "ALL" ||
-            user?.roles?.includes(item.visibleTo) ? (
+            canViewNavItem(item.visibleTo, user?.roles, isLoggedIn) ? (
               <NavItem key={index} item={item} />
             ) : null,
           )}
@@ -131,8 +195,9 @@ export default function Navbar() {
                 <div className="focus:outline-none cursor-pointer">
                   {user?.photoFilePath ? (
                     <img
-                      src={user.photoFilePath}
+                      src={`${new URL(config.baseUrl).origin}/${user.photoFilePath}`}
                       alt="Profile"
+                      crossOrigin="anonymous"
                       className="w-12 h-12 rounded-full border-2 border-indigo-600"
                     />
                   ) : (
@@ -148,9 +213,10 @@ export default function Navbar() {
                   <div className="flex items-center gap-3 py-2">
                     {user?.photoFilePath ? (
                       <img
-                        src={user.photoFilePath}
+                        src={`${new URL(config.baseUrl).origin}/${user.photoFilePath}`}
                         alt="Profile"
-                        className="w-12 h-12 rounded-full"
+                        crossOrigin="anonymous"
+                        className="w-12 h-12 rounded-full object-cover"
                       />
                     ) : (
                       <div className="w-12 h-12 border-2 border-indigo-600 rounded-full flex items-center justify-center bg-accent text-indigo-800 uppercase text-xl font-bold">
@@ -197,15 +263,6 @@ export default function Navbar() {
                 className="block text-left px-2 py-2 text-white hover:text-gray-200 transition-colors duration-150"
               >
                 Login
-              </Link>
-
-              <div className="text-white">|</div>
-
-              <Link
-                to="/register"
-                className="block text-left px-2 py-2 text-white hover:text-gray-200 transition-colors duration-150"
-              >
-                Register
               </Link>
             </div>
           )}

@@ -1,3 +1,5 @@
+import type { UserRole } from "./user";
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -18,8 +20,8 @@ export interface RegisterRequest {
   occupation: string;
   country: string;
   linkedinUrl: string;
-  photoFilePath: string;
-  cvFilePath: string;
+  photoFilePath?: string;
+  cvFilePath?: string;
   roles: string[];
 }
 
@@ -34,7 +36,7 @@ export interface UserDetails {
   lastName: string;
   email: string;
   phone: string;
-  roles: string[];
+  roles: UserRole[];
   status: number;
   institution: string;
   occupation: string;
