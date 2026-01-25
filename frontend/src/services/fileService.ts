@@ -38,4 +38,24 @@ export const fileService = {
       true,
     );
   },
+  downloadFile: async (filePath: string): Promise<void> => {
+    try {
+      const blob = await api.getBlob(
+        `/files/download?path=${encodeURIComponent(filePath)}`,
+        true,
+      );
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filePath.split("/").pop() || "download";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("File download error:", error);
+      throw error;
+    }
+  },
 };

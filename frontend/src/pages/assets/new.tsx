@@ -1,489 +1,179 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useCreateUserMutation } from "@/hooks/useUsers";
-import { UserStatus } from "@/models/user";
 import { FileTypeEnum } from "@/models/file";
 import { fileService } from "@/services/fileService";
-import { User, FileText } from "lucide-react";
+import { Upload, FileText, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function NewAsset() {
   const navigate = useNavigate();
-  const createUserMutation = useCreateUserMutation();
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    phone: "",
-    institution: "",
-    occupation: "",
-    country: "",
-    linkedinUrl: "",
-    status: 1,
-    photoFilePath: "",
-    cvFilePath: "",
-  });
-
-  const [selectedRoles, setSelectedRoles] = useState<string[]>(["USER"]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<any>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleRoleToggle = (role: string) => {
-    setSelectedRoles((prev) => {
-      if (prev.includes(role)) {
-        // Don't allow deselecting if it's the only role
-        if (prev.length === 1) return prev;
-        return prev.filter((r) => r !== role);
-      }
-      return [...prev, role];
-    });
-  };
-
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: FileTypeEnum,
-  ) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (type === FileTypeEnum.PROFILE_PHOTOS) {
-        setPhotoFile(file);
-        try {
-          let formDataToUpload = new FormData();
-          formDataToUpload.append("file", file);
-
-          let fileUploadResponse = await fileService.uploadFile(
-            type,
-            formDataToUpload,
-          );
-
-          if (
-            fileUploadResponse.success &&
-            fileUploadResponse.data.file.storageKey
-          ) {
-            setFormData((prev) => ({
-              ...prev,
-              photoFilePath: fileUploadResponse.data.file.storageKey,
-            }));
-          }
-        } catch (error) {
-          console.error("Photo upload error:", error);
-          setPhotoFile(null);
-          setFormData((prev) => ({
-            ...prev,
-            photoFilePath: "",
-          }));
-        }
-      } else {
-        setCvFile(file);
-
-        try {
-          let formDataToUpload = new FormData();
-          formDataToUpload.append("file", file);
-
-          let fileUploadResponse = await fileService.uploadFile(
-            type,
-            formDataToUpload,
-          );
-
-          if (
-            fileUploadResponse.success &&
-            fileUploadResponse.data.file.storageKey
-          ) {
-            setFormData((prev) => ({
-              ...prev,
-              cvFilePath: fileUploadResponse.data.file.storageKey,
-            }));
-          }
-        } catch (error) {
-          console.error("CV upload error:", error);
-          setCvFile(null);
-          setFormData((prev) => ({
-            ...prev,
-            cvFilePath: "",
-          }));
-        }
-      }
+      setSelectedFile(file);
+      setError("");
+      setSuccess(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    // Validate required fields
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.phone ||
-      !formData.institution ||
-      !formData.occupation ||
-      !formData.country
-    ) {
-      setError("Please fill in all required fields");
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setError("Please select a file to upload");
       return;
     }
 
-    createUserMutation.mutate(
-      {
-        ...formData,
-        roles: selectedRoles,
-      },
-      {
-        onSuccess: () => {
-          navigate("/users");
-        },
-        onError: (error) => {
-          const errorMessage =
-            error instanceof Error ? error.message : "Failed to create user";
-          setError(errorMessage);
-        },
-      },
-    );
+    setIsUploading(true);
+    setError("");
+    setSuccess(false);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      const response = await fileService.uploadFile(
+        FileTypeEnum.ASSETS,
+        formData,
+      );
+
+      if (response.success && response.data.file) {
+        setSuccess(true);
+        setUploadedFile(response.data.file);
+        setSelectedFile(null);
+        // Reset form after 2 seconds
+        setTimeout(() => {
+          setSuccess(false);
+          setUploadedFile(null);
+          navigate(`/assets`);
+        }, 2000);
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to upload file";
+      setError(errorMessage);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-accent text-3xl font-bold">Create New User</h1>
-        <p className="text-muted-foreground">Add a new user to the system</p>
+        <h1 className="text-accent text-3xl font-bold">Create New Asset</h1>
+        <p className="text-muted-foreground">
+          Upload a new file to your assets
+        </p>
       </div>
 
       {/* Form Card */}
       <div className="rounded-lg border border-slate-200 bg-white shadow-md p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Form Fields Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* First Name */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="firstName"
-                className="text-sm font-medium text-slate-700"
-              >
-                First Name *
-              </label>
-              <Input
-                id="firstName"
-                name="firstName"
-                type="text"
-                placeholder="John"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-              />
-            </div>
+        <div className="space-y-3">
+          {/* Asset Type is fixed to ASSETS; no selection needed */}
 
-            {/* Last Name */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="lastName"
-                className="text-sm font-medium text-slate-700"
-              >
-                Last Name *
-              </label>
-              <Input
-                id="lastName"
-                name="lastName"
-                type="text"
-                placeholder="Doe"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Email */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="email"
-                className="text-sm font-medium text-slate-700"
-              >
-                Email *
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="user@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Password */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-slate-700"
-              >
-                Password *
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter a secure password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Phone */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="phone"
-                className="text-sm font-medium text-slate-700"
-              >
-                Phone *
-              </label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="+8801712345678"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Country */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="country"
-                className="text-sm font-medium text-slate-700"
-              >
-                Country *
-              </label>
-              <Input
-                id="country"
-                name="country"
-                type="text"
-                placeholder="Bangladesh"
-                value={formData.country}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Institution */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="institution"
-                className="text-sm font-medium text-slate-700"
-              >
-                Institution *
-              </label>
-              <Input
-                id="institution"
-                name="institution"
-                type="text"
-                placeholder="University Name"
-                value={formData.institution}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Occupation */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="occupation"
-                className="text-sm font-medium text-slate-700"
-              >
-                Occupation *
-              </label>
-              <Input
-                id="occupation"
-                name="occupation"
-                type="text"
-                placeholder="Student"
-                value={formData.occupation}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* LinkedIn URL */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="linkedinUrl"
-                className="text-sm font-medium text-slate-700"
-              >
-                LinkedIn URL
-              </label>
-              <Input
-                id="linkedinUrl"
-                name="linkedinUrl"
-                type="url"
-                placeholder="https://www.linkedin.com/in/yourprofile"
-                value={formData.linkedinUrl}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Status */}
-            <div className="flex flex-col space-y-2">
-              <label className="text-sm font-medium text-slate-700">
-                Status *
-              </label>
-              <Select
-                value={formData.status.toString()}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, status: Number(value) }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={UserStatus.INACTIVE.toString()}>
-                    Inactive
-                  </SelectItem>
-                  <SelectItem value={UserStatus.ACTIVE.toString()}>
-                    Active
-                  </SelectItem>
-                  <SelectItem value={UserStatus.SUSPENDED.toString()}>
-                    Suspended
-                  </SelectItem>
-                  <SelectItem value={UserStatus.DELETED.toString()}>
-                    Deleted
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Profile Picture */}
-            <div className="flex flex-col space-y-3">
-              <label className="text-sm text-muted-foreground">
-                Profile picture
-              </label>
-              <div>
-                <Input
-                  id="photo"
-                  name="photo"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleFileChange(e, FileTypeEnum.PROFILE_PHOTOS)
-                  }
-                  className="cursor-pointer"
-                />
-                {photoFile && (
-                  <p className="text-xs text-slate-500 mt-2">
-                    Selected: {photoFile.name}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* CV */}
-            <div className="flex flex-col space-y-3">
-              <label className="text-sm text-muted-foreground">CV</label>
-              <div>
-                <Input
-                  id="cv"
-                  name="cv"
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => handleFileChange(e, FileTypeEnum.CVS)}
-                  className="cursor-pointer"
-                />
-                {cvFile && (
-                  <p className="text-xs text-slate-500 mt-2">
-                    Selected: {cvFile.name}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Roles Selection */}
-          <div className="flex flex-col space-y-3">
+          {/* File Upload Area */}
+          <div className="flex flex-col space-y-3 max-w-lg">
             <label className="text-sm font-medium text-slate-700">
-              Select Roles *
+              Select File *
             </label>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="role-user"
-                  checked={selectedRoles.includes("USER")}
-                  onCheckedChange={() => handleRoleToggle("USER")}
-                />
-                <label
-                  htmlFor="role-user"
-                  className="text-sm text-slate-700 cursor-pointer"
-                >
-                  User
-                </label>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="role-reviewer"
-                  checked={selectedRoles.includes("REVIEWER")}
-                  onCheckedChange={() => handleRoleToggle("REVIEWER")}
-                />
-                <label
-                  htmlFor="role-reviewer"
-                  className="text-sm text-slate-700 cursor-pointer"
-                >
-                  Reviewer
-                </label>
-              </div>
+            <div className="relative">
+              <input
+                type="file"
+                onChange={handleFileSelect}
+                disabled={isUploading}
+                className="cursor-pointer hidden"
+                id="file-input"
+              />
+              <label
+                htmlFor="file-input"
+                className={`flex items-center justify-center w-full px-6 py-8 border-2 border-dashed rounded-lg transition-colors ${
+                  selectedFile
+                    ? "border-green-500 bg-green-50"
+                    : "border-slate-300 bg-slate-50 hover:border-slate-400"
+                } ${isUploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+              >
+                <div className="flex flex-col items-center space-y-2">
+                  <Upload className="w-8 h-8 text-slate-400" />
+                  <div className="text-sm text-slate-600">
+                    {selectedFile ? (
+                      <div className="flex flex-col items-center space-y-1">
+                        <FileText className="w-5 h-5 text-green-600" />
+                        <p className="font-medium text-green-600">
+                          {selectedFile.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="font-medium">
+                          Click to select or drag and drop
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Any file type is supported
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </label>
             </div>
-            <p className="text-xs text-slate-500">
-              Select at least one role for the user
-            </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="p-4 rounded-md text-sm border border-red-500/30 bg-red-500/10 text-red-800">
-              {error}
+            <div className="p-4 rounded-md text-sm border border-red-500/30 bg-red-500/10 text-red-800 flex items-start gap-3">
+              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3">
+          {/* Success Message */}
+          {success && uploadedFile && (
+            <div className="p-4 rounded-md text-sm border border-green-500/30 bg-green-500/10 text-green-800 flex items-start gap-3">
+              <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">File uploaded successfully!</p>
+                <p className="text-xs text-green-700 mt-1">
+                  Name: {uploadedFile.name}
+                </p>
+                <p className="text-xs text-green-700">
+                  Size: {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                </p>
+                <p className="text-xs text-green-700">
+                  Redirecting to asset details...
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => navigate("/users")}
-              disabled={createUserMutation.isPending}
+              onClick={() => navigate("/assets")}
+              disabled={isUploading}
             >
               Cancel
             </Button>
             <Button
-              type="submit"
+              type="button"
               size="sm"
-              disabled={createUserMutation.isPending}
+              onClick={handleUpload}
+              disabled={isUploading || !selectedFile || success}
             >
-              {createUserMutation.isPending ? "Creating..." : "Create User"}
+              {isUploading ? "Uploading..." : "Upload Asset"}
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

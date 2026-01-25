@@ -160,6 +160,39 @@ class BaseApiService {
     });
   }
 
+  async getBlob(endpoint: string, requiresAuth: boolean = false): Promise<Blob> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    // Check token validity for authenticated requests
+    if (requiresAuth && !this.checkTokenValidity()) {
+      const error: ApiError = new Error("Token is expired or invalid");
+      error.status = 401;
+      throw error;
+    }
+
+    const headers = this.getHeaders(requiresAuth, {});
+
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Request failed with status ${response.status}`,
+        );
+      }
+
+      return response.blob();
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("An unexpected error occurred");
+    }
+  }
+
   async uploadFile<T>(
     endpoint: string,
     formData: FileUploadRequest["file"],

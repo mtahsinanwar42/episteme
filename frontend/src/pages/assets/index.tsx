@@ -4,14 +4,11 @@ import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useUserDetailsMutation } from "@/hooks/useUsers";
 
 import { useFiles } from "@/hooks/useFiles";
 import type { File } from "@/models/file";
 
 export default function Assets() {
-  const updateStatusMutation = useUserDetailsMutation();
-
   const columns: ColumnDef<File>[] = [
     {
       id: "serial",
@@ -24,14 +21,16 @@ export default function Assets() {
       header: "Name",
       cell: ({ row }) => {
         const name = row.getValue("name") as string;
-        return <span className="font-medium">{name}</span>;
+        return (
+          <div className="font-medium max-w-96 wrap-break-word">{name}</div>
+        );
       },
     },
     {
       accessorKey: "storageKey",
       header: "Storage Key",
       cell: ({ row }) => (
-        <div className="text-sm max-w-96 overflow-clip">
+        <div className="text-sm max-w-96 break-all">
           {row.getValue("storageKey")}
         </div>
       ),
