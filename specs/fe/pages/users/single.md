@@ -19,6 +19,7 @@
   - `PUT /api/v1/users/:id/status`
 - File upload (if CV/photo are uploaded via file endpoint):
   - Use the project’s file upload endpoint/workflow to obtain `cvFilePath` and/or `photoFilePath`
+- Can get countries list from `GET /api/v1/reference-data/countries` API
 
 ## Form Fields (updatable per API spec)
 

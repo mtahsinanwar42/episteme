@@ -18,6 +18,8 @@
 - `PUT /api/v1/auth/me/details` (save changes)
 - Payload: As defined in Auth API spec
 
+- Can get countries list from `GET /api/v1/reference-data/countries` API
+
 ## Profile Fields
 
 | Field         | Type          | Editable |

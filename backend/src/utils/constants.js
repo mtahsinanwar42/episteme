@@ -94,5 +94,23 @@ export const FILE_BUCKETS = {
   assets: { visibility: "public", maxSize: 5_000_000, types: /jpg|jpeg|png|svg|json/ },
 };
 
+export const REFERENCE_FILES = Object.freeze({
+  TOPICS: "topics.txt",
+  COUNTRIES: "countries.txt",
+});
+
+export const TOPICS_CONFIG = Object.freeze({
+  URL: process.env.TOPICS_URL || "https://api.openalex.org/concepts",
+  START_PAGE: 1,
+  END_PAGE: 50,
+  PER_PAGE: 200,
+});
+
+export const COUNTRIES_CONFIG = Object.freeze({
+  URL:
+    process.env.COUNTRIES_URL
+    || "https://gist.githubusercontent.com/kalinchernev/486393efcca01623b18d/raw/countries",
+});
+
 export const DEFAULT_PAGE_NO = 1;
 export const DEFAULT_PAGE_LIMIT = 10;

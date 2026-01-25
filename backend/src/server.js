@@ -15,6 +15,7 @@ import { initModels } from "./models/index.js";
 import { notFound, errorHandler } from "./middlewares/error.js";
 import authRoutes from "./routes/auth.js";
 import fileRoutes from "./routes/file.js";
+import refDataRoutes from "./routes/referenceData.js";
 import userRoutes from "./routes/user.js";
 import conferenceRoutes from "./routes/conference.js";
 import trainingRoutes from "./routes/training.js";
@@ -67,6 +68,7 @@ app.get("/health", async (req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/files', fileRoutes);
+app.use('/api/v1/reference-data', refDataRoutes);
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/conferences', conferenceRoutes);

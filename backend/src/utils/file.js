@@ -121,3 +121,38 @@ export const getFileListByDirectory = (directory) => {
     return [];
   }
 };
+
+export const resolveInDir = (dirPath, fileName) => {
+  return path.join(dirPath, fileName);
+};
+
+export const readLinesIfExists = (filePath) => {
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  const content = fs.readFileSync(filePath, "utf8");
+  return content
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+};
+
+export const writeLines = (filePath, lines) => {
+  const cleaned = lines.map((x) => String(x).trim()).filter(Boolean);
+
+  const unique = Array.from(new Set(cleaned));
+
+  fs.writeFileSync(filePath, unique.join("\n") + "\n", "utf8");
+  return unique;
+};
+
+export const getPublicAssetsDiskDir = () => {
+  const projectRoot = path.resolve();
+  const publicAssetsPath = process.env.FILE_STORAGE_PUBLIC_ASSETS_PATH || "/storage/public/assets";
+
+  const publicAssetsRel = publicAssetsPath.replace(/^[\\/]+/, "");
+  const normalizedPublicAssetsRel = publicAssetsRel.replace(/[\\/]+$/, "");
+
+  return path.join(projectRoot, normalizedPublicAssetsRel);
+}
