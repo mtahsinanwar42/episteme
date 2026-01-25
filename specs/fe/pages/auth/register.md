@@ -10,11 +10,13 @@
 
 - Allow a new user to create an account.
 
-## API
+## APIs
 
 - `POST /api/v1/auth/register`
 - Trigger: Form submission
 - Payload: As defined in Auth API spec
+
+- Can get countries list from `GET /api/v1/reference-data/countries` API
 
 ## Form Fields
 
