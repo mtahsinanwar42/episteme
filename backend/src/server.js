@@ -24,11 +24,15 @@ import activityRoutes from "./routes/activity.js";
 import announcementRoutes from "./routes/announcement.js";
 import submissionRoutes from "./routes/contentSubmission.js";
 import reviewAssignmentRoutes from "./routes/contentReviewAssignment.js";
+import { createRefDataService } from "./services/referenceData.js";
+import { createSchedulerService } from "./services/scheduler.js";
 
 dotenv.config();
 
 const app = express();
 const __dirname = path.resolve();
+const refDataService = createRefDataService({});
+const schedulerService = createSchedulerService({ refDataService });
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -96,6 +100,8 @@ async function start() {
   try {
     await connectDb();
     initModels(sequelize);
+
+    schedulerService.start();
 
     app.listen(PORT, () =>
       console.log(

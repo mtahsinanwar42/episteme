@@ -114,3 +114,9 @@ export const COUNTRIES_CONFIG = Object.freeze({
 
 export const DEFAULT_PAGE_NO = 1;
 export const DEFAULT_PAGE_LIMIT = 10;
+
+export const UPDATE_SCHEDULER_TIME_PATTERN = Object.freeze({
+  TOPICS: "0 0 0 * * 0",
+  COUNTRIES: "0 0 0 * * 0",
+  ALL: "* * * * *",
+});
