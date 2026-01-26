@@ -17,10 +17,12 @@ import Announcements from "@/pages/announcements";
 import Blogs from "@/pages/blogs";
 import Register from "@/pages/register";
 import UserDetails from "@/pages/users/details";
-import NewUser from "./pages/users/new";
-import Assets from "./pages/assets";
-import AssetDetails from "./pages/assets/details";
-import NewAsset from "./pages/assets/new";
+import NewUser from "@/pages/users/new";
+import Assets from "@/pages/assets";
+import AssetDetails from "@/pages/assets/details";
+import NewAsset from "@/pages/assets/new";
+import Activities from "@/pages/activities/list";
+import ActivityDetails from "@/pages/activities/details";
 
 export default function RouteConfig() {
   return (
@@ -82,6 +84,9 @@ export default function RouteConfig() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/activities" element={<Activities />} />
+      <Route path="/activities/:activityId" element={<ActivityDetails />} />
 
       <Route path="/conferences" element={<Conferences />} />
       <Route path="/trainings" element={<Trainings />} />
