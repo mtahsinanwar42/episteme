@@ -63,10 +63,29 @@ Required:
 
 - id
 
-## 4. Update Submission Status
+## 4. Update Submission DOI
+
+**PUT /:id/doi**
+Access: ADMIN, for APPROVED submissions only.
+
+### Request Body
+
+Required:
+
+- doi (text)
+
+Example:
+
+```json
+{
+  "doi": "XYZ"
+}
+```
+
+## 5. Update Submission Status
 
 **PUT /:id/status**
-Access: USER/ADMIN
+Access: ADMIN
 
 ### Request Body
 

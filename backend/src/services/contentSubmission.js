@@ -101,16 +101,31 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     });
   }
 
+  async function updateSubmissionDoiById(id, doi) {
+    if (isEmpty(doi)) {
+      throw new ErrorResponse(400, "DOI should not be empty");
+    }
+
+    const where = { id };
+    const submission = await ContentSubmission.findOne({
+      where,
+    });
+
+    if (submission.currentStatus !== CONTENT_SUBMISSION_STATUS.APPROVED) {
+      throw new ErrorResponse(400, "DOI should be set for approved submissions.");
+    }
+
+    await submission.update({ doi });
+
+    return submission;
+  }
+
   async function updateSubmissionStatusById(user, id, status) {
     if (!Object.values(CONTENT_SUBMISSION_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid ContentSubmission status");
     }
 
-    const roles = Array.isArray(user.roles) ? user.roles : [];
-    const isUser = roles.includes(USER_ROLE.USER);
-
     const where = { id };
-
     const submission = await ContentSubmission.findOne({
       where,
     });
@@ -128,6 +143,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     getSubmissionsByUserIdAndRoles,
     getSubmissionById,
     saveSubmission,
+    updateSubmissionDoiById,
     updateSubmissionStatusById
   };
 }

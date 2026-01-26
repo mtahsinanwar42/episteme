@@ -57,6 +57,9 @@ Display submission-level information in a read-only format (unless specified).
 - Status Update (ADMIN only). Shown for submissions of PENDING_APPROVAL or RETURNED status
   - Opens status update control (inline or modal)
   - Triggers submission status update API
+- DOI Update (ADMIN only). Shown for submissions of APPROVED status.
+  - Opens DOI update control (inline/modal)
+  - Triggers submission DOI update API
 
 ---
 
@@ -118,7 +121,8 @@ Provide a tabbed interface below the metadata section.
   - Can access Versions, Messages, and Reviews tabs.
 - ADMIN:
   - Can view all submissions.
-  - Can update submission status.
+  - Can update submission status _(for PENDING_APPROVAL or RETURNED submissions)_.
+  - Can update DOI _(for APPROVED submissions)_
   - Can view owner information.
 
 ---

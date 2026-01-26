@@ -53,6 +53,18 @@ export const saveSubmission = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Update submission DOI by id
+// @route   PUT /api/v1/submissions/:id/doi
+// @access  Private
+export const updateSubmissionDoi = asyncHandler(async (req, res) => {
+  const submission = await submissionService.updateSubmissionDoiById(req.params.id, req.body.doi);
+
+  return res.status(200).json({
+    success: true,
+    data: submission,
+  });
+});
+
 // @desc    Update submission status by id
 // @route   PUT /api/v1/submissions/:id/status
 // @access  Private

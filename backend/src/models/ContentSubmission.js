@@ -31,6 +31,11 @@ export default (sequelize, DataTypes) => {
           },
         },
       },
+      doi: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "doi",
+      },
       conferenceId: {
         type: DataTypes.BIGINT,
         allowNull: false,
