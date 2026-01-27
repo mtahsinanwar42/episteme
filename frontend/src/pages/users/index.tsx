@@ -234,10 +234,10 @@ export default function Users() {
           <DialogBody>
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-foreground mb-2">
                   Name: {selectedUser?.firstName} {selectedUser?.lastName}
                 </p>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-foreground/80 mb-4">
                   Current status:{" "}
                   {selectedUser && UserStatus[selectedUser.status]}
                 </p>
