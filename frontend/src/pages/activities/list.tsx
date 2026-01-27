@@ -3,9 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useActivities } from "@/hooks/useActivities";
 import { ActivityCard } from "@/components/activity/ActivityCard";
 import { Pagination } from "@/components/ui/pagination";
+import { useSelector } from "react-redux";
+import { UserRole } from "@/models/user";
+import { Button } from "@/components/ui/button";
+import type { RootState } from "@/stores/store";
 
 export default function Activities() {
   const navigate = useNavigate();
+  const currentRoles = useSelector(
+    (state: RootState) => state?.auth?.user?.roles,
+  );
+
+  console.log(currentRoles);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(9); // 3 cards x 3 rows by default
 
@@ -42,9 +51,22 @@ export default function Activities() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-4xl text-accent font-bold mb-2">Activities</h1>
-        <p className="text-slate-600">Latest activities and events</p>
+      <div className="mb-8 flex justify-between items-end">
+        <div>
+          <h1 className="text-4xl text-accent font-bold mb-2">Activities</h1>
+          <p className="text-slate-600">Latest activities and events</p>
+        </div>
+
+        {currentRoles?.includes(UserRole.ADMIN) && (
+          <div className="flex justify-end">
+            <Button
+              onClick={() => navigate("/activities/new")}
+              className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              Add New Activity
+            </Button>
+          </div>
+        )}
       </div>
 
       {isLoading && <div className="text-slate-600">Loading activities...</div>}

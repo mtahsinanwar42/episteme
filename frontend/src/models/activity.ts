@@ -33,3 +33,18 @@ export enum ActivityStatus {
   PUBLISHED = 1,
   DELETED = 9,
 }
+
+export interface GetActivitiesParams {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  select?: string;
+  search?: string;
+  paginate?: boolean;
+}
+
+export interface CreateActivityRequest {
+  title: string;
+  metadataFilePath: string;
+  status: number;
+}

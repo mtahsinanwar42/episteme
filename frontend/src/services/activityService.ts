@@ -1,14 +1,10 @@
 import { api } from "./api";
-import type { ActivityResponse, ActivityDetailsResponse } from "@/models/activity";
-
-export interface GetActivitiesParams {
-  page?: number;
-  limit?: number;
-  sort?: string;
-  select?: string;
-  search?: string;
-  paginate?: boolean;
-}
+import type {
+  ActivityResponse,
+  ActivityDetailsResponse,
+  GetActivitiesParams,
+  CreateActivityRequest,
+} from "@/models/activity";
 
 export const activityService = {
   getActivities: async (
@@ -35,5 +31,11 @@ export const activityService = {
     activityId: string | number,
   ): Promise<ActivityDetailsResponse> => {
     return api.get<ActivityDetailsResponse>(`/activities/${activityId}`, false);
+  },
+
+  createActivity: async (
+    data: CreateActivityRequest,
+  ): Promise<ActivityDetailsResponse> => {
+    return api.post<ActivityDetailsResponse>("/activities", data, true);
   },
 };

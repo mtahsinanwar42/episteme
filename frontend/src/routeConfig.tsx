@@ -23,6 +23,7 @@ import AssetDetails from "@/pages/assets/details";
 import NewAsset from "@/pages/assets/new";
 import Activities from "@/pages/activities/list";
 import ActivityDetails from "@/pages/activities/details";
+import NewActivity from "@/pages/activities/new";
 
 export default function RouteConfig() {
   return (
@@ -87,6 +88,7 @@ export default function RouteConfig() {
 
       <Route path="/activities" element={<Activities />} />
       <Route path="/activities/:activityId" element={<ActivityDetails />} />
+      <Route path="/activities/new" element={<NewActivity />} />
 
       <Route path="/conferences" element={<Conferences />} />
       <Route path="/trainings" element={<Trainings />} />
