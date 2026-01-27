@@ -1,8 +1,16 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useActivityById } from "@/hooks/useActivities";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, ArrowLeft } from "lucide-react";
+import {
+  Calendar,
+  ArrowLeft,
+  FileJson,
+  Info,
+  Clock,
+  ImageIcon,
+} from "lucide-react";
 import { ActivityStatus } from "@/models/activity";
 import { config } from "@/config/config";
 
@@ -10,6 +18,39 @@ export default function ActivityDetailsPage() {
   const { activityId } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useActivityById(activityId);
+  const [metadata, setMetadata] = useState<any>(null);
+  const [metadataLoading, setMetadataLoading] = useState(false);
+  const [metadataError, setMetadataError] = useState<string | null>(null);
+
+  // Fetch metadata JSON file
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      if (!data?.data?.metadataFilePath) return;
+
+      try {
+        setMetadataLoading(true);
+        setMetadataError(null);
+        const metadataUrl = `${new URL(config.baseUrl).origin}/${data.data.metadataFilePath}`;
+        const response = await fetch(metadataUrl);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch metadata: ${response.statusText}`);
+        }
+
+        const jsonData = await response.json();
+        setMetadata(jsonData);
+      } catch (err) {
+        console.error("Error fetching metadata:", err);
+        setMetadataError(
+          err instanceof Error ? err.message : "Failed to load metadata",
+        );
+      } finally {
+        setMetadataLoading(false);
+      }
+    };
+
+    fetchMetadata();
+  }, [data?.data?.metadataFilePath]);
 
   if (isLoading) {
     return (
@@ -58,81 +99,87 @@ export default function ActivityDetailsPage() {
 
   const activity = data.data;
 
-  const getStatusBadge = (status: number) => {
+  const getStatusBadge = (status: ActivityStatus) => {
     switch (status) {
       case ActivityStatus.DRAFT:
-        return <Badge variant="secondary">Draft</Badge>;
+        return "Draft";
       case ActivityStatus.PUBLISHED:
-        return <Badge variant="default">Published</Badge>;
+        return "Published";
       case ActivityStatus.DELETED:
-        return <Badge variant="destructive">Deleted</Badge>;
+        return "deleted";
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return `${status}`;
     }
   };
 
-  const imageUrl = activity.metadataFilePath
-    ? `${new URL(config.baseUrl).origin}/${activity.metadataFilePath}`
-    : null;
-
   return (
-    <div>
-      <div className="mb-6">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate("/activities")}
-          className="mb-4"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Activities
-        </Button>
-        <h1 className="text-4xl text-accent font-bold mb-2">
-          Activity Details
-        </h1>
-      </div>
+    <div className="max-w-6xl mx-auto">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => navigate("/activities")}
+        className="mb-6"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to Activities
+      </Button>
 
-      <div className="rounded-lg shadow-small p-6 bg-white">
-        {imageUrl && (
-          <div className="mb-6 rounded-lg overflow-hidden">
+      <div className="space-y-6">
+        <div className="rounded-lg border border-slate-200 bg-white shadow-sm relative">
+          {!metadataLoading && !metadataError && metadata ? (
             <img
-              src={imageUrl}
-              alt={activity.title}
-              className="w-full max-h-[400px] object-cover"
-              loading="lazy"
+              src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
+              crossOrigin="anonymous"
+              alt="Activity Image"
+              className="w-full h-96 object-cover rounded-t-lg"
             />
-          </div>
-        )}
-
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">
-              {activity.title}
-            </h2>
-            <div className="flex items-center gap-3">
-              {getStatusBadge(activity.status)}
+          ) : (
+            <div className="w-full h-96 flex items-center justify-center bg-linear-to-br from-slate-50 to-slate-100 animate-pulse">
+              <div className="text-center">
+                <ImageIcon className="w-12 h-12 text-slate-200 mx-auto mb-2" />
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="border-t pt-4 space-y-3">
-            <div className="flex items-center gap-2 text-slate-600">
-              <Calendar className="w-4 h-4" />
-              <span className="text-sm">
+          <div className="flex flex-col gap-4 p-4">
+            <div>
+              <h3 className="font-bold text-slate-900">{activity.title}</h3>
+              <h6 className="text-slate-600">{metadata?.summary}</h6>
+            </div>
+
+            <div className="flex gap-4">
+              <Badge variant="outline">ID: {activity.id}</Badge>
+              <Badge variant="outline">
+                {getStatusBadge(activity?.status)}
+              </Badge>
+              <Badge variant="outline">
                 Created: {new Date(activity.createdAt).toLocaleString()}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-600">
-              <Calendar className="w-4 h-4" />
-              <span className="text-sm">
+              </Badge>
+              <Badge variant="outline">
                 Updated: {new Date(activity.updatedAt).toLocaleString()}
-              </span>
+              </Badge>
             </div>
-          </div>
-
-          <div className="border-t pt-4">
-            <p className="text-sm text-slate-500">Activity ID: {activity.id}</p>
           </div>
         </div>
+
+        {!metadataLoading && !metadataError && metadata && (
+          <>
+            {metadata?.sections &&
+              metadata?.sections?.length > 0 &&
+              metadata?.sections?.map((section: any, index: number) => (
+                <div
+                  key={index}
+                  className="rounded-lg border border-slate-200 bg-white shadow-sm p-6"
+                >
+                  <h2 className="text-2xl font-semibold text-slate-900 mb-4">
+                    {section.heading}
+                  </h2>
+
+                  <p>{section.content}</p>
+                </div>
+              ))}
+          </>
+        )}
       </div>
     </div>
   );
