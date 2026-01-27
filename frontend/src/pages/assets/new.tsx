@@ -5,6 +5,8 @@ import { FileTypeEnum } from "@/models/file";
 import { fileService } from "@/services/fileService";
 import { Upload, FileText, AlertCircle, CheckCircle } from "lucide-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageSubTitle from "@/components/common/PageSubTitle";
+import PageTitle from "@/components/common/PageTitle";
 
 export default function NewAsset() {
   const navigate = useNavigate();
@@ -72,22 +74,18 @@ export default function NewAsset() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-accent text-3xl font-bold">Create New Asset</h1>
-          <p className="text-muted-foreground">
-            Upload a new file to your assets
-          </p>
+          <PageTitle title="Create New Asset" />
+          <PageSubTitle text="Upload a new file to your assets" />
         </div>
 
         {/* Form Card */}
-        <div className="rounded-lg border border-slate-200 bg-white shadow-md p-6">
+        <div className="rounded-lg border border-border bg-card shadow-md p-6">
           <div className="space-y-3">
             {/* Asset Type is fixed to ASSETS; no selection needed */}
 
             {/* File Upload Area */}
             <div className="flex flex-col space-y-3 max-w-lg">
-              <label className="text-sm font-medium text-slate-700">
-                Select File *
-              </label>
+              <label className="text-sm font-medium">Select File *</label>
               <div className="relative">
                 <input
                   type="file"
@@ -101,19 +99,19 @@ export default function NewAsset() {
                   className={`flex items-center justify-center w-full px-6 py-8 border-2 border-dashed rounded-lg transition-colors ${
                     selectedFile
                       ? "border-green-500 bg-green-50"
-                      : "border-slate-300 bg-slate-50 hover:border-slate-400"
+                      : "border-border bg-slate-900 hover:border-slate-500"
                   } ${isUploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                 >
                   <div className="flex flex-col items-center space-y-2">
-                    <Upload className="w-8 h-8 text-slate-400" />
-                    <div className="text-sm text-slate-600">
+                    <Upload className="w-8 h-8 text-foreground/80" />
+                    <div className="text-sm text-foreground/80">
                       {selectedFile ? (
                         <div className="flex flex-col items-center space-y-1">
                           <FileText className="w-5 h-5 text-green-600" />
                           <p className="font-medium text-green-600">
                             {selectedFile.name}
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-foreground/80">
                             ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
                           </p>
                         </div>
@@ -122,7 +120,7 @@ export default function NewAsset() {
                           <p className="font-medium">
                             Click to select or drag and drop
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-foreground/60">
                             Any file type is supported
                           </p>
                         </>

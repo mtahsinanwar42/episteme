@@ -16,6 +16,8 @@ import { ActivityStatus } from "@/models/activity";
 import { useFiles } from "@/hooks/useFiles";
 import { useCreateActivityMutation } from "@/hooks/useActivities";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageTitle from "@/components/common/PageTitle";
+import PageSubTitle from "@/components/common/PageSubTitle";
 
 export default function NewActivity() {
   const navigate = useNavigate();
@@ -121,15 +123,11 @@ export default function NewActivity() {
       />
 
       <div className="mb-8">
-        <h1 className="text-4xl text-accent font-bold mb-2">
-          Create New Activity
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Add a new activity with metadata configuration
-        </p>
+        <PageTitle title="Create New Activity" />
+        <PageSubTitle text="Add a new activity with metadata configuration" />
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white shadow-md p-6">
+      <div className="rounded-lg border border-border bg-card shadow-md p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="text-red-600">

@@ -27,7 +27,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           </h4>
         ),
         p: ({ children }) => (
-          <p className="text-slate-700 leading-relaxed mb-4">{children}</p>
+          <p className="text-foreground leading-relaxed mb-4">{children}</p>
         ),
         strong: ({ children }) => (
           <strong className="font-semibold text-foreground">{children}</strong>
@@ -46,7 +46,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           <li className="ml-4 leading-relaxed">{children}</li>
         ),
         blockquote: ({ children }) => (
-          <blockquote className="border-l-4 border-accent bg-slate-50 pl-4 py-2 my-4 italic text-slate-700">
+          <blockquote className="border-l-4 border-accent bg-background pl-4 py-2 my-4 italic text-foreground/70">
             {children}
           </blockquote>
         ),

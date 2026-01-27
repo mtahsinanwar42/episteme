@@ -25,6 +25,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageSubTitle from "@/components/common/PageSubTitle";
+import PageTitle from "@/components/common/PageTitle";
 
 export default function Users() {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -106,11 +108,11 @@ export default function Users() {
         return (
           <div className="flex gap-4 place-self-center">
             <Link to={`/users/${row?.original?.id}`}>
-              <Edit className="size-4 text-gray-600 hover:text-gray-800 cursor-pointer" />
+              <Edit className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
             </Link>
 
             <div onClick={() => handleOpenStatusModal(row?.original)}>
-              <RefreshCw className="size-4 text-blue-600 hover:text-blue-800 cursor-pointer" />
+              <RefreshCw className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
             </div>
           </div>
         );
@@ -199,8 +201,8 @@ export default function Users() {
     <div>
       <Breadcrumb items={[{ label: "Users", href: "/users" }]} />
       <div className="mb-6">
-        <h1 className="text-4xl text-accent font-bold mb-2">Users</h1>
-        <p className="text-slate-600">View and manage all registered users</p>
+        <PageTitle title="Users" />
+        <PageSubTitle text="View and manage all registered users" />
       </div>
 
       <div className="flex flex-col gap-4">

@@ -117,7 +117,7 @@ export default function ActivityDetailsPage() {
       />
 
       <div className="space-y-6">
-        <div className="rounded-lg border border-slate-200 bg-white shadow-sm relative">
+        <div className="rounded-lg border border-border shadow-sm relative">
           {!metadataLoading && !metadataError && metadata ? (
             <img
               src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
@@ -126,17 +126,17 @@ export default function ActivityDetailsPage() {
               className="w-full h-96 object-cover rounded-t-lg"
             />
           ) : (
-            <div className="w-full h-96 flex items-center justify-center bg-linear-to-br from-slate-50 to-slate-100 animate-pulse">
+            <div className="w-full h-96 flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 animate-pulse">
               <div className="text-center">
-                <ImageIcon className="w-12 h-12 text-slate-200 mx-auto mb-2" />
+                <ImageIcon className="w-12 h-12 text-slate-600 mx-auto mb-2" />
               </div>
             </div>
           )}
 
           <div className="flex flex-col gap-4 p-4">
             <div>
-              <h3 className="font-bold text-slate-900">{activity.title}</h3>
-              <h6 className="text-slate-600">{metadata?.summary}</h6>
+              <h3 className="font-bold">{activity.title}</h3>
+              <h6 className="text-foreground/60">{metadata?.summary}</h6>
             </div>
 
             <div className="flex gap-4">
@@ -161,9 +161,9 @@ export default function ActivityDetailsPage() {
               metadata?.sections?.map((section: any, index: number) => (
                 <div
                   key={index}
-                  className="rounded-lg border border-slate-200 bg-white shadow-sm"
+                  className="rounded-lg border border-border shadow-sm"
                 >
-                  <div className="p-4 bg-accent/5 shadow-sm">
+                  <div className="p-4 bg-accent/5 shadow-sm rounded-t-lg">
                     <h3 className="font-semibold">{section.heading}</h3>
                   </div>
 

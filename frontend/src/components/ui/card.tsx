@@ -21,7 +21,7 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className="rounded-lg border border-slate-200 bg-accent-foreground shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="rounded-lg border border-border bg-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
       onClick={onClick}
     >
       {showImage && imageUrl && (

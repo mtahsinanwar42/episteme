@@ -91,8 +91,8 @@ export default function AssetDetails() {
         <h1 className="text-3xl text-accent font-bold">Asset Details</h1>
       </div>
 
-      <div className="">
-        <div className="rounded-lg shadow-small">
+      <div>
+        <div className="rounded-lg shadow-small border border-border">
           <div className="p-4 bg-accent/5 shadow-sm">
             <h3 className="text-accent text-lg font-semibold">Information</h3>
           </div>

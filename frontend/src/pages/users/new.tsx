@@ -15,6 +15,8 @@ import { UserStatus } from "@/models/user";
 import { FileTypeEnum } from "@/models/file";
 import { fileService } from "@/services/fileService";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageSubTitle from "@/components/common/PageSubTitle";
+import PageTitle from "@/components/common/PageTitle";
 
 export default function NewUser() {
   const navigate = useNavigate();
@@ -168,18 +170,15 @@ export default function NewUser() {
 
       <div className="space-y-6">
         <div>
-          <h1 className="text-accent text-3xl font-bold">Create New User</h1>
-          <p className="text-muted-foreground">Add a new user to the system</p>
+          <PageTitle title="Create New User" />
+          <PageSubTitle text="Add a new user to the system" />
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white shadow-md p-6">
+        <div className="rounded-lg border border-border bg-card shadow-md p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="firstName"
-                  className="text-sm font-medium text-slate-700"
-                >
+                <label htmlFor="firstName" className="text-sm font-medium">
                   First Name *
                 </label>
                 <Input
@@ -196,7 +195,7 @@ export default function NewUser() {
               <div className="flex flex-col space-y-2">
                 <label
                   htmlFor="lastName"
-                  className="text-sm font-medium text-slate-700"
+                  className="text-sm font-medium"
                 >
                   Last Name *
                 </label>
@@ -214,7 +213,7 @@ export default function NewUser() {
               <div className="flex flex-col space-y-2">
                 <label
                   htmlFor="email"
-                  className="text-sm font-medium text-slate-700"
+                  className="text-sm font-medium"
                 >
                   Email *
                 </label>
@@ -232,7 +231,7 @@ export default function NewUser() {
               <div className="flex flex-col space-y-2">
                 <label
                   htmlFor="password"
-                  className="text-sm font-medium text-slate-700"
+                  className="text-sm font-medium "
                 >
                   Password *
                 </label>
@@ -250,7 +249,7 @@ export default function NewUser() {
               <div className="flex flex-col space-y-2">
                 <label
                   htmlFor="phone"
-                  className="text-sm font-medium text-slate-700"
+                  className="text-sm font-medium "
                 >
                   Phone *
                 </label>
@@ -268,7 +267,7 @@ export default function NewUser() {
               <div className="flex flex-col space-y-2">
                 <label
                   htmlFor="country"
-                  className="text-sm font-medium text-slate-700"
+                  className="text-sm font-medium "
                 >
                   Country *
                 </label>
@@ -286,7 +285,7 @@ export default function NewUser() {
               <div className="flex flex-col space-y-2">
                 <label
                   htmlFor="institution"
-                  className="text-sm font-medium text-slate-700"
+                  className="text-sm font-medium "
                 >
                   Institution *
                 </label>
@@ -304,7 +303,7 @@ export default function NewUser() {
               <div className="flex flex-col space-y-2">
                 <label
                   htmlFor="occupation"
-                  className="text-sm font-medium text-slate-700"
+                  className="text-sm font-medium "
                 >
                   Occupation *
                 </label>
@@ -322,7 +321,7 @@ export default function NewUser() {
               <div className="flex flex-col space-y-2">
                 <label
                   htmlFor="linkedinUrl"
-                  className="text-sm font-medium text-slate-700"
+                  className="text-sm font-medium "
                 >
                   LinkedIn URL
                 </label>
@@ -337,7 +336,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium ">
                   Status *
                 </label>
                 <Select
@@ -410,7 +409,7 @@ export default function NewUser() {
             </div>
 
             <div className="flex flex-col space-y-3">
-              <label className="text-sm font-medium text-slate-700">
+              <label className="text-sm font-medium ">
                 Select Roles *
               </label>
               <div className="space-y-3">
@@ -422,7 +421,7 @@ export default function NewUser() {
                   />
                   <label
                     htmlFor="role-user"
-                    className="text-sm text-slate-700 cursor-pointer"
+                    className="text-sm  cursor-pointer"
                   >
                     User
                   </label>
@@ -435,7 +434,7 @@ export default function NewUser() {
                   />
                   <label
                     htmlFor="role-reviewer"
-                    className="text-sm text-slate-700 cursor-pointer"
+                    className="text-sm  cursor-pointer"
                   >
                     Reviewer
                   </label>

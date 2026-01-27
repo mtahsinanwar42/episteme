@@ -66,7 +66,7 @@ export function Pagination({
 
   return (
     <div className="flex items-center justify-between py-4 rounded">
-      <div className="flex items-center gap-4 text-sm text-slate-600">
+      <div className="flex items-center gap-4 text-sm text-foreground/80">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
           <Select

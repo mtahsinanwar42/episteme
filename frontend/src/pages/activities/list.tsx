@@ -8,6 +8,8 @@ import { UserRole } from "@/models/user";
 import { Button } from "@/components/ui/button";
 import type { RootState } from "@/stores/store";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageTitle from "@/components/common/PageTitle";
+import PageSubTitle from "@/components/common/PageSubTitle";
 
 export default function Activities() {
   const navigate = useNavigate();
@@ -55,8 +57,8 @@ export default function Activities() {
       <Breadcrumb items={[{ label: "Activities", href: "/activities" }]} />
       <div className="mb-6 flex justify-between items-end">
         <div>
-          <h1 className="text-4xl text-accent font-bold mb-2">Activities</h1>
-          <p className="text-slate-600">Latest activities and events</p>
+          <PageTitle title="Activities" />
+          <PageSubTitle text="Latest activities and events" />
         </div>
 
         {currentRoles?.includes(UserRole.ADMIN) && (
