@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Menu } from "lucide-react";
 import { UserRole } from "@/models/user";
 import { config } from "@/config/config";
 
@@ -180,7 +180,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <div className="flex gap-8">
+        <div className="hidden lg:flex! gap-8">
           {navItems.map((item, index) =>
             canViewNavItem(item.visibleTo, user?.roles, isLoggedIn) ? (
               <NavItem key={index} item={item} />
@@ -208,7 +208,10 @@ export default function Navbar() {
                 </div>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="w-64 border-none" align="end">
+              <DropdownMenuContent
+                className="w-64 border-none bg-gray-100"
+                align="end"
+              >
                 <DropdownMenuLabel>
                   <div className="flex items-center gap-3 py-2">
                     {user?.photoFilePath ? (
@@ -266,7 +269,9 @@ export default function Navbar() {
               </Link>
             </div>
           )}
-          {/* <span className="text-sm">{user?.user_metadata?.full_name}</span> */}
+          <div className="block lg:hidden">
+            <Menu />
+          </div>
           {/* <ThemeSwitcher /> */}
         </div>
       </div>
