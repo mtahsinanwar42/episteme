@@ -1,9 +1,9 @@
 import { sequelize } from "../config/db.js";
-import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails } from "../repositories/contentSubmission.js";
+import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails, markSubmissionAsApprovedOrRejected, markSubmissionAsDeleted, markSubmissionAsStatus } from "../repositories/contentSubmission.js";
 import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { serializeContentSubmission } from "../utils/serializers.js";
-import { isEmpty, isNotEmpty } from "../utils/string.js";
+import { isEmpty } from "../utils/string.js";
 
 export function createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, conferenceService, fileService }) {
   if (!ContentSubmission || !ContentSubmissionVersion) {
@@ -122,28 +122,42 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
 
   async function updateSubmissionStatusById(user, id, payload) {
     const { status, statusUpdateNotes, } = payload;
-    const updates = {};
 
     if (!Object.values(CONTENT_SUBMISSION_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid ContentSubmission status");
     }
 
-    updates.currentStatus = status;
-
-    if (isNotEmpty(statusUpdateNotes)) {
-      updates.statusUpdateNotes = statusUpdateNotes;
-    }
-
     const where = { id };
-    const submission = await ContentSubmission.findOne({
-      where,
-    });
+    const submission = await ContentSubmission.findOne({ where });
 
     if (!submission) {
       throw new ErrorResponse(404, "ContentSubmission not found");
     }
 
-    await submission.update(updates);
+    await sequelize.transaction(async (t) => {
+      if (status === CONTENT_SUBMISSION_STATUS.DELETED) {
+        await markSubmissionAsDeleted(
+          { submissionId: id, statusUpdateNotes },
+          { t }
+        );
+      } else if ([
+        CONTENT_SUBMISSION_STATUS.APPROVED,
+        CONTENT_SUBMISSION_STATUS.REJECTED
+      ].includes(status)) {
+        await markSubmissionAsApprovedOrRejected(
+          { submissionId: id, status, statusUpdateNotes },
+          { t }
+        );
+      } else {
+        await markSubmissionAsStatus(
+          { submissionId: id, status, statusUpdateNotes },
+          { t }
+        );
+      }
+    });
+
+    submission.set("currentStatus", status);
+    submission.set("statusUpdateNotes", statusUpdateNotes ?? null);
 
     return submission;
   }

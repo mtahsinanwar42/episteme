@@ -69,6 +69,7 @@ export const REVIEW_ASSIGNMENT_STATUS = Object.freeze({
   ACCEPTED: 2,
   DECLINED: 3,
   COMPLETED: 4,
+  CANCELLED: 5,
   DELETED: 9,
 });
 export const REVIEW_RECOMMENDATION = Object.freeze({
@@ -117,4 +118,13 @@ export const DEFAULT_PAGE_LIMIT = 10;
 export const UPDATE_SCHEDULER_TIME_PATTERN = Object.freeze({
   TOPICS: "0 0 0 * * 0",
   COUNTRIES: "0 0 0 * * 0",
+});
+
+export const STATUS_UPDATE_NOTES = Object.freeze({
+  SUBMISSION_DELETION_DUE_TO_CONF_DELETE: "Associated Conference was deleted; cascaded deletion to submissions.",
+  SUBMISSION_DELETION_DUE_TO_CONF_FINISH: "Conference was finished; submission was auto-rejected.",
+  REVIEW_ASSIGNMENT_DELETION_DUE_TO_SUBMISSION_DELETE: "Submission was deleted; cascaded deletion to review assignments.",
+  REVIEW_ASSIGNMENT_DELETION_DUE_TO_CONF_DELETE: "Associated Conference was deleted; cascaded deletion to review assignments.",
+  REVIEW_ASSIGNMENT_DELETION_DUE_TO_CONF_FINISH: "Conference was finished; assignment was auto-cancelled.",
+  REVIEW_ASSIGNMENT_CANCELLATION_DUE_TO_SUBMISSION_ACCEPT_REJECT: "Submission was finalized (approved/rejected); assignment was auto-cancelled.",
 });

@@ -26,6 +26,7 @@ import submissionRoutes from "./routes/contentSubmission.js";
 import reviewAssignmentRoutes from "./routes/contentReviewAssignment.js";
 import { createRefDataService } from "./services/referenceData.js";
 import { createSchedulerService } from "./services/scheduler.js";
+import { startKafkaProducer, stopKafkaProducer } from "./config/kafka.js";
 
 dotenv.config();
 
@@ -103,6 +104,17 @@ async function start() {
 
     schedulerService.start();
 
+    await startKafkaProducer();
+
+    process.on("SIGINT", async () => {
+      await stopKafkaProducer();
+      process.exit(0);
+    });
+    process.on("SIGTERM", async () => {
+      await stopKafkaProducer();
+      process.exit(0);
+    });
+
     app.listen(PORT, () =>
       console.log(
         `Server running in ${process.env.NODE_ENV || "development"} on port ${PORT}`
@@ -111,6 +123,7 @@ async function start() {
     );
   } catch (err) {
     console.error("Failed to start server".red, err);
+    await stopKafkaProducer();
     process.exit(1);
   }
 }
