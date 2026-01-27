@@ -467,7 +467,6 @@ export default function NewUser() {
           {/* Actions */}
           <div className="flex justify-end gap-3">
             <Button
-              type="button"
               variant="outline"
               size="sm"
               onClick={() => navigate("/users")}
