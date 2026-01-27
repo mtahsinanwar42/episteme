@@ -14,6 +14,7 @@ import {
 import { ActivityStatus } from "@/models/activity";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export default function ActivityDetailsPage() {
   const { activityId } = useParams();
@@ -115,15 +116,12 @@ export default function ActivityDetailsPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => navigate("/activities")}
-        className="mb-6"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Activities
-      </Button>
+      <Breadcrumb
+        items={[
+          { label: "Activities", href: "/activities" },
+          { label: activity.title },
+        ]}
+      />
 
       <div className="space-y-6">
         <div className="rounded-lg border border-slate-200 bg-white shadow-sm relative">
