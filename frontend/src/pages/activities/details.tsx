@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { ActivityStatus } from "@/models/activity";
 import { config } from "@/config/config";
+import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 
 export default function ActivityDetailsPage() {
   const { activityId } = useParams();
@@ -169,13 +170,15 @@ export default function ActivityDetailsPage() {
               metadata?.sections?.map((section: any, index: number) => (
                 <div
                   key={index}
-                  className="rounded-lg border border-slate-200 bg-white shadow-sm p-6"
+                  className="rounded-lg border border-slate-200 bg-white shadow-sm"
                 >
-                  <h2 className="text-2xl font-semibold text-slate-900 mb-4">
-                    {section.heading}
-                  </h2>
+                  <div className="p-4 bg-accent/5 shadow-sm">
+                    <h3 className="font-semibold">{section.heading}</h3>
+                  </div>
 
-                  <p>{section.content}</p>
+                  <p className="p-4">
+                    <MarkdownRenderer content={section.content} />
+                  </p>
                 </div>
               ))}
           </>
