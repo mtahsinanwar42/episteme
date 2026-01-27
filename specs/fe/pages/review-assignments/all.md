@@ -41,6 +41,7 @@
   - Conference (text)
   - Reviewer (name + email)
   - Assignment Status (badge)
+  - Assignment Status Update Notes (Text)
   - Assigned By (name + email)
   - Assigned At (date/time)
   - Submitter (name + email)
@@ -54,9 +55,11 @@
 
 ## Assignment Status Update
 
-- Provide a status update control per row:
+- Provide a status update control (maybe a modal) per row:
   - Assignment Status — single select
     - Allowed values: as defined in Review Assignment API spec
+  - Status Update Notes (Optional) - Text
+    - Shown for ADMIN only
 - Updating status triggers:
   - `PUT /api/v1/review-assignments/:id/status`
 

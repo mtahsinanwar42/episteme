@@ -77,10 +77,15 @@ Required:
 
 - status (integer)
 
+Optional:
+
+- statusUpdateNotes (text), shown for ADMIN only
+
 Example:
 
 ```json
 {
-  "status": 1
+  "status": 1,
+  "statusUpdateNotes": "Accepted" // ADMIN only
 }
 ```

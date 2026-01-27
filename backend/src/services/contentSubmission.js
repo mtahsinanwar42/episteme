@@ -3,7 +3,7 @@ import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails } from "
 import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { serializeContentSubmission } from "../utils/serializers.js";
-import { isEmpty } from "../utils/string.js";
+import { isEmpty, isNotEmpty } from "../utils/string.js";
 
 export function createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, conferenceService, fileService }) {
   if (!ContentSubmission || !ContentSubmissionVersion) {
@@ -120,9 +120,18 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     return submission;
   }
 
-  async function updateSubmissionStatusById(user, id, status) {
+  async function updateSubmissionStatusById(user, id, payload) {
+    const { status, statusUpdateNotes, } = payload;
+    const updates = {};
+
     if (!Object.values(CONTENT_SUBMISSION_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid ContentSubmission status");
+    }
+
+    updates.currentStatus = status;
+
+    if (isNotEmpty(statusUpdateNotes)) {
+      updates.statusUpdateNotes = statusUpdateNotes;
     }
 
     const where = { id };
@@ -134,7 +143,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       throw new ErrorResponse(404, "ContentSubmission not found");
     }
 
-    await submission.update({ currentStatus: status });
+    await submission.update(updates);
 
     return submission;
   }

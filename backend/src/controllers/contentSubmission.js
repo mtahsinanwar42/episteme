@@ -69,7 +69,7 @@ export const updateSubmissionDoi = asyncHandler(async (req, res) => {
 // @route   PUT /api/v1/submissions/:id/status
 // @access  Private
 export const updateSubmissionStatus = asyncHandler(async (req, res) => {
-  const submission = await submissionService.updateSubmissionStatusById(req.user, req.params.id, req.body.status);
+  const submission = await submissionService.updateSubmissionStatusById(req.user, req.params.id, req.body);
 
   return res.status(200).json({
     success: true,

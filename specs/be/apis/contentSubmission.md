@@ -93,10 +93,15 @@ Required:
 
 - status (integer)
 
+Optional:
+
+- statusUpdateNotes (text)
+
 Example:
 
 ```json
 {
-  "status": 1
+  "status": 1,
+  "statusUpdateNotes": "Active"
 }
 ```

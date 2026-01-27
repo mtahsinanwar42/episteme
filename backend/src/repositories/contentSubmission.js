@@ -110,6 +110,7 @@ export async function findSubmissionByIdAndUserDetails({
       CS.topics          AS "topics",
       CS.doi             AS "doi",
       CS.current_status  AS "status",
+      CS.status_update_notes AS "statusUpdateNotes",
       CS.created_at      AS "createdAt",
       CS.updated_at      AS "updatedAt",
 

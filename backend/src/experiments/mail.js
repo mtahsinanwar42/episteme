@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const mailjet = Mailjet.apiConnect(
-  process.env.MJ_APIKEY_PUBLIC,
-  process.env.MJ_APIKEY_PRIVATE
+  process.env.MAILJET_API_KEY_PUBLIC,
+  process.env.MAILJET_API_KEY_PRIVATE,
 );
 
 const request = mailjet

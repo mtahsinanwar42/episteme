@@ -7,7 +7,7 @@
   - USER
   - REVIEWER
   - ADMIN
-- Mode: View + partial update (status for ADMIN)
+- Mode: View + partial update (status/statusUpdateNotes for ADMIN)
 
 ---
 
@@ -15,7 +15,7 @@
 
 - Display detailed information about a submission.
 - Provide access to related sections in Tabs: Versions, Messages, Reviews.
-- Allow ADMIN to update submission status.
+- Allow ADMIN to update submission status and statusUpdateNotes.
 - Allow role-based interaction with submission-related data.
 
 ---
@@ -31,7 +31,7 @@
 ### Status Update (ADMIN only)
 
 - `PUT /api/v1/submissions/:id/status`
-- Trigger: Status update action
+- Trigger: Status update action (maybe a modal)
 - Request body: As defined in Submission API spec
 
 ---
@@ -48,6 +48,7 @@ Display submission-level information in a read-only format (unless specified).
 - Topics (text, derived from string[])
 - Conference (text)
 - Status (badge)
+- Status Update Notes (field shown if not null)
 - Owner (name & email — ADMIN only)
 - Created At (date/time)
 - Updated At (date/time)

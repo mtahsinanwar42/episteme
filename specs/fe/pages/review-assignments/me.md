@@ -34,6 +34,7 @@
   - Conference (text)
   - Assigned By (name + email)
   - Assignment Status (badge)
+  - Assignment Status Update Notes (Text)
   - Assigned At (date/time)
   - Submitter (name + email)
   - **Action**: View, Accept, Decline

@@ -52,6 +52,11 @@ export default (sequelize, DataTypes) => {
         field: "current_status",
         defaultValue: 1,
       },
+      statusUpdateNotes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "status_update_notes",
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

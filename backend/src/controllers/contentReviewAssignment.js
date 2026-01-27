@@ -57,7 +57,7 @@ export const saveReviewAssignment = asyncHandler(async (req, res) => {
 // @route   PUT /api/v1/review-assignments/:id
 // @access  Private
 export const updateReviewAssignmentStatus = asyncHandler(async (req, res) => {
-  const assignment = await reviewAssignmentService.updateReviewAssignmentStatusById(req.user, req.params.id, req.body.status);
+  const assignment = await reviewAssignmentService.updateReviewAssignmentStatusById(req.user, req.params.id, req.body);
 
   return res.status(200).json({
     success: true,

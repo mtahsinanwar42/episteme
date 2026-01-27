@@ -14,7 +14,6 @@ export const CONFERENCE_STATUS = Object.freeze({
   INACTIVE: 0,
   ACTIVE: 1,
   FINISHED: 2,
-  ARCHIVED: 3,
   DELETED: 9,
 });
 
@@ -118,5 +117,4 @@ export const DEFAULT_PAGE_LIMIT = 10;
 export const UPDATE_SCHEDULER_TIME_PATTERN = Object.freeze({
   TOPICS: "0 0 0 * * 0",
   COUNTRIES: "0 0 0 * * 0",
-  ALL: "* * * * *",
 });
