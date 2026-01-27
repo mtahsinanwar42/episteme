@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { fileService } from "@/services/fileService";
 import { config } from "@/config/config";
 import { useFileById } from "@/hooks/useFiles";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export default function AssetDetails() {
   const { fileId } = useParams();
@@ -82,6 +83,10 @@ export default function AssetDetails() {
 
   return (
     <div>
+      <Breadcrumb
+        items={[{ label: "Assets", href: "/assets" }, { label: file.id }]}
+      />
+
       <div className="mb-6">
         <h1 className="text-3xl text-accent font-bold">Asset Details</h1>
       </div>

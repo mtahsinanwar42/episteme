@@ -15,6 +15,7 @@ import type { File } from "@/models/file";
 import { ActivityStatus } from "@/models/activity";
 import { useFiles } from "@/hooks/useFiles";
 import { useCreateActivityMutation } from "@/hooks/useActivities";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export default function NewActivity() {
   const navigate = useNavigate();
@@ -112,6 +113,13 @@ export default function NewActivity() {
 
   return (
     <div>
+      <Breadcrumb
+        items={[
+          { label: "Activities", href: "/activities" },
+          { label: "New Activity" },
+        ]}
+      />
+
       <div className="mb-8">
         <h1 className="text-4xl text-accent font-bold mb-2">
           Create New Activity

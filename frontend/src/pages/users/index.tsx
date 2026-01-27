@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export default function Users() {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -196,7 +197,8 @@ export default function Users() {
 
   return (
     <div>
-      <div className="mb-8">
+      <Breadcrumb items={[{ label: "Users", href: "/users" }]} />
+      <div className="mb-6">
         <h1 className="text-4xl text-accent font-bold mb-2">Users</h1>
         <p className="text-slate-600">View and manage all registered users</p>
       </div>

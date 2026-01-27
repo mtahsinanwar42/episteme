@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 
 import { useFiles } from "@/hooks/useFiles";
 import type { File } from "@/models/file";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export default function Assets() {
   const columns: ColumnDef<File>[] = [
@@ -96,7 +97,9 @@ export default function Assets() {
 
   return (
     <div>
-      <div className="mb-8">
+      <Breadcrumb items={[{ label: "Assets", href: "/assets" }]} />
+
+      <div className="mb-6">
         <h1 className="text-4xl text-accent font-bold mb-2">Assets</h1>
         <p className="text-slate-600">View and manage all assets</p>
       </div>

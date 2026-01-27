@@ -3,14 +3,7 @@ import { useState, useEffect } from "react";
 import { useActivityById } from "@/hooks/useActivities";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Calendar,
-  ArrowLeft,
-  FileJson,
-  Info,
-  Clock,
-  ImageIcon,
-} from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import { ActivityStatus } from "@/models/activity";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
@@ -115,7 +108,7 @@ export default function ActivityDetailsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div>
       <Breadcrumb
         items={[
           { label: "Activities", href: "/activities" },

@@ -30,6 +30,7 @@ import { useState, useEffect } from "react";
 import { FileTypeEnum } from "@/models/file";
 import { fileService } from "@/services/fileService";
 import { config } from "@/config/config";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export default function UserDetails() {
   const { userId } = useParams();
@@ -189,6 +190,13 @@ export default function UserDetails() {
 
   return (
     <div>
+      <Breadcrumb
+        items={[
+          { label: "Users", href: "/users" },
+          { label: `${user.firstName} ${user.lastName}` },
+        ]}
+      />
+
       <div className="mb-6">
         <h1 className="text-3xl text-accent font-bold">User Details</h1>
       </div>

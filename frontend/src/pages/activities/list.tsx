@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { UserRole } from "@/models/user";
 import { Button } from "@/components/ui/button";
 import type { RootState } from "@/stores/store";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export default function Activities() {
   const navigate = useNavigate();
@@ -51,7 +52,8 @@ export default function Activities() {
 
   return (
     <div>
-      <div className="mb-8 flex justify-between items-end">
+      <Breadcrumb items={[{ label: "Activities", href: "/activities" }]} />
+      <div className="mb-6 flex justify-between items-end">
         <div>
           <h1 className="text-4xl text-accent font-bold mb-2">Activities</h1>
           <p className="text-slate-600">Latest activities and events</p>
