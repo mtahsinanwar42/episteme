@@ -35,6 +35,7 @@
   --shadow-large: 0 0 16px 16px rgba(0, 0, 0, 0.05);
 
   --title-gradient: #735fe9, #ce47eb, #f47b74;
+  --card-gradient: #1d293d, #0f172d;
 }
 
 @layer base {
@@ -117,5 +118,10 @@ h6 {
   .gradient-title {
     @apply bg-linear-to-r bg-clip-text text-transparent;
     background-image: linear-gradient(90deg, var(--title-gradient));
+  }
+
+  .gradient-card {
+    @apply bg-linear-to-br;
+    background-image: linear-gradient(135deg, var(--card-gradient));
   }
 }

@@ -23,7 +23,7 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className="relative h-full rounded-lg border border-border bg-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="relative h-full rounded-lg border-b-2 border-border gradient-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
       onClick={onClick}
     >
       {showImage && imageUrl && (
