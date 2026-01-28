@@ -16,7 +16,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
         className="fixed inset-0 bg-black/50"
         onClick={() => onOpenChange(false)}
       />
-      <div className="relative z-50 bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+      <div className="relative z-50 border border-border bg-card rounded-lg shadow-lg max-w-md w-full mx-4">
         {children}
       </div>
     </div>
@@ -34,7 +34,7 @@ export function DialogContent({ children, onClose }: DialogContentProps) {
       {onClose && (
         <div
           onClick={onClose}
-          className="cursor-pointer p-2 absolute right-2 top-2 hover:text-accent"
+          className="cursor-pointer p-2 absolute right-2 top-2 hover:text-foreground/60"
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>

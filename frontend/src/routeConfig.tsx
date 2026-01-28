@@ -17,10 +17,23 @@ import Announcements from "@/pages/announcements";
 import Blogs from "@/pages/blogs";
 import Register from "@/pages/register";
 import UserDetails from "@/pages/users/details";
-import NewUser from "./pages/users/new";
-import Assets from "./pages/assets";
-import AssetDetails from "./pages/assets/details";
-import NewAsset from "./pages/assets/new";
+import NewUser from "@/pages/users/new";
+import Assets from "@/pages/assets";
+import AssetDetails from "@/pages/assets/details";
+import NewAsset from "@/pages/assets/new";
+import Activities from "@/pages/activities";
+import ActivityDetails from "@/pages/activities/details";
+import NewActivity from "@/pages/activities/new";
+import EditActivity from "./pages/activities/edit";
+import TrainingDetails from "./pages/trainings/details";
+import NewTraining from "./pages/trainings/new";
+import EditTraining from "./pages/trainings/edit";
+import AnnouncementDetails from "./pages/announcements/details";
+import NewAnnouncement from "./pages/announcements/new";
+import EditAnnouncement from "./pages/announcements/edit";
+import BlogDetails from "./pages/blogs/details";
+import NewBlog from "./pages/blogs/new";
+import EditBlog from "./pages/blogs/edit";
 
 export default function RouteConfig() {
   return (
@@ -83,12 +96,33 @@ export default function RouteConfig() {
         }
       />
 
-      <Route path="/conferences" element={<Conferences />} />
+      <Route path="/activities" element={<Activities />} />
+      <Route path="/activities/:activityId" element={<ActivityDetails />} />
+      <Route path="/activities/new" element={<NewActivity />} />
+      <Route path="/activities/edit/:activityId" element={<EditActivity />} />
+
       <Route path="/trainings" element={<Trainings />} />
+      <Route path="/trainings/:trainingId" element={<TrainingDetails />} />
+      <Route path="/trainings/new" element={<NewTraining />} />
+      <Route path="/trainings/edit/:trainingId" element={<EditTraining />} />
+
       <Route path="/announcements" element={<Announcements />} />
+      <Route
+        path="/announcements/:announcementId"
+        element={<AnnouncementDetails />}
+      />
+      <Route path="/announcements/new" element={<NewAnnouncement />} />
+      <Route
+        path="/announcements/edit/:announcementId"
+        element={<EditAnnouncement />}
+      />
+
+      <Route path="/conferences" element={<Conferences />} />
 
       <Route path="/blogs" element={<Blogs />} />
-      <Route path="/blogs/:id" element={<Blogs />} />
+      <Route path="/blogs/:blogId" element={<BlogDetails />} />
+      <Route path="/blogs/new" element={<NewBlog />} />
+      <Route path="/blogs/edit/:blogId" element={<EditBlog />} />
 
       <Route path="/about/mission" element={<Mission />} />
       <Route path="/about/ethics" element={<Ethics />} />

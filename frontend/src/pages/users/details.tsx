@@ -30,6 +30,8 @@ import { useState, useEffect } from "react";
 import { FileTypeEnum } from "@/models/file";
 import { fileService } from "@/services/fileService";
 import { config } from "@/config/config";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageTitle from "@/components/common/PageTitle";
 
 export default function UserDetails() {
   const { userId } = useParams();
@@ -189,13 +191,20 @@ export default function UserDetails() {
 
   return (
     <div>
+      <Breadcrumb
+        items={[
+          { label: "Users", href: "/users" },
+          { label: `${user.firstName} ${user.lastName}` },
+        ]}
+      />
+
       <div className="mb-6">
-        <h1 className="text-3xl text-accent font-bold">User Details</h1>
+        <PageTitle title="User Details" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div>
-          <div className="rounded-lg shadow-small p-4 pt-8 relative">
+          <div className="rounded-lg shadow-small p-4 pt-8 relative border border-border ">
             <div className="flex gap-4 z-0">
               {user.photoFilePath ? (
                 <img
@@ -210,7 +219,7 @@ export default function UserDetails() {
                 </div>
               )}
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col justify-between gap-2">
                 {isEdit ? (
                   <div>
                     <div className="mb-2">
@@ -249,7 +258,6 @@ export default function UserDetails() {
                     {user.firstName} {user.lastName}
                   </h2>
                 )}
-                <p className="text-sm text-slate-600">ID: {user.id}</p>
                 <div className="flex flex-wrap gap-2">
                   {user.roles.map((role) => (
                     <Badge key={role} variant="outline" className="gap-1">
@@ -304,7 +312,7 @@ export default function UserDetails() {
         </div>
 
         <div className="lg:col-span-2">
-          <div className="rounded-lg shadow-small">
+          <div className="rounded-lg shadow-small border border-border">
             <div className="p-4 bg-accent/5 shadow-sm flex justify-between items-center">
               <h3 className="text-accent text-lg font-semibold">Information</h3>
 
@@ -314,12 +322,12 @@ export default function UserDetails() {
                     setFormData(user);
                     setIsEdit(false);
                   }}
-                  className="size-4 text-gray-600 hover:text-gray-800 cursor-pointer"
+                  className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
                 />
               ) : (
                 <Edit
                   onClick={() => setIsEdit(true)}
-                  className="size-4 text-gray-600 hover:text-gray-800 cursor-pointer"
+                  className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
                 />
               )}
             </div>

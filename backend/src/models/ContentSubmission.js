@@ -31,6 +31,11 @@ export default (sequelize, DataTypes) => {
           },
         },
       },
+      doi: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "doi",
+      },
       conferenceId: {
         type: DataTypes.BIGINT,
         allowNull: false,
@@ -46,6 +51,11 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         field: "current_status",
         defaultValue: 1,
+      },
+      statusUpdateNotes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "status_update_notes",
       },
       createdAt: {
         type: DataTypes.DATE,

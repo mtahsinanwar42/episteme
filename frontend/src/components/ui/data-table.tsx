@@ -82,8 +82,8 @@ export function DataTable<TData, TValue = unknown>({
 
   return (
     <div>
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm">
+      <div className="rounded-2xl border border-border shadow-lg overflow-hidden">
+        <div className="bg-linear-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -115,12 +115,12 @@ export function DataTable<TData, TValue = unknown>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="border-b border-slate-300! dark:border-slate-700 hover:bg-slate-100! dark:hover:bg-blue-950/20 transition-colors duration-200 group"
+                    className="border-b border-slate-300! dark:border-slate-700 hover:bg-slate-900! dark:hover:bg-blue-950/20 transition-colors duration-200 group"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="group-hover:text-accent dark:group-hover:text-accent transition-colors"
+                        className="group-hover:text-foreground dark:group-hover:text-foreground/90 transition-colors"
                       >
                         {flexRender(
                           cell.column.columnDef.cell,

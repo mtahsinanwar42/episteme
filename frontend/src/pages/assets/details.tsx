@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { fileService } from "@/services/fileService";
 import { config } from "@/config/config";
 import { useFileById } from "@/hooks/useFiles";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export default function AssetDetails() {
   const { fileId } = useParams();
@@ -82,12 +83,16 @@ export default function AssetDetails() {
 
   return (
     <div>
+      <Breadcrumb
+        items={[{ label: "Assets", href: "/assets" }, { label: file.id }]}
+      />
+
       <div className="mb-6">
         <h1 className="text-3xl text-accent font-bold">Asset Details</h1>
       </div>
 
-      <div className="">
-        <div className="rounded-lg shadow-small">
+      <div>
+        <div className="rounded-lg shadow-small border border-border">
           <div className="p-4 bg-accent/5 shadow-sm">
             <h3 className="text-accent text-lg font-semibold">Information</h3>
           </div>
@@ -132,7 +137,7 @@ export default function AssetDetails() {
 
                   <p className="font-medium">
                     <img
-                      src={`${new URL(config.baseUrl).origin}${file.storageKey}`}
+                      src={`${new URL(config.baseUrl).origin}/${file.storageKey}`}
                       alt="Asset Image"
                       crossOrigin="anonymous"
                       className="w-24 h-24 object-cover"

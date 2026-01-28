@@ -1,58 +1,48 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { blogService } from "@/services/blogService";
-import type { Post } from "@/models/post";
+import type {
+  CreateBlogRequest,
+  UpdateBlogRequest,
+  GetBlogsParams,
+} from "@/models/blog";
 
-// Get all blogs
-export function useBlogs() {
+export function useBlogs(params?: GetBlogsParams) {
   return useQuery({
-    queryKey: ["blogs"],
-    queryFn: blogService.getBlogs,
+    queryKey: ["blogs", params],
+    queryFn: () => blogService.getBlogs(params),
+    staleTime: 30000, // 30 seconds
   });
 }
 
-// Get user blogs
-export function useUserBlogs(userId: number) {
+export function useBlogById(blogId: string | number | undefined) {
   return useQuery({
-    queryKey: ["blogs", "user", userId],
-    queryFn: () => blogService.getUserBlogs(userId),
-    enabled: !!userId,
+    queryKey: ["blog", blogId],
+    queryFn: () => blogService.getBlogById(blogId!),
+    enabled: !!blogId,
+    staleTime: 30000, // 30 seconds
   });
 }
 
-// Create blog mutation
-export function useCreateBlog() {
+export function useCreateBlogMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: blogService.createBlog,
-    onSuccess: () => {
-      // Invalidate and refetch posts
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-    },
-  });
-}
-
-// Update post mutation
-export function useUpdatePost() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, blog }: { id: number; blog: Partial<Post> }) =>
-      blogService.updateBlog(id, blog),
+    mutationFn: (data: CreateBlogRequest) => blogService.createBlog(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
     },
   });
 }
 
-// Delete blog mutation
-export function useDeleteBlog() {
+export function useUpdateBlogMutation(blogId: string | number) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: blogService.deleteBlog,
+    mutationFn: (data: UpdateBlogRequest) =>
+      blogService.updateBlog(blogId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["blog", blogId] });
     },
   });
 }

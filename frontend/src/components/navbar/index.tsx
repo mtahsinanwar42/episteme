@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Menu } from "lucide-react";
 import { UserRole } from "@/models/user";
 import { config } from "@/config/config";
 
@@ -23,22 +23,22 @@ const navItems: NavItemConfig[] = [
   {
     label: "Activities",
     href: "/activities",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER],
-  },
-  {
-    label: "Announcements",
-    href: "/announcements",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER],
+    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
   },
   {
     label: "Trainings",
     href: "/trainings",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER],
+    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
+  },
+  {
+    label: "Announcements",
+    href: "/announcements",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
   },
   {
     label: "Blogs",
     href: "/blogs",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER],
+    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
   },
   {
     label: "Conferences",
@@ -79,37 +79,7 @@ const navItems: NavItemConfig[] = [
     ],
     visibleTo: UserRole.ADMIN,
   },
-  {
-    label: "Content Management",
-    children: [
-      {
-        label: "Activities",
-        href: "/admin/activities",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "Blogs",
-        href: "/admin/blogs",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "Trainings",
-        href: "/admin/trainings",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "Announcements",
-        href: "/admin/announcements",
-        visibleTo: UserRole.ADMIN,
-      },
-    ],
-    visibleTo: UserRole.ADMIN,
-  },
-  {
-    label: "Conferences",
-    href: "/admin/conferences",
-    visibleTo: UserRole.ADMIN,
-  },
+
   {
     label: "Submissions",
     href: "/user/submissions",
@@ -172,15 +142,15 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="py-2 px-4 bg-accent">
+    <nav className="py-2 px-4 border-b border-border bg-background">
       <div className="flex justify-between items-center mx-auto 2xl:max-w-7xl">
         <div>
-          <Link to="/" className="text-white text-3xl">
+          <Link to="/" className="text-accent text-3xl">
             EPISTEME
           </Link>
         </div>
 
-        <div className="flex gap-8">
+        <div className="hidden lg:flex! gap-8">
           {navItems.map((item, index) =>
             canViewNavItem(item.visibleTo, user?.roles, isLoggedIn) ? (
               <NavItem key={index} item={item} />
@@ -208,7 +178,10 @@ export default function Navbar() {
                 </div>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="w-64 border-none" align="end">
+              <DropdownMenuContent
+                className="w-64 border border-border bg-card z-100"
+                align="end"
+              >
                 <DropdownMenuLabel>
                   <div className="flex items-center gap-3 py-2">
                     {user?.photoFilePath ? (
@@ -266,7 +239,9 @@ export default function Navbar() {
               </Link>
             </div>
           )}
-          {/* <span className="text-sm">{user?.user_metadata?.full_name}</span> */}
+          <div className="block lg:hidden">
+            <Menu />
+          </div>
           {/* <ThemeSwitcher /> */}
         </div>
       </div>

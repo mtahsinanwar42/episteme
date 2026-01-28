@@ -27,6 +27,10 @@ Required:
 - message (string)
 - scope (string)
 
+Optional:
+
+- receiverUsrId (integer, required for ADMIN)
+
 Example:
 
 ```json

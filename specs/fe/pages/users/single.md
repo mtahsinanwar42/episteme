@@ -32,6 +32,7 @@
 - Occupation — text
 - Country — single select
 - Status — single select (integer, numeric-to-label mapping, can be found in utils/constants.js)
+- Status Update Notes (Optional) - Text
 - Roles — multi select (string[])
 - LinkedIn URL — text
 - Profile Photo — file upload (sets `photoFilePath`)

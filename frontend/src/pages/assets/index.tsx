@@ -7,6 +7,9 @@ import { Link } from "react-router-dom";
 
 import { useFiles } from "@/hooks/useFiles";
 import type { File } from "@/models/file";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageTitle from "@/components/common/PageTitle";
+import PageSubTitle from "@/components/common/PageSubTitle";
 
 export default function Assets() {
   const columns: ColumnDef<File>[] = [
@@ -55,7 +58,7 @@ export default function Assets() {
         return (
           <div className="flex gap-4 place-self-center">
             <Link to={`/assets/${row?.original?.id}`}>
-              <Eye className="size-4 text-gray-600 hover:text-gray-800 cursor-pointer" />
+              <Eye className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
             </Link>
           </div>
         );
@@ -96,9 +99,11 @@ export default function Assets() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-4xl text-accent font-bold mb-2">Assets</h1>
-        <p className="text-slate-600">View and manage all assets</p>
+      <Breadcrumb items={[{ label: "Assets", href: "/assets" }]} />
+
+      <div className="mb-6">
+        <PageTitle title="Assets" />
+        <PageSubTitle text="View and manage all assets" />
       </div>
 
       <div className="flex flex-col gap-4">

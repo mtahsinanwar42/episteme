@@ -1,5 +1,5 @@
 import express from 'express';
-import { getSubmissions, getSubmission, updateSubmissionStatus, saveSubmission } from '../controllers/contentSubmission.js';
+import { getSubmissions, getSubmission, updateSubmissionStatus, updateSubmissionDoi, saveSubmission } from '../controllers/contentSubmission.js';
 import { getSubmissionVersions, saveSubmissionVersion } from '../controllers/contentSubmissionVersion.js';
 import { authenticate, authorize } from '../middlewares/auth.js';
 import { getSubmissionMessages, saveSubmissionMessage } from '../controllers/contentSubmissionMessage.js';
@@ -20,7 +20,11 @@ router
 
 router
   .route('/:id/status')
-  .put(authorize(USER_ROLE.ADMIN, USER_ROLE.USER), updateSubmissionStatus);
+  .put(authorize(USER_ROLE.ADMIN), updateSubmissionStatus);
+
+router
+  .route('/:id/doi')
+  .put(authorize(USER_ROLE.ADMIN), updateSubmissionDoi);
 
 router
   .route('/:id/versions')

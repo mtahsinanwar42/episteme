@@ -9,6 +9,7 @@ const GET_REVIEW_ASSIGNMENTS_BASE_SELECT = `
     CRA.content_submission_id AS "submissionId",
     CRA.reviewer_usr_id       AS "reviewerUserId",
     CRA.status                AS "assignmentStatus",
+    CRA.status_update_notes   AS "assignmentStatusUpdateNotes",
     CRA.assigned_at           AS "assignedAt",
     CRA.assigned_by_usr_id    AS "assignedByUserId",
     CRA.assigned_by_notes     AS "assignedByNotes",

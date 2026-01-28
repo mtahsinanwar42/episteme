@@ -47,7 +47,7 @@ Example:
   "title": "Graph Theory Unleashed",
   "conferenceId": 5,
   "topics": ["Graph"],
-  "contentFilePath": "storage/private/papers/paper1_b32e94f6_20260118T225541_911.docx",
+  "contentFilePath": "storage/private/submissions/paper1_b32e94f6_20260118T225541_911.docx",
   "message": "Please approve this for the conference 2026, I've really worked hard for it!."
 }
 ```
@@ -63,10 +63,29 @@ Required:
 
 - id
 
-## 4. Update Submission Status
+## 4. Update Submission DOI
+
+**PUT /:id/doi**
+Access: ADMIN, for APPROVED submissions only.
+
+### Request Body
+
+Required:
+
+- doi (text)
+
+Example:
+
+```json
+{
+  "doi": "XYZ"
+}
+```
+
+## 5. Update Submission Status
 
 **PUT /:id/status**
-Access: USER/ADMIN
+Access: ADMIN
 
 ### Request Body
 
@@ -74,10 +93,15 @@ Required:
 
 - status (integer)
 
+Optional:
+
+- statusUpdateNotes (text)
+
 Example:
 
 ```json
 {
-  "status": 1
+  "status": 1,
+  "statusUpdateNotes": "Active"
 }
 ```

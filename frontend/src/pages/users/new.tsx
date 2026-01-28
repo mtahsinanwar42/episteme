@@ -14,7 +14,9 @@ import { useCreateUserMutation } from "@/hooks/useUsers";
 import { UserStatus } from "@/models/user";
 import { FileTypeEnum } from "@/models/file";
 import { fileService } from "@/services/fileService";
-import { User, FileText } from "lucide-react";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageSubTitle from "@/components/common/PageSubTitle";
+import PageTitle from "@/components/common/PageTitle";
 
 export default function NewUser() {
   const navigate = useNavigate();
@@ -161,329 +163,313 @@ export default function NewUser() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-accent text-3xl font-bold">Create New User</h1>
-        <p className="text-muted-foreground">Add a new user to the system</p>
-      </div>
+    <div>
+      <Breadcrumb
+        items={[{ label: "Users", href: "/users" }, { label: "New User" }]}
+      />
 
-      {/* Form Card */}
-      <div className="rounded-lg border border-slate-200 bg-white shadow-md p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Form Fields Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* First Name */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="firstName"
-                className="text-sm font-medium text-slate-700"
-              >
-                First Name *
-              </label>
-              <Input
-                id="firstName"
-                name="firstName"
-                type="text"
-                placeholder="John"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-              />
-            </div>
+      <div className="space-y-6">
+        <div>
+          <PageTitle title="Create New User" />
+          <PageSubTitle text="Add a new user to the system" />
+        </div>
 
-            {/* Last Name */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="lastName"
-                className="text-sm font-medium text-slate-700"
-              >
-                Last Name *
-              </label>
-              <Input
-                id="lastName"
-                name="lastName"
-                type="text"
-                placeholder="Doe"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Email */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="email"
-                className="text-sm font-medium text-slate-700"
-              >
-                Email *
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="user@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Password */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-slate-700"
-              >
-                Password *
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter a secure password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Phone */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="phone"
-                className="text-sm font-medium text-slate-700"
-              >
-                Phone *
-              </label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="+8801712345678"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Country */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="country"
-                className="text-sm font-medium text-slate-700"
-              >
-                Country *
-              </label>
-              <Input
-                id="country"
-                name="country"
-                type="text"
-                placeholder="Bangladesh"
-                value={formData.country}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Institution */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="institution"
-                className="text-sm font-medium text-slate-700"
-              >
-                Institution *
-              </label>
-              <Input
-                id="institution"
-                name="institution"
-                type="text"
-                placeholder="University Name"
-                value={formData.institution}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Occupation */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="occupation"
-                className="text-sm font-medium text-slate-700"
-              >
-                Occupation *
-              </label>
-              <Input
-                id="occupation"
-                name="occupation"
-                type="text"
-                placeholder="Student"
-                value={formData.occupation}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* LinkedIn URL */}
-            <div className="flex flex-col space-y-2">
-              <label
-                htmlFor="linkedinUrl"
-                className="text-sm font-medium text-slate-700"
-              >
-                LinkedIn URL
-              </label>
-              <Input
-                id="linkedinUrl"
-                name="linkedinUrl"
-                type="url"
-                placeholder="https://www.linkedin.com/in/yourprofile"
-                value={formData.linkedinUrl}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Status */}
-            <div className="flex flex-col space-y-2">
-              <label className="text-sm font-medium text-slate-700">
-                Status *
-              </label>
-              <Select
-                value={formData.status.toString()}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, status: Number(value) }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={UserStatus.INACTIVE.toString()}>
-                    Inactive
-                  </SelectItem>
-                  <SelectItem value={UserStatus.ACTIVE.toString()}>
-                    Active
-                  </SelectItem>
-                  <SelectItem value={UserStatus.SUSPENDED.toString()}>
-                    Suspended
-                  </SelectItem>
-                  <SelectItem value={UserStatus.DELETED.toString()}>
-                    Deleted
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Profile Picture */}
-            <div className="flex flex-col space-y-3">
-              <label className="text-sm text-muted-foreground">
-                Profile picture
-              </label>
-              <div>
+        <div className="rounded-lg border border-border bg-card shadow-md p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col space-y-2">
+                <label htmlFor="firstName" className="text-sm font-medium">
+                  First Name *
+                </label>
                 <Input
-                  id="photo"
-                  name="photo"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleFileChange(e, FileTypeEnum.PROFILE_PHOTOS)
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  placeholder="John"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="lastName"
+                  className="text-sm font-medium"
+                >
+                  Last Name *
+                </label>
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  placeholder="Doe"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="email"
+                  className="text-sm font-medium"
+                >
+                  Email *
+                </label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="user@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium "
+                >
+                  Password *
+                </label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter a secure password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="phone"
+                  className="text-sm font-medium "
+                >
+                  Phone *
+                </label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="+8801712345678"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="country"
+                  className="text-sm font-medium "
+                >
+                  Country *
+                </label>
+                <Input
+                  id="country"
+                  name="country"
+                  type="text"
+                  placeholder="Bangladesh"
+                  value={formData.country}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="institution"
+                  className="text-sm font-medium "
+                >
+                  Institution *
+                </label>
+                <Input
+                  id="institution"
+                  name="institution"
+                  type="text"
+                  placeholder="University Name"
+                  value={formData.institution}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="occupation"
+                  className="text-sm font-medium "
+                >
+                  Occupation *
+                </label>
+                <Input
+                  id="occupation"
+                  name="occupation"
+                  type="text"
+                  placeholder="Student"
+                  value={formData.occupation}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="linkedinUrl"
+                  className="text-sm font-medium "
+                >
+                  LinkedIn URL
+                </label>
+                <Input
+                  id="linkedinUrl"
+                  name="linkedinUrl"
+                  type="url"
+                  placeholder="https://www.linkedin.com/in/yourprofile"
+                  value={formData.linkedinUrl}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label className="text-sm font-medium ">
+                  Status *
+                </label>
+                <Select
+                  value={formData.status.toString()}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, status: Number(value) }))
                   }
-                  className="cursor-pointer"
-                />
-                {photoFile && (
-                  <p className="text-xs text-slate-500 mt-2">
-                    Selected: {photoFile.name}
-                  </p>
-                )}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={UserStatus.INACTIVE.toString()}>
+                      Inactive
+                    </SelectItem>
+                    <SelectItem value={UserStatus.ACTIVE.toString()}>
+                      Active
+                    </SelectItem>
+                    <SelectItem value={UserStatus.SUSPENDED.toString()}>
+                      Suspended
+                    </SelectItem>
+                    <SelectItem value={UserStatus.DELETED.toString()}>
+                      Deleted
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex flex-col space-y-3">
+                <label className="text-sm text-muted-foreground">
+                  Profile picture
+                </label>
+                <div>
+                  <Input
+                    id="photo"
+                    name="photo"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleFileChange(e, FileTypeEnum.PROFILE_PHOTOS)
+                    }
+                    className="cursor-pointer"
+                  />
+                  {photoFile && (
+                    <p className="text-xs text-slate-500 mt-2">
+                      Selected: {photoFile.name}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col space-y-3">
+                <label className="text-sm text-muted-foreground">CV</label>
+                <div>
+                  <Input
+                    id="cv"
+                    name="cv"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => handleFileChange(e, FileTypeEnum.CVS)}
+                    className="cursor-pointer"
+                  />
+                  {cvFile && (
+                    <p className="text-xs text-slate-500 mt-2">
+                      Selected: {cvFile.name}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* CV */}
             <div className="flex flex-col space-y-3">
-              <label className="text-sm text-muted-foreground">CV</label>
-              <div>
-                <Input
-                  id="cv"
-                  name="cv"
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => handleFileChange(e, FileTypeEnum.CVS)}
-                  className="cursor-pointer"
-                />
-                {cvFile && (
-                  <p className="text-xs text-slate-500 mt-2">
-                    Selected: {cvFile.name}
-                  </p>
-                )}
+              <label className="text-sm font-medium ">
+                Select Roles *
+              </label>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="role-user"
+                    checked={selectedRoles.includes("USER")}
+                    onCheckedChange={() => handleRoleToggle("USER")}
+                  />
+                  <label
+                    htmlFor="role-user"
+                    className="text-sm  cursor-pointer"
+                  >
+                    User
+                  </label>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="role-reviewer"
+                    checked={selectedRoles.includes("REVIEWER")}
+                    onCheckedChange={() => handleRoleToggle("REVIEWER")}
+                  />
+                  <label
+                    htmlFor="role-reviewer"
+                    className="text-sm  cursor-pointer"
+                  >
+                    Reviewer
+                  </label>
+                </div>
               </div>
+              <p className="text-xs text-slate-500">
+                Select at least one role for the user
+              </p>
             </div>
-          </div>
 
-          {/* Roles Selection */}
-          <div className="flex flex-col space-y-3">
-            <label className="text-sm font-medium text-slate-700">
-              Select Roles *
-            </label>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="role-user"
-                  checked={selectedRoles.includes("USER")}
-                  onCheckedChange={() => handleRoleToggle("USER")}
-                />
-                <label
-                  htmlFor="role-user"
-                  className="text-sm text-slate-700 cursor-pointer"
-                >
-                  User
-                </label>
+            {error && (
+              <div className="p-4 rounded-md text-sm border border-red-500/30 bg-red-500/10 text-red-800">
+                {error}
               </div>
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="role-reviewer"
-                  checked={selectedRoles.includes("REVIEWER")}
-                  onCheckedChange={() => handleRoleToggle("REVIEWER")}
-                />
-                <label
-                  htmlFor="role-reviewer"
-                  className="text-sm text-slate-700 cursor-pointer"
-                >
-                  Reviewer
-                </label>
-              </div>
-            </div>
-            <p className="text-xs text-slate-500">
-              Select at least one role for the user
-            </p>
-          </div>
+            )}
 
-          {/* Error Message */}
-          {error && (
-            <div className="p-4 rounded-md text-sm border border-red-500/30 bg-red-500/10 text-red-800">
-              {error}
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/users")}
+                disabled={createUserMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={createUserMutation.isPending}
+              >
+                {createUserMutation.isPending ? "Creating..." : "Create User"}
+              </Button>
             </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/users")}
-              disabled={createUserMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              disabled={createUserMutation.isPending}
-            >
-              {createUserMutation.isPending ? "Creating..." : "Create User"}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

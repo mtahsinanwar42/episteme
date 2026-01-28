@@ -1,9 +1,10 @@
 import { Op } from "sequelize";
-import { findConferencePublicationsById } from "../repositories/conference.js";
+import { findConferencePublicationsById, markConferenceAsStatus, markConferenceAsDeleted, markConferenceAsFinished } from "../repositories/conference.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS } from "../utils/constants.js";
 import { serializeConference } from "../utils/serializers.js";
 import { isEmpty, isNotEmpty } from "../utils/string.js";
+import { sequelize } from "../config/db.js";
 
 export function createConferenceService({ Conference, fileService }) {
   if (!Conference) {
@@ -138,13 +139,27 @@ export function createConferenceService({ Conference, fileService }) {
       if (!Object.values(CONFERENCE_STATUS).includes(status)) {
         throw new ErrorResponse(400, "Invalid conference status");
       }
-
-      updates.status = status;
     }
 
-    await conference.update(updates);
+    return sequelize.transaction(async (t) => {
+      if (Object.keys(updates).length > 0) {
+        await conference.update(updates, { transaction: t });
+      }
 
-    return serializeConference(conference, metadataFilePath);
+      if (Number.isInteger(status)) {
+        if (status === CONFERENCE_STATUS.DELETED) {
+          await markConferenceAsDeleted({ conferenceId: id }, { t });
+        } else if (status === CONFERENCE_STATUS.FINISHED) {
+          await markConferenceAsFinished({ conferenceId: id }, { t });
+        } else {
+          await markConferenceAsStatus({ conferenceId: id, status }, { t });
+        }
+
+        conference.set("status", status);
+      }
+
+      return serializeConference(conference, metadataFilePath);
+    });
   }
 
   async function updateConferenceStatusById(id, status) {
@@ -157,7 +172,17 @@ export function createConferenceService({ Conference, fileService }) {
       throw new ErrorResponse(404, "Conference not found");
     }
 
-    await conference.update({ status });
+    await sequelize.transaction(async (t) => {
+      if (status === CONFERENCE_STATUS.DELETED) {
+        await markConferenceAsDeleted({ conferenceId: id }, { t });
+      } else if (status === CONFERENCE_STATUS.FINISHED) {
+        await markConferenceAsFinished({ conferenceId: id }, { t });
+      } else {
+        await markConferenceAsStatus({ conferenceId: id, status }, { t });
+      }
+    });
+
+    conference.set("status", status);
 
     return serializeConference(conference);
   }
