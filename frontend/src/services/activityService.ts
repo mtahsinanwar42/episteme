@@ -4,6 +4,7 @@ import type {
   ActivityDetailsResponse,
   GetActivitiesParams,
   CreateActivityRequest,
+  UpdateActivityRequest,
 } from "@/models/activity";
 
 export const activityService = {
@@ -37,5 +38,12 @@ export const activityService = {
     data: CreateActivityRequest,
   ): Promise<ActivityDetailsResponse> => {
     return api.post<ActivityDetailsResponse>("/activities", data, true);
+  },
+
+  updateActivity: async (
+    activityId: string | number,
+    data: UpdateActivityRequest,
+  ): Promise<ActivityDetailsResponse> => {
+    return api.put<ActivityDetailsResponse>(`/activities/${activityId}`, data, true);
   },
 };

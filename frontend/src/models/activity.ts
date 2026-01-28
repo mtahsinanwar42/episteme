@@ -48,3 +48,9 @@ export interface CreateActivityRequest {
   metadataFilePath: string;
   status: number;
 }
+
+export interface UpdateActivityRequest {
+  title: string;
+  metadataFilePath: string;
+  status: number;
+}

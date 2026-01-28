@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { activityService } from "@/services/activityService";
 import type {
   CreateActivityRequest,
+  UpdateActivityRequest,
   GetActivitiesParams,
 } from "@/models/activity";
 
@@ -30,6 +31,19 @@ export function useCreateActivityMutation() {
       activityService.createActivity(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["activities"] });
+    },
+  });
+}
+
+export function useUpdateActivityMutation(activityId: string | number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: UpdateActivityRequest) =>
+      activityService.updateActivity(activityId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["activities"] });
+      queryClient.invalidateQueries({ queryKey: ["activity", activityId] });
     },
   });
 }

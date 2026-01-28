@@ -7,6 +7,7 @@ interface CardProps {
   title: string;
   statusBadge?: ReactNode;
   metadata?: ReactNode;
+  actions?: ReactNode;
   onClick?: () => void;
 }
 
@@ -17,11 +18,12 @@ export function Card({
   title,
   statusBadge,
   metadata,
+  actions,
   onClick,
 }: CardProps) {
   return (
     <div
-      className="rounded-lg border border-border bg-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="relative h-full rounded-lg border border-border bg-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
       onClick={onClick}
     >
       {showImage && imageUrl && (
@@ -36,10 +38,18 @@ export function Card({
         </div>
       )}
 
-      <div className="p-4 flex flex-col gap-2">
-        <h3 className="text-lg font-semibold text-foreground line-clamp-2">
-          {title}
-        </h3>
+      <div className="h-full p-4 flex flex-col gap-2 justify-between">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-semibold text-foreground pr-4">{title}</h3>
+          {actions && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="absolute top-4 right-4"
+            >
+              {actions}
+            </div>
+          )}
+        </div>
 
         <div className="flex items-center gap-2">
           {statusBadge}
