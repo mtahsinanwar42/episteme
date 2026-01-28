@@ -145,7 +145,10 @@ export default function Navbar() {
     <nav className="py-2 px-4 border-b border-border bg-background backdrop-blur-xs">
       <div className="flex justify-between items-center mx-auto 2xl:max-w-7xl">
         <div>
-          <Link to="/" className="text-accent text-3xl">
+          <Link
+            to="/"
+            className="font-semibold bg-linear-to-r from-indigo-400 via-violet-400 to-violet-500 bg-clip-text text-transparent text-3xl"
+          >
             EPISTEME
           </Link>
         </div>
