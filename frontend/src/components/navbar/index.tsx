@@ -142,7 +142,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="py-2 px-4 border-b border-border bg-background">
+    <nav className="py-2 px-4 border-b border-border bg-background backdrop-blur-xs">
       <div className="flex justify-between items-center mx-auto 2xl:max-w-7xl">
         <div>
           <Link to="/" className="text-accent text-3xl">
@@ -150,7 +150,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <div className="hidden lg:flex! gap-8">
+        <div className="hidden lg:flex! gap-8 lg:h-12">
           {navItems.map((item, index) =>
             canViewNavItem(item.visibleTo, user?.roles, isLoggedIn) ? (
               <NavItem key={index} item={item} />
