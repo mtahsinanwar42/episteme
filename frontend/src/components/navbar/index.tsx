@@ -172,7 +172,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="py-2 px-4 border-b border-border">
+    <nav className="py-2 px-4 border-b border-border bg-background">
       <div className="flex justify-between items-center mx-auto 2xl:max-w-7xl">
         <div>
           <Link to="/" className="text-accent text-3xl">
@@ -209,7 +209,7 @@ export default function Navbar() {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent
-                className="w-64 border-none bg-gray-100"
+                className="w-64 border border-border bg-card z-100"
                 align="end"
               >
                 <DropdownMenuLabel>
