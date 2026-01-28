@@ -1,100 +1,103 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUp, ArrowDown } from "lucide-react";
 import { useBlogs } from "@/hooks/useBlogs";
-import { DataTable } from "@/components/ui/data-table";
-import type { Blog } from "@/models/blog";
-
-type BlogData = Blog & { author: string; published_at: string };
+import { BlogCard } from "@/components/blog/BlogCard";
+import { Pagination } from "@/components/ui/pagination";
+import { useSelector } from "react-redux";
+import { UserRole } from "@/models/user";
+import { Button } from "@/components/ui/button";
+import type { RootState } from "@/stores/store";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageTitle from "@/components/common/PageTitle";
+import PageSubTitle from "@/components/common/PageSubTitle";
 
 export default function Blogs() {
   const navigate = useNavigate();
-  const { data: blogs, isLoading, error } = useBlogs();
+  const currentRoles = useSelector(
+    (state: RootState) => state?.auth?.user?.roles,
+  );
 
-  const columns: ColumnDef<BlogData, unknown>[] = [
-    {
-      accessorKey: "title",
-      header: ({ column }) => (
-        <div
-          onClick={() => column.toggleSorting()}
-          className="flex items-center gap-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 select-none transition-colors font-semibold"
-        >
-          Title
-          {column.getIsSorted() && (
-            <span className="inline-block">
-              {column.getIsSorted() === "asc" ? (
-                <ArrowUp className="size-3" />
-              ) : (
-                <ArrowDown className="size-3" />
-              )}
-            </span>
-          )}
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div
-          onClick={() => navigate(`/blogs/${row.original.id}`)}
-          className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer text-left font-medium transition-colors"
-        >
-          {row.getValue("title")}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "body",
-      header: "Description",
-      cell: ({ row }) => (
-        <div className="text-left max-w-[400px]">{row.getValue("body")}</div>
-      ),
-    },
-    {
-      accessorKey: "published_at",
-      header: ({ column }) => (
-        <div
-          onClick={() => column.toggleSorting()}
-          className="flex items-center gap-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 select-none transition-colors font-semibold"
-        >
-          Date
-          {column.getIsSorted() && (
-            <span className="inline-block">
-              {column.getIsSorted() === "asc" ? (
-                <ArrowUp className="size-3" />
-              ) : (
-                <ArrowDown className="size-3" />
-              )}
-            </span>
-          )}
-        </div>
-      ),
-      cell: ({ row }) => {
-        const blog = row.original;
-        return (
-          <div className="text-left max-w-[400px]">
-            By {blog.author} on{" "}
-            {new Date(blog.published_at).toLocaleDateString()}
-          </div>
-        );
-      },
-    },
-  ];
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(9); // 3 cards x 3 rows by default
+
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useBlogs({
+    page,
+    limit: pageSize,
+    sort: "-createdAt",
+    paginate: true,
+  });
+
+  const blogs = response?.data || [];
+  const total = response?.total || 0;
+
+  const currentPage = page;
+  const currentLimit = response?.pagination?.next?.limit || pageSize;
+  const totalPages = Math.ceil(total / currentLimit || 1);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPage(1);
+  };
+
+  const handleBlogClick = (blogId: string | number) => {
+    navigate(`/blogs/${blogId}`);
+  };
 
   return (
-    <div className="">
-      <div className="mb-8">
-        <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-          Blogs
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Explore and discover our latest articles
-        </p>
+    <div>
+      <Breadcrumb items={[{ label: "Blogs", href: "/blogs" }]} />
+      <div className="mb-6 flex justify-between items-end">
+        <div>
+          <PageTitle title="Blogs" />
+          <PageSubTitle text="Latest blog posts and articles" />
+        </div>
+
+        {currentRoles?.includes(UserRole.ADMIN) && (
+          <div className="flex justify-end">
+            <Button
+              onClick={() => navigate("/blogs/new")}
+              className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              Add New Blog
+            </Button>
+          </div>
+        )}
       </div>
-      <DataTable
-        columns={columns}
-        data={(blogs || []).filter((blog): blog is BlogData => !!blog.title)}
-        isLoading={isLoading}
-        error={error ? (error as Error).message : null}
-        pageSize={10}
-      />
+
+      {isLoading && <div className="text-slate-600">Loading blogs...</div>}
+      {error && <div className="text-red-600">{(error as Error).message}</div>}
+
+      {!isLoading && !error && (
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {blogs.map((blog) => (
+              <div key={blog.id} onClick={() => handleBlogClick(blog.id)}>
+                <BlogCard blog={blog} />
+              </div>
+            ))}
+          </div>
+
+          {total > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={currentLimit}
+              totalItems={total}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              pageSizeOptions={[3, 6, 9, 12, 15]}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -167,9 +167,9 @@ export default function ActivityDetails() {
                     <h3 className="font-semibold">{section.heading}</h3>
                   </div>
 
-                  <p className="p-4">
+                  <div className="p-4">
                     <MarkdownRenderer content={section.content} />
-                  </p>
+                  </div>
                 </div>
               ))}
           </>

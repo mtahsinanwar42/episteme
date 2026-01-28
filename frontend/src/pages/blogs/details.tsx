@@ -1,19 +1,23 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useAnnouncementById } from "@/hooks/useAnnouncements";
+import { useBlogById } from "@/hooks/useBlogs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ImageIcon } from "lucide-react";
-import { AnnouncementStatus } from "@/models/announcement";
+import { ImageIcon, Pencil } from "lucide-react";
+import { BlogStatus } from "@/models/blog";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { useSelector } from "react-redux";
+import { type RootState } from "@/stores/store";
+import { UserRole } from "@/models/user";
 
-export default function AnnouncementDetails() {
-  const { announcementId } = useParams();
+export default function BlogDetails() {
+  const { blogId } = useParams();
   const navigate = useNavigate();
-  const { data, isLoading, isError, error } =
-    useAnnouncementById(announcementId);
+  const { data, isLoading, isError, error } = useBlogById(blogId);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const isAdmin = user?.roles?.includes(UserRole.ADMIN);
   const [metadata, setMetadata] = useState<any>(null);
   const [metadataLoading, setMetadataLoading] = useState(false);
   const [metadataError, setMetadataError] = useState<string | null>(null);
@@ -53,9 +57,7 @@ export default function AnnouncementDetails() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">
-            Loading announcement details...
-          </p>
+          <p className="text-muted-foreground">Loading blog details...</p>
         </div>
       </div>
     );
@@ -66,12 +68,10 @@ export default function AnnouncementDetails() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center max-w-md">
           <div className="bg-destructive/10 text-destructive rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-2">
-              Error Loading Announcement
-            </h3>
-            <p className="text-sm">{error.message}</p>
-            <Button className="mt-4" onClick={() => navigate("/announcements")}>
-              Back to Announcements
+            <h3 className="text-lg font-semibold mb-2">Error Loading Blog</h3>
+            <p className="text-sm">{error?.message}</p>
+            <Button className="mt-4" onClick={() => navigate("/blogs")}>
+              Back to Blogs
             </Button>
           </div>
         </div>
@@ -83,40 +83,39 @@ export default function AnnouncementDetails() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <h3 className="text-lg font-semibold mb-2">Announcement Not Found</h3>
+          <h3 className="text-lg font-semibold mb-2">Blog Not Found</h3>
           <p className="text-muted-foreground mb-4">
-            The announcement you're looking for doesn't exist.
+            The blog you're looking for doesn't exist.
           </p>
-          <Button onClick={() => navigate("/announcements")}>
-            Back to Announcements
-          </Button>
+          <Button onClick={() => navigate("/blogs")}>Back to Blogs</Button>
         </div>
       </div>
     );
   }
 
-  const announcement = data.data;
+  const blog = data.data;
 
-  const getStatusBadge = (status: AnnouncementStatus) => {
+  const getStatusBadge = (status: BlogStatus) => {
     switch (status) {
-      case AnnouncementStatus.DRAFT:
+      case BlogStatus.DRAFT:
         return "Draft";
-      case AnnouncementStatus.PUBLISHED:
+      case BlogStatus.PUBLISHED:
         return "Published";
-      case AnnouncementStatus.DELETED:
-        return "deleted";
+      case BlogStatus.DELETED:
+        return "Deleted";
       default:
         return `${status}`;
     }
   };
 
+  const handleEdit = () => {
+    navigate(`/blogs/edit/${blogId}`);
+  };
+
   return (
     <div>
       <Breadcrumb
-        items={[
-          { label: "Announcements", href: "/announcements" },
-          { label: announcement.title },
-        ]}
+        items={[{ label: "Blogs", href: "/blogs" }, { label: blog.title }]}
       />
 
       <div className="space-y-6">
@@ -125,7 +124,7 @@ export default function AnnouncementDetails() {
             <img
               src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
               crossOrigin="anonymous"
-              alt="Announcement Image"
+              alt="Blog Image"
               className="w-full h-96 object-cover rounded-t-lg"
             />
           ) : (
@@ -137,21 +136,32 @@ export default function AnnouncementDetails() {
           )}
 
           <div className="flex flex-col gap-4 p-4">
-            <div>
-              <h3 className="font-bold">{announcement.title}</h3>
-              <h6 className="text-foreground/60">{metadata?.summary}</h6>
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <h3 className="font-bold text-2xl">{blog.title}</h3>
+                <h6 className="text-foreground/60">{metadata?.summary}</h6>
+              </div>
+              {isAdmin && (
+                <Button
+                  onClick={handleEdit}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Edit
+                </Button>
+              )}
             </div>
 
-            <div className="flex gap-4">
-              <Badge variant="outline">ID: {announcement.id}</Badge>
+            <div className="flex gap-4 flex-wrap">
+              <Badge variant="outline">ID: {blog.id}</Badge>
+              <Badge variant="outline">{getStatusBadge(blog?.status)}</Badge>
               <Badge variant="outline">
-                {getStatusBadge(announcement?.status)}
+                Created: {new Date(blog.createdAt).toLocaleString()}
               </Badge>
               <Badge variant="outline">
-                Created: {new Date(announcement.createdAt).toLocaleString()}
-              </Badge>
-              <Badge variant="outline">
-                Updated: {new Date(announcement.updatedAt).toLocaleString()}
+                Updated: {new Date(blog.updatedAt).toLocaleString()}
               </Badge>
             </div>
           </div>

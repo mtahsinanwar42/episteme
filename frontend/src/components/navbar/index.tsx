@@ -36,14 +36,9 @@ const navItems: NavItemConfig[] = [
     visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
   },
   {
-    label: "Trainings",
-    href: "/trainings",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER],
-  },
-  {
     label: "Blogs",
     href: "/blogs",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER],
+    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
   },
   {
     label: "Conferences",
@@ -84,11 +79,7 @@ const navItems: NavItemConfig[] = [
     ],
     visibleTo: UserRole.ADMIN,
   },
-  {
-    label: "Conferences",
-    href: "/admin/conferences",
-    visibleTo: UserRole.ADMIN,
-  },
+
   {
     label: "Submissions",
     href: "/user/submissions",

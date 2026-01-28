@@ -1,28 +1,44 @@
-import { api } from "@/services/api";
-import type { Blog } from "@/models/blog";
+import { api } from "./api";
+import type {
+  BlogResponse,
+  BlogDetailsResponse,
+  GetBlogsParams,
+  CreateBlogRequest,
+  UpdateBlogRequest,
+} from "@/models/blog";
 
 export const blogService = {
-  getBlogs: async (): Promise<Blog[]> => {
-    return api.get<Blog[]>("/posts", false);
+  getBlogs: async (params?: GetBlogsParams): Promise<BlogResponse> => {
+    const queryParams = new URLSearchParams();
+
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.sort) queryParams.append("sort", params.sort);
+    if (params?.select) queryParams.append("select", params.select);
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.paginate !== undefined)
+      queryParams.append("paginate", params.paginate.toString());
+
+    const queryString = queryParams.toString();
+    const endpoint = queryString ? `/blogs?${queryString}` : "/blogs";
+
+    return api.get<BlogResponse>(endpoint, false);
   },
 
-  // Get blogs by user
-  getUserBlogs: async (userId: number): Promise<Blog[]> => {
-    return api.get<Blog[]>(`/blogs?userId=${userId}`, false);
+  getBlogById: async (
+    blogId: string | number,
+  ): Promise<BlogDetailsResponse> => {
+    return api.get<BlogDetailsResponse>(`/blogs/${blogId}`, false);
   },
 
-  // Create blog
-  createBlog: async (blog: Omit<Blog, "id">): Promise<Blog> => {
-    return api.post<Blog>("/blogs", blog, true);
+  createBlog: async (data: CreateBlogRequest): Promise<BlogDetailsResponse> => {
+    return api.post<BlogDetailsResponse>("/blogs", data, true);
   },
 
-  // Update blog
-  updateBlog: async (id: number, blog: Partial<Blog>): Promise<Blog> => {
-    return api.patch<Blog>(`/blogs/${id}`, blog, true);
-  },
-
-  // Delete blog
-  deleteBlog: async (id: number): Promise<void> => {
-    return api.delete<void>(`/blogs/${id}`, true);
+  updateBlog: async (
+    blogId: string | number,
+    data: UpdateBlogRequest,
+  ): Promise<BlogDetailsResponse> => {
+    return api.put<BlogDetailsResponse>(`/blogs/${blogId}`, data, true);
   },
 };

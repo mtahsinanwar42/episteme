@@ -31,6 +31,9 @@ import EditTraining from "./pages/trainings/edit";
 import AnnouncementDetails from "./pages/announcements/details";
 import NewAnnouncement from "./pages/announcements/new";
 import EditAnnouncement from "./pages/announcements/edit";
+import BlogDetails from "./pages/blogs/details";
+import NewBlog from "./pages/blogs/new";
+import EditBlog from "./pages/blogs/edit";
 
 export default function RouteConfig() {
   return (
@@ -115,10 +118,11 @@ export default function RouteConfig() {
       />
 
       <Route path="/conferences" element={<Conferences />} />
-      <Route path="/trainings" element={<Trainings />} />
 
       <Route path="/blogs" element={<Blogs />} />
-      <Route path="/blogs/:id" element={<Blogs />} />
+      <Route path="/blogs/:blogId" element={<BlogDetails />} />
+      <Route path="/blogs/new" element={<NewBlog />} />
+      <Route path="/blogs/edit/:blogId" element={<EditBlog />} />
 
       <Route path="/about/mission" element={<Mission />} />
       <Route path="/about/ethics" element={<Ethics />} />
