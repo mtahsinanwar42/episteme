@@ -33,7 +33,7 @@ const navItems: NavItemConfig[] = [
   {
     label: "Announcements",
     href: "/announcements",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER],
+    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
   },
   {
     label: "Trainings",

@@ -28,6 +28,9 @@ import EditActivity from "./pages/activities/edit";
 import TrainingDetails from "./pages/trainings/details";
 import NewTraining from "./pages/trainings/new";
 import EditTraining from "./pages/trainings/edit";
+import AnnouncementDetails from "./pages/announcements/details";
+import NewAnnouncement from "./pages/announcements/new";
+import EditAnnouncement from "./pages/announcements/edit";
 
 export default function RouteConfig() {
   return (
@@ -100,9 +103,19 @@ export default function RouteConfig() {
       <Route path="/trainings/new" element={<NewTraining />} />
       <Route path="/trainings/edit/:trainingId" element={<EditTraining />} />
 
+      <Route path="/announcements" element={<Announcements />} />
+      <Route
+        path="/announcements/:announcementId"
+        element={<AnnouncementDetails />}
+      />
+      <Route path="/announcements/new" element={<NewAnnouncement />} />
+      <Route
+        path="/announcements/edit/:announcementId"
+        element={<EditAnnouncement />}
+      />
+
       <Route path="/conferences" element={<Conferences />} />
       <Route path="/trainings" element={<Trainings />} />
-      <Route path="/announcements" element={<Announcements />} />
 
       <Route path="/blogs" element={<Blogs />} />
       <Route path="/blogs/:id" element={<Blogs />} />
