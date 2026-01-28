@@ -1,18 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useActivityById } from "@/hooks/useActivities";
+import { useTrainingById } from "@/hooks/useTrainings";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImageIcon } from "lucide-react";
-import { ActivityStatus } from "@/models/activity";
+import { TrainingStatus } from "@/models/training";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 
-export default function ActivityDetails() {
-  const { activityId } = useParams();
+export default function TrainingDetails() {
+  const { trainingId } = useParams();
   const navigate = useNavigate();
-  const { data, isLoading, isError, error } = useActivityById(activityId);
+  const { data, isLoading, isError, error } = useTrainingById(trainingId);
   const [metadata, setMetadata] = useState<any>(null);
   const [metadataLoading, setMetadataLoading] = useState(false);
   const [metadataError, setMetadataError] = useState<string | null>(null);
@@ -52,7 +52,7 @@ export default function ActivityDetails() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading activity details...</p>
+          <p className="text-muted-foreground">Loading training details...</p>
         </div>
       </div>
     );
@@ -64,11 +64,11 @@ export default function ActivityDetails() {
         <div className="text-center max-w-md">
           <div className="bg-destructive/10 text-destructive rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-2">
-              Error Loading Activity
+              Error Loading Training
             </h3>
             <p className="text-sm">{error.message}</p>
-            <Button className="mt-4" onClick={() => navigate("/activities")}>
-              Back to Activities
+            <Button className="mt-4" onClick={() => navigate("/trainings")}>
+              Back to Trainings
             </Button>
           </div>
         </div>
@@ -80,27 +80,27 @@ export default function ActivityDetails() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <h3 className="text-lg font-semibold mb-2">Activity Not Found</h3>
+          <h3 className="text-lg font-semibold mb-2">Training Not Found</h3>
           <p className="text-muted-foreground mb-4">
-            The activity you're looking for doesn't exist.
+            The training you're looking for doesn't exist.
           </p>
-          <Button onClick={() => navigate("/activities")}>
-            Back to Activities
+          <Button onClick={() => navigate("/trainings")}>
+            Back to Trainings
           </Button>
         </div>
       </div>
     );
   }
 
-  const activity = data.data;
+  const training = data.data;
 
-  const getStatusBadge = (status: ActivityStatus) => {
+  const getStatusBadge = (status: TrainingStatus) => {
     switch (status) {
-      case ActivityStatus.DRAFT:
+      case TrainingStatus.DRAFT:
         return "Draft";
-      case ActivityStatus.PUBLISHED:
+      case TrainingStatus.PUBLISHED:
         return "Published";
-      case ActivityStatus.DELETED:
+      case TrainingStatus.DELETED:
         return "deleted";
       default:
         return `${status}`;
@@ -111,8 +111,8 @@ export default function ActivityDetails() {
     <div>
       <Breadcrumb
         items={[
-          { label: "Activities", href: "/activities" },
-          { label: activity.title },
+          { label: "Trainings", href: "/trainings" },
+          { label: training.title },
         ]}
       />
 
@@ -122,7 +122,7 @@ export default function ActivityDetails() {
             <img
               src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
               crossOrigin="anonymous"
-              alt="Activity Image"
+              alt="Training Image"
               className="w-full h-96 object-cover rounded-t-lg"
             />
           ) : (
@@ -135,20 +135,20 @@ export default function ActivityDetails() {
 
           <div className="flex flex-col gap-4 p-4">
             <div>
-              <h3 className="font-bold">{activity.title}</h3>
+              <h3 className="font-bold">{training.title}</h3>
               <h6 className="text-foreground/60">{metadata?.summary}</h6>
             </div>
 
             <div className="flex gap-4">
-              <Badge variant="outline">ID: {activity.id}</Badge>
+              <Badge variant="outline">ID: {training.id}</Badge>
               <Badge variant="outline">
-                {getStatusBadge(activity?.status)}
+                {getStatusBadge(training?.status)}
               </Badge>
               <Badge variant="outline">
-                Created: {new Date(activity.createdAt).toLocaleString()}
+                Created: {new Date(training.createdAt).toLocaleString()}
               </Badge>
               <Badge variant="outline">
-                Updated: {new Date(activity.updatedAt).toLocaleString()}
+                Updated: {new Date(training.updatedAt).toLocaleString()}
               </Badge>
             </div>
           </div>

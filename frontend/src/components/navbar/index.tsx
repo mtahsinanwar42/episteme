@@ -26,6 +26,11 @@ const navItems: NavItemConfig[] = [
     visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
   },
   {
+    label: "Trainings",
+    href: "/trainings",
+    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
+  },
+  {
     label: "Announcements",
     href: "/announcements",
     visibleTo: [UserRole.PUBLIC, UserRole.USER],

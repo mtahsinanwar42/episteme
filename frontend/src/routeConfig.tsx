@@ -25,6 +25,9 @@ import Activities from "@/pages/activities";
 import ActivityDetails from "@/pages/activities/details";
 import NewActivity from "@/pages/activities/new";
 import EditActivity from "./pages/activities/edit";
+import TrainingDetails from "./pages/trainings/details";
+import NewTraining from "./pages/trainings/new";
+import EditTraining from "./pages/trainings/edit";
 
 export default function RouteConfig() {
   return (
@@ -91,6 +94,11 @@ export default function RouteConfig() {
       <Route path="/activities/:activityId" element={<ActivityDetails />} />
       <Route path="/activities/new" element={<NewActivity />} />
       <Route path="/activities/edit/:activityId" element={<EditActivity />} />
+
+      <Route path="/trainings" element={<Trainings />} />
+      <Route path="/trainings/:trainingId" element={<TrainingDetails />} />
+      <Route path="/trainings/new" element={<NewTraining />} />
+      <Route path="/trainings/edit/:trainingId" element={<EditTraining />} />
 
       <Route path="/conferences" element={<Conferences />} />
       <Route path="/trainings" element={<Trainings />} />
