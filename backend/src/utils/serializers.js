@@ -7,6 +7,7 @@ export const serializeUser = (user, cvFilePath, photoFilePath) => {
     phone: user.phone,
     roles: user.roles,
     status: user.status,
+    statusUpdateNotes: user.statusUpdateNotes,
     institution: user.institution,
     occupation: user.occupation,
     country: user.country,

@@ -40,6 +40,11 @@ export default (sequelize, DataTypes) => {
         field: "status",
         defaultValue: 1,
       },
+      statusUpdateNotes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "status_update_notes",
+      },
     },
     {
       schema: "episteme",

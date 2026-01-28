@@ -1,6 +1,7 @@
 import { canCreateReviewAssignment, findReviewAssignments, findReviewAssignmentsByUserId } from "../repositories/contentReviewAssignment.js";
 import { REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
+import { isNotEmpty } from "../utils/string.js";
 
 export function createReviewAssignmentService({ ContentReviewAssignment, fileService }) {
   if (!ContentReviewAssignment) {
@@ -51,10 +52,13 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
     return assignment;
   }
 
-  async function updateReviewAssignmentStatusById(user, id, status) {
+  async function updateReviewAssignmentStatusById(user, id, payload) {
     const userId = Number(user.id);
     const userRoles = Array.isArray(user.roles) ? user.roles : [];
     const isAdmin = userRoles.includes(USER_ROLE.ADMIN);
+
+    const { status, statusUpdateNotes, } = payload;
+    const updates = {};
 
     if (!Object.values(REVIEW_ASSIGNMENT_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid assignment status");
@@ -70,6 +74,12 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
       throw new ErrorResponse(400, "Invalid assignment status");
     }
 
+    updates.status = status;
+
+    if (isAdmin && isNotEmpty(statusUpdateNotes)) {
+      updates.statusUpdateNotes = statusUpdateNotes;
+    }
+
     const where = isAdmin
       ? { id: Number(id) }
       : { id: Number(id), reviewerUsrId: userId };
@@ -80,7 +90,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
       throw new ErrorResponse(404, "ContentReviewAssignment not found");
     }
 
-    await assignment.update({ status });
+    await assignment.update(updates);
 
     return assignment;
   }

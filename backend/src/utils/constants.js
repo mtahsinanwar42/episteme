@@ -14,7 +14,6 @@ export const CONFERENCE_STATUS = Object.freeze({
   INACTIVE: 0,
   ACTIVE: 1,
   FINISHED: 2,
-  ARCHIVED: 3,
   DELETED: 9,
 });
 
@@ -52,7 +51,7 @@ export const CONTENT_SUBMISSION_STATUS = Object.freeze({
   REJECTED: 4,
   DELETED: 9,
 });
-export const CONTENT_SUBMISSION_VERSION_INITIAL = 1;
+export const CONTENT_SUBMISSION_VERSION_INITIAL = CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL;
 
 export const CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE = Object.freeze({
   USER_ADMIN: "USER_ADMIN",
@@ -70,6 +69,7 @@ export const REVIEW_ASSIGNMENT_STATUS = Object.freeze({
   ACCEPTED: 2,
   DECLINED: 3,
   COMPLETED: 4,
+  CANCELLED: 5,
   DELETED: 9,
 });
 export const REVIEW_RECOMMENDATION = Object.freeze({
@@ -90,7 +90,7 @@ export const CONTENT_SUBMISSION_PAYMENT_STATUS = Object.freeze({
 export const FILE_BUCKETS = {
   cvs: { visibility: "private", maxSize: 10_000_000, types: /docx|pdf/ },
   profile_photos: { visibility: "public", maxSize: 5_000_000, types: /jpg|jpeg|png/ },
-  papers: { visibility: "private", maxSize: 20_000_000, types: /docx|pdf/ },
+  submissions: { visibility: "private", maxSize: 20_000_000, types: /docx|pdf/ },
   assets: { visibility: "public", maxSize: 5_000_000, types: /jpg|jpeg|png|svg|json/ },
 };
 
@@ -114,3 +114,36 @@ export const COUNTRIES_CONFIG = Object.freeze({
 
 export const DEFAULT_PAGE_NO = 1;
 export const DEFAULT_PAGE_LIMIT = 10;
+
+export const UPDATE_SCHEDULER_TIME_PATTERN = Object.freeze({
+  TOPICS: "0 0 0 * * 0",
+  COUNTRIES: "0 0 0 * * 0",
+});
+
+export const KAFKA_EVENT_TYPES = Object.freeze({
+  EMAIL_SEND: "EMAIL_SEND",
+});
+export const KAFKA_TOPICS = Object.freeze({
+  EMAIL_SEND: "email.send",
+});
+export const KAFKA_CONSUMER_GROUPS = Object.freeze({
+  EMAIL_WORKER: "email-worker-group",
+});
+
+export const CACHE_TTL = Object.freeze({
+  DEDUPE: 10 * 60 * 1000,
+});
+
+export const MAIL_TYPES = Object.freeze({
+  USER_REGISTER: 1,
+  REVIEWER_REGISTER: 2,
+});
+
+export const STATUS_UPDATE_NOTES = Object.freeze({
+  SUBMISSION_DELETION_DUE_TO_CONF_DELETE: "Associated Conference was deleted; cascaded deletion to submissions.",
+  SUBMISSION_DELETION_DUE_TO_CONF_FINISH: "Conference was finished; submission was auto-rejected.",
+  REVIEW_ASSIGNMENT_DELETION_DUE_TO_SUBMISSION_DELETE: "Submission was deleted; cascaded deletion to review assignments.",
+  REVIEW_ASSIGNMENT_DELETION_DUE_TO_CONF_DELETE: "Associated Conference was deleted; cascaded deletion to review assignments.",
+  REVIEW_ASSIGNMENT_DELETION_DUE_TO_CONF_FINISH: "Conference was finished; assignment was auto-cancelled.",
+  REVIEW_ASSIGNMENT_CANCELLATION_DUE_TO_SUBMISSION_ACCEPT_REJECT: "Submission was finalized (approved/rejected); assignment was auto-cancelled.",
+});

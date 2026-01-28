@@ -84,6 +84,11 @@ export default (sequelize, DataTypes) => {
         field: "status",
         defaultValue: 0,
       },
+      statusUpdateNotes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "status_update_notes",
+      },
       cvFileId: {
         type: DataTypes.BIGINT,
         allowNull: true,

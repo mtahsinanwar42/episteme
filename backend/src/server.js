@@ -24,11 +24,19 @@ import activityRoutes from "./routes/activity.js";
 import announcementRoutes from "./routes/announcement.js";
 import submissionRoutes from "./routes/contentSubmission.js";
 import reviewAssignmentRoutes from "./routes/contentReviewAssignment.js";
+import { createRefDataService } from "./services/referenceData.js";
+import { createSchedulerService } from "./services/scheduler.js";
+import { createKafkaTopics, startKafkaProducer, stopKafkaProducer } from "./config/kafka.js";
+import { startRedis, stopRedis } from "./config/redis.js";
+import { startEmailWorker, stopEmailWorker } from "./workers/email.js";
+import { KAFKA_TOPICS } from "./utils/constants.js";
 
 dotenv.config();
 
 const app = express();
 const __dirname = path.resolve();
+const refDataService = createRefDataService({});
+const schedulerService = createSchedulerService({ refDataService });
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -97,6 +105,18 @@ async function start() {
     await connectDb();
     initModels(sequelize);
 
+    schedulerService.start();
+
+    await startRedis();
+    await startKafkaProducer();
+    await createKafkaTopics([
+      KAFKA_TOPICS.EMAIL_SEND,
+    ]);
+    await startEmailWorker();
+
+    process.on("SIGINT", shutdown);
+    process.on("SIGTERM", shutdown);
+
     app.listen(PORT, () =>
       console.log(
         `Server running in ${process.env.NODE_ENV || "development"} on port ${PORT}`
@@ -105,8 +125,15 @@ async function start() {
     );
   } catch (err) {
     console.error("Failed to start server".red, err);
-    process.exit(1);
+    shutdown();
   }
+}
+
+async function shutdown() {
+  await stopEmailWorker();
+  await stopKafkaProducer();
+  await stopRedis();
+  process.exit(0);
 }
 
 start();

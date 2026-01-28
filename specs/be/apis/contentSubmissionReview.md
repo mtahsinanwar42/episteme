@@ -24,12 +24,12 @@ Access: REVIEWER
 
 Required:
 
-- reviewerContentSubmissionVersionId (integer)
-- recommendation
+- recommendation (integer)
 
 Optional:
 
-- comment
+- comment (text)
+- reviewerContentSubmissionVersionId (integer)
 
 Example:
 
