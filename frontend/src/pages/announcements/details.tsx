@@ -120,7 +120,7 @@ export default function AnnouncementDetails() {
       />
 
       <div className="space-y-6">
-        <div className="rounded-lg border border-border shadow-sm relative">
+        <div className="rounded-lg border border-border shadow-sm relative gradient-card">
           {!metadataLoading && !metadataError && metadata ? (
             <img
               src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
@@ -166,7 +166,7 @@ export default function AnnouncementDetails() {
                   key={index}
                   className="rounded-lg border border-border shadow-sm"
                 >
-                  <div className="p-4 bg-accent/5 shadow-sm rounded-t-lg">
+                  <div className="p-4 gradient-card shadow-sm rounded-t-lg">
                     <h3 className="font-semibold">{section.heading}</h3>
                   </div>
 

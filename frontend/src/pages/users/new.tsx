@@ -193,10 +193,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="lastName"
-                  className="text-sm font-medium"
-                >
+                <label htmlFor="lastName" className="text-sm font-medium">
                   Last Name *
                 </label>
                 <Input
@@ -211,10 +208,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="email"
-                  className="text-sm font-medium"
-                >
+                <label htmlFor="email" className="text-sm font-medium">
                   Email *
                 </label>
                 <Input
@@ -229,10 +223,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-medium "
-                >
+                <label htmlFor="password" className="text-sm font-medium ">
                   Password *
                 </label>
                 <Input
@@ -247,10 +238,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="phone"
-                  className="text-sm font-medium "
-                >
+                <label htmlFor="phone" className="text-sm font-medium ">
                   Phone *
                 </label>
                 <Input
@@ -265,10 +253,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="country"
-                  className="text-sm font-medium "
-                >
+                <label htmlFor="country" className="text-sm font-medium ">
                   Country *
                 </label>
                 <Input
@@ -283,10 +268,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="institution"
-                  className="text-sm font-medium "
-                >
+                <label htmlFor="institution" className="text-sm font-medium ">
                   Institution *
                 </label>
                 <Input
@@ -301,10 +283,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="occupation"
-                  className="text-sm font-medium "
-                >
+                <label htmlFor="occupation" className="text-sm font-medium ">
                   Occupation *
                 </label>
                 <Input
@@ -319,10 +298,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label
-                  htmlFor="linkedinUrl"
-                  className="text-sm font-medium "
-                >
+                <label htmlFor="linkedinUrl" className="text-sm font-medium ">
                   LinkedIn URL
                 </label>
                 <Input
@@ -336,9 +312,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label className="text-sm font-medium ">
-                  Status *
-                </label>
+                <label className="text-sm font-medium ">Status *</label>
                 <Select
                   value={formData.status.toString()}
                   onValueChange={(value) =>
@@ -409,9 +383,7 @@ export default function NewUser() {
             </div>
 
             <div className="flex flex-col space-y-3">
-              <label className="text-sm font-medium ">
-                Select Roles *
-              </label>
+              <label className="text-sm font-medium ">Select Roles *</label>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Checkbox
