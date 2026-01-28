@@ -85,32 +85,6 @@ const navItems: NavItemConfig[] = [
     visibleTo: UserRole.ADMIN,
   },
   {
-    label: "Content Management",
-    children: [
-      {
-        label: "Activities",
-        href: "/admin/activities",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "Blogs",
-        href: "/admin/blogs",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "Trainings",
-        href: "/admin/trainings",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "Announcements",
-        href: "/admin/announcements",
-        visibleTo: UserRole.ADMIN,
-      },
-    ],
-    visibleTo: UserRole.ADMIN,
-  },
-  {
     label: "Conferences",
     href: "/admin/conferences",
     visibleTo: UserRole.ADMIN,
