@@ -21,7 +21,7 @@ import NewUser from "@/pages/users/new";
 import Assets from "@/pages/assets";
 import AssetDetails from "@/pages/assets/details";
 import NewAsset from "@/pages/assets/new";
-import Activities from "@/pages/activities/list";
+import Activities from "@/pages/activities";
 import ActivityDetails from "@/pages/activities/details";
 import NewActivity from "@/pages/activities/new";
 

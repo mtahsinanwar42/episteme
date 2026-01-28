@@ -206,10 +206,10 @@ export default function NewActivity() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={ActivityStatus.DRAFT.toString()}>
-                  Draft (0)
+                  Draft
                 </SelectItem>
                 <SelectItem value={ActivityStatus.PUBLISHED.toString()}>
-                  Published (1)
+                  Published
                 </SelectItem>
               </SelectContent>
             </Select>
