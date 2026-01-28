@@ -2,11 +2,15 @@ import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
 
 import ErrorResponse from "../utils/ErrorResponse.js";
-import { sendEmail } from "../utils/email.js";
+import { createEventEnvelope } from "../utils/kafka.js";
+import { publishEvent } from "../config/kafka.js";
+import { generateUUID } from "../utils/uuid.js";
+import { KAFKA_EVENT_TYPES, KAFKA_TOPICS, MAIL_TYPES } from "../utils/constants.js";
 import { generateHash } from "../utils/hashing.js";
 import { USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import { isEmpty, isNotEmpty } from "../utils/string.js";
 import { serializeUser } from "../utils/serializers.js";
+import { getMailContents } from "../utils/email.js";
 
 export function createAuthService({ User, fileService }) {
   if (!User) {
@@ -86,6 +90,8 @@ export function createAuthService({ User, fileService }) {
       phone,
       linkedinUrl,
     }], { individualHooks: true, returning: true });
+
+    await publishRegistrationEmail(user);
 
     const token = buildJwtToken(user);
 
@@ -250,6 +256,32 @@ export function createAuthService({ User, fileService }) {
 
     const token = buildJwtToken(user);
     return { user, token };
+  }
+
+  async function publishRegistrationEmail(user) {
+    const correlationId = generateUUID();
+
+    const emailMetadata = getMailContents(MAIL_TYPES.USER_REGISTER, user);
+    const emailEnvelope = createEventEnvelope({
+      type: KAFKA_EVENT_TYPES.EMAIL_SEND,
+      version: 1,
+      correlationId,
+      actor: { system: true, userId: user.id },
+      payload: {
+        to: { email: user.email, name: `${user.firstName} ${user.lastName}` },
+        ...emailMetadata,
+      },
+    });
+
+    await publishEvent({
+      topic: KAFKA_TOPICS.EMAIL_SEND,
+      key: emailEnvelope.id,
+      value: emailEnvelope,
+      headers: {
+        "event-type": emailEnvelope.type,
+        "correlation-id": correlationId,
+      },
+    });
   }
 
   return {

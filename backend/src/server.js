@@ -26,7 +26,10 @@ import submissionRoutes from "./routes/contentSubmission.js";
 import reviewAssignmentRoutes from "./routes/contentReviewAssignment.js";
 import { createRefDataService } from "./services/referenceData.js";
 import { createSchedulerService } from "./services/scheduler.js";
-import { startKafkaProducer, stopKafkaProducer } from "./config/kafka.js";
+import { createKafkaTopics, startKafkaProducer, stopKafkaProducer } from "./config/kafka.js";
+import { startRedis, stopRedis } from "./config/redis.js";
+import { startEmailWorker, stopEmailWorker } from "./workers/email.js";
+import { KAFKA_TOPICS } from "./utils/constants.js";
 
 dotenv.config();
 
@@ -104,16 +107,15 @@ async function start() {
 
     schedulerService.start();
 
+    await startRedis();
     await startKafkaProducer();
+    await createKafkaTopics([
+      KAFKA_TOPICS.EMAIL_SEND,
+    ]);
+    await startEmailWorker();
 
-    process.on("SIGINT", async () => {
-      await stopKafkaProducer();
-      process.exit(0);
-    });
-    process.on("SIGTERM", async () => {
-      await stopKafkaProducer();
-      process.exit(0);
-    });
+    process.on("SIGINT", shutdown);
+    process.on("SIGTERM", shutdown);
 
     app.listen(PORT, () =>
       console.log(
@@ -123,9 +125,15 @@ async function start() {
     );
   } catch (err) {
     console.error("Failed to start server".red, err);
-    await stopKafkaProducer();
-    process.exit(1);
+    shutdown();
   }
+}
+
+async function shutdown() {
+  await stopEmailWorker();
+  await stopKafkaProducer();
+  await stopRedis();
+  process.exit(0);
 }
 
 start();

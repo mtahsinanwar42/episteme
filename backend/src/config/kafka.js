@@ -4,7 +4,7 @@ import { parseBrokers } from "../utils/kafka.js";
 const enabled = (process.env.KAFKA_ENABLED || "false").toLowerCase() === "true";
 const kafka = enabled
   ? new Kafka({
-    clientId: process.env.KAFKA_CLIENT_ID || "app",
+    clientId: process.env.KAFKA_CLIENT_ID || "episteme-backend",
     brokers: parseBrokers(process.env.KAFKA_BROKERS),
     logLevel: logLevel.INFO,
   })
@@ -14,6 +14,7 @@ let producer;
 
 export async function startKafkaProducer() {
   if (!enabled) {
+    console.log("Kafka disabled, producer not starting.");
     return;
   }
 
@@ -69,4 +70,30 @@ export async function publishEvent({ topic, key, value, headers }) {
       headers: hdrs
     }],
   });
+}
+
+export async function createKafkaTopics(topics = []) {
+  if (!enabled) {
+    console.log("Kafka disabled, topics not created.")
+    return;
+  }
+
+  const admin = kafka.admin();
+  await admin.connect();
+
+  try {
+    await admin.createTopics({
+      waitForLeaders: true,
+      topics: topics.map((t) => ({ topic: t, numPartitions: 1, replicationFactor: 1 })),
+    });
+  } catch (e) {
+    const msg = e?.message || "";
+
+    if (!msg.toLowerCase().includes("topic") || !msg.toLowerCase().includes("exists")) {
+      throw e;
+    }
+  }
+  finally {
+    await admin.disconnect();
+  }
 }

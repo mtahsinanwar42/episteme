@@ -120,6 +120,25 @@ export const UPDATE_SCHEDULER_TIME_PATTERN = Object.freeze({
   COUNTRIES: "0 0 0 * * 0",
 });
 
+export const KAFKA_EVENT_TYPES = Object.freeze({
+  EMAIL_SEND: "EMAIL_SEND",
+});
+export const KAFKA_TOPICS = Object.freeze({
+  EMAIL_SEND: "email.send",
+});
+export const KAFKA_CONSUMER_GROUPS = Object.freeze({
+  EMAIL_WORKER: "email-worker-group",
+});
+
+export const CACHE_TTL = Object.freeze({
+  DEDUPE: 10 * 60 * 1000,
+});
+
+export const MAIL_TYPES = Object.freeze({
+  USER_REGISTER: 1,
+  REVIEWER_REGISTER: 2,
+});
+
 export const STATUS_UPDATE_NOTES = Object.freeze({
   SUBMISSION_DELETION_DUE_TO_CONF_DELETE: "Associated Conference was deleted; cascaded deletion to submissions.",
   SUBMISSION_DELETION_DUE_TO_CONF_FINISH: "Conference was finished; submission was auto-rejected.",
