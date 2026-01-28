@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,29 +11,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import type { File } from "@/models/file";
 import { ActivityStatus } from "@/models/activity";
-import { useFiles } from "@/hooks/useFiles";
 import { useCreateActivityMutation } from "@/hooks/useActivities";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
+import { fileService } from "@/services/fileService";
+import { FileTypeEnum } from "@/models/file";
+import { FileText, Upload } from "lucide-react";
 
 export default function NewActivity() {
   const navigate = useNavigate();
   const createActivityMutation = useCreateActivityMutation();
-  const [files, setFiles] = useState<File[]>([]);
-  const [fileLoading, setFileLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const {
-    data: filesResponse,
-    isLoading,
-    error: fileResponseError,
-  } = useFiles({
-    sort: "-createdAt",
-    paginate: true,
-  });
+  const [metadataFile, setMetadataFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -90,28 +82,55 @@ export default function NewActivity() {
     }));
   };
 
-  const handleFileChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      metadataFilePath: value,
-    }));
-  };
+  const handleMetadataFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  useEffect(() => {
-    try {
-      if (filesResponse?.success && filesResponse.data) {
-        const assetsFiles = filesResponse.data.filter((file) =>
-          file.storageKey.startsWith("storage/public/assets/"),
-        );
-        setFiles(assetsFiles);
-      }
-    } catch (err) {
-      console.error("Error fetching files:", err);
-      setError("Failed to load files");
-    } finally {
-      setFileLoading(false);
+    // Validate file type (JSON only)
+    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
+      setError("Please upload a JSON file");
+      return;
     }
-  }, [filesResponse]);
+
+    setMetadataFile(file);
+    setUploading(true);
+    setError(null);
+
+    try {
+      const formDataToUpload = new FormData();
+      formDataToUpload.append("file", file);
+
+      const fileUploadResponse = await fileService.uploadFile(
+        FileTypeEnum.ASSETS,
+        formDataToUpload,
+      );
+
+      if (
+        fileUploadResponse.success &&
+        fileUploadResponse.data.file.storageKey
+      ) {
+        setFormData((prev) => ({
+          ...prev,
+          metadataFilePath: fileUploadResponse.data.file.storageKey,
+        }));
+      } else {
+        setError("Failed to upload file");
+        setMetadataFile(null);
+      }
+    } catch (error) {
+      console.error("Metadata file upload error:", error);
+      setError("Failed to upload metadata file");
+      setMetadataFile(null);
+      setFormData((prev) => ({
+        ...prev,
+        metadataFilePath: "",
+      }));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div>
@@ -129,11 +148,7 @@ export default function NewActivity() {
 
       <div className="rounded-lg border border-border bg-card shadow-md p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="text-red-600">
-              {(fileResponseError as Error).message}
-            </div>
-          )}
+          {error && <div className="text-red-600">{error}</div>}
 
           {/* Title Field */}
           <div>
@@ -151,44 +166,56 @@ export default function NewActivity() {
             />
           </div>
 
-          {/* Metadata File Select */}
+          {/* Metadata File Upload */}
           <div>
             <label className="block text-sm font-medium mb-2 text-heading">
-              Metadata File *
+              Metadata File (JSON) *
             </label>
-            {fileLoading ? (
-              <div className="p-3 border border-accent rounded bg-slate-50 dark:bg-slate-900 text-body">
-                Loading files...
+            <div className="space-y-3">
+              <div className="flex items-center gap-4">
+                <label
+                  htmlFor="metadata-file"
+                  className={`flex items-center gap-2 px-4 py-2 border border-accent rounded cursor-pointer hover:bg-accent/10 transition-colors ${
+                    uploading || createActivityMutation.isPending
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                >
+                  <Upload className="w-4 h-4" />
+                  <span className="text-sm">
+                    {uploading ? "Uploading..." : "Choose JSON File"}
+                  </span>
+                </label>
+                <input
+                  id="metadata-file"
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={handleMetadataFileChange}
+                  disabled={uploading || createActivityMutation.isPending}
+                  className="hidden"
+                />
               </div>
-            ) : (
-              <Select
-                value={formData.metadataFilePath}
-                onValueChange={handleFileChange}
-                disabled={
-                  createActivityMutation.isPending || files.length === 0
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a metadata file" />
-                </SelectTrigger>
-                <SelectContent>
-                  {files.length > 0 ? (
-                    files.map((file) => (
-                      <SelectItem key={file.id} value={file.storageKey}>
-                        {file.name}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <div className="p-2 text-body">
-                      No files found in storage/public/assets
-                    </div>
+
+              {metadataFile && (
+                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded">
+                  <FileText className="w-4 h-4 text-green-600" />
+                  <span className="text-sm text-green-800">
+                    {metadataFile.name}
+                  </span>
+                  {formData.metadataFilePath && (
+                    <span className="text-xs text-green-600 ml-auto">
+                      ✓ Uploaded
+                    </span>
                   )}
-                </SelectContent>
-              </Select>
-            )}
-            <p className="text-xs text-body mt-2">
-              Files from: storage/public/assets/
-            </p>
+                </div>
+              )}
+
+              {!metadataFile && (
+                <p className="text-xs text-body">
+                  Upload a JSON file containing activity metadata
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Status Field */}
