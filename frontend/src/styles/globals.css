@@ -30,10 +30,12 @@
   --primary: oklch(100% 0 0);
   --primary-foreground: oklch(8% 0.02 290);
   --secondary-foreground: oklch(100% 0 0);
-
   --shadow-small: 0 0 4px 4px rgba(0, 0, 0, 0.05);
   --shadow-medium: 0 0 8px 8px rgba(0, 0, 0, 0.05);
   --shadow-large: 0 0 16px 16px rgba(0, 0, 0, 0.05);
+
+  --title-gradient: #735fe9, #ce47eb, #f47b74;
+  --card-gradient: #1d293d, #0f172d;
 }
 
 @layer base {
@@ -57,10 +59,10 @@
     --border: #080c0f;
     --input: oklch(32% 0.01 240);
     --ring: oklch(20% 0.01 240);
-    --chart-1: oklch(58% 0.2 285);
-    --chart-2: oklch(65% 0.25 320);
-    --chart-3: oklch(72% 0.15 25);
-    --chart-4: oklch(50% 0.15 240);
+    --chart-1: #735fe9;
+    --chart-2: #ce47eb;
+    --chart-3: #f47b74;
+    --chart-4: #006aaf;
   }
 
   html[data-theme="emerald"] {
@@ -110,4 +112,16 @@ h5 {
 h6 {
   font-size: 1rem;
   line-height: 1.5rem;
+}
+
+@layer utilities {
+  .gradient-title {
+    @apply bg-linear-to-r bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, var(--title-gradient));
+  }
+
+  .gradient-card {
+    @apply bg-linear-to-br;
+    background-image: linear-gradient(135deg, var(--card-gradient));
+  }
 }

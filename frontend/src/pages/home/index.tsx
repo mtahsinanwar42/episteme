@@ -1,17 +1,15 @@
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { logout } from "@/stores/authSlice";
-import { type RootState } from "@/stores/store";
+import HeroSection from "@/components/home/HeroSection";
+import HomeMission from "@/components/home/HomeMission";
+import HomeBlogSection from "@/components/home/HomeBlogSection";
+import HomeActivitySection from "@/components/home/HomeActivitySection";
 
-function Home() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
+export default function Home() {
   return (
-    <div className="">
-      <h1>Welcome to Episteme</h1>
+    <div>
+      <HeroSection />
+      <HomeMission />
+      <HomeBlogSection />
+      <HomeActivitySection />
     </div>
   );
 }
-
-export default Home;

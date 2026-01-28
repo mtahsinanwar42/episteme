@@ -107,7 +107,7 @@ export function NavItem({ item }: NavItemProps) {
       onMouseLeave={handleMouseLeave}
     >
       {/* Parent Item */}
-      <div className="flex items-center gap-1 text-white cursor-pointer">
+      <div className="h-full flex items-center gap-1 text-white cursor-pointer">
         {item.label}
         <ChevronDown
           size={16}
@@ -122,17 +122,16 @@ export function NavItem({ item }: NavItemProps) {
         <>
           {/* Invisible bridge to prevent dropdown from closing */}
           <div
-            className="absolute left-0 top-full w-48 h-2 z-40"
+            className="absolute left-0 top-full w-48 h-4 z-40"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           />
           <div
-            className="absolute left-0 mt-2 w-48 text-white bg-accent rounded-lg shadow-lg z-50 
-              animate-in fade-in slide-in-from-top-2 duration-200"
+            className="absolute left-0 mt-3 w-48 text-white bg-card border border-border rounded-lg shadow-lg z-50 animate-in fade-in slide-in-from-top-2 duration-200"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            <div className="py-2">
+            <div className="flex flex-col gap-2 p-2">
               {item.children?.map((child, index) => {
                 if (!canViewNavItem(child.visibleTo, userRoles, isLoggedIn))
                   return null;
@@ -144,7 +143,7 @@ export function NavItem({ item }: NavItemProps) {
                     ) : (
                       <Link
                         to={child.href || "/"}
-                        className="block text-left px-4 py-2 hover:text-gray-200 transition-colors duration-150"
+                        className="block text-left px-4 py-1 bg-blue-200/10 rounded-lg hover:bg-blue-200/20 hover:text-gray-200 transition-colors duration-150"
                       >
                         {child.label}
                       </Link>

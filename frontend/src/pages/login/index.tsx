@@ -135,7 +135,10 @@ function Login() {
 
             <div className="text-center">
               New here?{" "}
-              <Link to="/register" className="text-accent hover:brightness-80">
+              <Link
+                to="/register"
+                className="text-indigo-300 hover:brightness-90"
+              >
                 Register here
               </Link>
             </div>
