@@ -171,6 +171,7 @@ export default function Users() {
   const handleOpenStatusModal = (user: User) => {
     setSelectedUser(user);
     setSelectedStatus(user.status);
+    setStatusUpdateNotes(user.statusUpdateNotes);
     setIsStatusModalOpen(true);
   };
 
