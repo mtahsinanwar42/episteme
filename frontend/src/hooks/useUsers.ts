@@ -6,7 +6,6 @@ export function useUsers(params?: GetUsersParams) {
   return useQuery({
     queryKey: ["users", params],
     queryFn: () => userService.getUsers(params),
-    staleTime: 30000, // Keep data fresh for 30 seconds
   });
 }
 
@@ -16,7 +15,6 @@ export function useUserById(userId: string | number | undefined) {
     queryKey: ["user", userId],
     queryFn: () => userService.getUserById(userId!),
     enabled: !!userId, // Only run query if userId is provided
-    staleTime: 30000, // Keep data fresh for 30 seconds
   });
 }
 

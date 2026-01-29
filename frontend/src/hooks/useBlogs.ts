@@ -10,7 +10,6 @@ export function useBlogs(params?: GetBlogsParams) {
   return useQuery({
     queryKey: ["blogs", params],
     queryFn: () => blogService.getBlogs(params),
-    staleTime: 30000, // 30 seconds
   });
 }
 
@@ -19,7 +18,6 @@ export function useBlogById(blogId: string | number | undefined) {
     queryKey: ["blog", blogId],
     queryFn: () => blogService.getBlogById(blogId!),
     enabled: !!blogId,
-    staleTime: 30000, // 30 seconds
   });
 }
 

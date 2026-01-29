@@ -70,6 +70,7 @@ Example:
 
 **PUT /:id/status**  
 Access: ADMIN / REVIEWER
+Notes: Cannot update CANCELLED/DELETED assignment.
 
 ### Request Body
 

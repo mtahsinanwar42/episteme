@@ -1,12 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, User as UserIcon, Edit, X, Image } from "lucide-react";
-import { UserStatus } from "@/models/user";
-import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import {
+  Mail,
+  Phone,
+  User as UserIcon,
+  Image,
+  DownloadCloud,
+} from "lucide-react";
 import { fileService } from "@/services/fileService";
-import { config } from "@/config/config";
 import { useFileById } from "@/hooks/useFiles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 
@@ -14,11 +15,6 @@ export default function AssetDetails() {
   const { fileId } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useFileById(fileId);
-
-  const [isEdit, setIsEdit] = useState(false);
-  const [formData, setFormData] = useState<Record<string, any>>(() => {
-    return data?.data ? { ...data.data } : {};
-  });
 
   const handleDownload = async () => {
     if (!file?.storageKey) {
@@ -34,18 +30,12 @@ export default function AssetDetails() {
     }
   };
 
-  useEffect(() => {
-    if (data?.data) {
-      setFormData({ ...data.data });
-    }
-  }, [data?.data]);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading user details...</p>
+          <p className="text-muted-foreground">Loading asset details...</p>
         </div>
       </div>
     );
@@ -56,7 +46,7 @@ export default function AssetDetails() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center max-w-md">
           <div className="bg-destructive/10 text-destructive rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-2">Error Loading User</h3>
+            <h3 className="text-lg font-semibold mb-2">Error Loading Asset</h3>
             <p className="text-sm">{error.message}</p>
           </div>
         </div>
@@ -69,7 +59,7 @@ export default function AssetDetails() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <UserIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">User Not Found</h3>
+          <h3 className="text-lg font-semibold mb-2">Asset Not Found</h3>
           <p className="text-muted-foreground mb-4">
             The user you're looking for doesn't exist.
           </p>
@@ -93,8 +83,8 @@ export default function AssetDetails() {
 
       <div>
         <div className="rounded-lg shadow-small border border-border">
-          <div className="p-4 bg-accent/5 shadow-sm">
-            <h3 className="text-accent text-lg font-semibold">Information</h3>
+          <div className="p-4 gradient-card shadow-sm">
+            <h3 className="font-semibold">Information</h3>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -132,24 +122,19 @@ export default function AssetDetails() {
 
               <div className="flex items-start gap-3">
                 <Image className="w-5 h-5 text-accent mt-0.5" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Image</p>
+                <div className="group">
+                  <p className="text-sm text-muted-foreground mb-2">Image</p>
 
-                  <p className="font-medium">
-                    <img
-                      src={`${new URL(config.baseUrl).origin}/${file.storageKey}`}
-                      alt="Asset Image"
-                      crossOrigin="anonymous"
-                      className="w-24 h-24 object-cover"
+                  <div
+                    onClick={() => handleDownload()}
+                    className="cursor-pointer w-24 h-24 rounded-md border border-dashed border-accent grid place-content-center "
+                  >
+                    <DownloadCloud
+                      size={36}
+                      className="transform transition duration-300 group-hover:scale-125 text-accent group-hover:text-foreground"
                     />
-                  </p>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="flex gap-4 justify-end mt-6">
-              <div className="">
-                <Button onClick={() => handleDownload()}>Download Asset</Button>
               </div>
             </div>
           </div>

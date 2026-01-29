@@ -1,51 +1,25 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { useActivityById } from "@/hooks/useActivities";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImageIcon } from "lucide-react";
-import { ActivityStatus } from "@/models/activity";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { getResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
 
 export default function ActivityDetails() {
   const { activityId } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useActivityById(activityId);
-  const [metadata, setMetadata] = useState<any>(null);
-  const [metadataLoading, setMetadataLoading] = useState(false);
-  const [metadataError, setMetadataError] = useState<string | null>(null);
+  const activity = data?.data;
 
-  // Fetch metadata JSON file
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      if (!data?.data?.metadataFilePath) return;
-
-      try {
-        setMetadataLoading(true);
-        setMetadataError(null);
-        const metadataUrl = `${new URL(config.baseUrl).origin}/${data.data.metadataFilePath}`;
-        const response = await fetch(metadataUrl);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch metadata: ${response.statusText}`);
-        }
-
-        const jsonData = await response.json();
-        setMetadata(jsonData);
-      } catch (err) {
-        console.error("Error fetching metadata:", err);
-        setMetadataError(
-          err instanceof Error ? err.message : "Failed to load metadata",
-        );
-      } finally {
-        setMetadataLoading(false);
-      }
-    };
-
-    fetchMetadata();
-  }, [data?.data?.metadataFilePath]);
+  const { data: metadata, isLoading: metadataLoading } = useMetadataFile({
+    filePath: activity?.metadataFilePath || "",
+    resourceId: activity?.id || "",
+    enabled: !!activity, // Only fetch metadata after activity is loaded
+  });
 
   if (isLoading) {
     return (
@@ -92,33 +66,18 @@ export default function ActivityDetails() {
     );
   }
 
-  const activity = data.data;
-
-  const getStatusBadge = (status: ActivityStatus) => {
-    switch (status) {
-      case ActivityStatus.DRAFT:
-        return "Draft";
-      case ActivityStatus.PUBLISHED:
-        return "Published";
-      case ActivityStatus.DELETED:
-        return "deleted";
-      default:
-        return `${status}`;
-    }
-  };
-
   return (
     <div>
       <Breadcrumb
         items={[
           { label: "Activities", href: "/activities" },
-          { label: activity.title },
+          { label: activity?.title || "" },
         ]}
       />
 
       <div className="space-y-6">
         <div className="rounded-lg border border-border shadow-sm relative gradient-card">
-          {!metadataLoading && !metadataError && metadata ? (
+          {!metadataLoading && metadata?.heroImagePath ? (
             <img
               src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
               crossOrigin="anonymous"
@@ -135,30 +94,29 @@ export default function ActivityDetails() {
 
           <div className="flex flex-col gap-4 p-4">
             <div>
-              <h3 className="font-bold">{activity.title}</h3>
+              <h3 className="font-bold">{activity?.title}</h3>
               <h6 className="text-foreground/60">{metadata?.summary}</h6>
             </div>
 
             <div className="flex gap-4">
-              <Badge variant="outline">ID: {activity.id}</Badge>
               <Badge variant="outline">
-                {getStatusBadge(activity?.status)}
+                {getResourceStatusEnum(activity?.status)}
               </Badge>
               <Badge variant="outline">
-                Created: {new Date(activity.createdAt).toLocaleString()}
+                Created: {new Date(activity?.createdAt || "").toLocaleString()}
               </Badge>
               <Badge variant="outline">
-                Updated: {new Date(activity.updatedAt).toLocaleString()}
+                Updated: {new Date(activity?.updatedAt || "").toLocaleString()}
               </Badge>
             </div>
           </div>
         </div>
 
-        {!metadataLoading && !metadataError && metadata && (
-          <>
-            {metadata?.sections &&
-              metadata?.sections?.length > 0 &&
-              metadata?.sections?.map((section: any, index: number) => (
+        {!metadataLoading &&
+          metadata?.sections &&
+          metadata?.sections?.length > 0 && (
+            <>
+              {metadata?.sections?.map((section: any, index: number) => (
                 <div
                   key={index}
                   className="rounded-lg border border-border shadow-sm "
@@ -172,8 +130,8 @@ export default function ActivityDetails() {
                   </div>
                 </div>
               ))}
-          </>
-        )}
+            </>
+          )}
       </div>
     </div>
   );

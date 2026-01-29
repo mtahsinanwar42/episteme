@@ -17,6 +17,7 @@ export async function findSubmissionVersionsByIdAndUserDetails({
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
     deletedConferenceStatus: CONFERENCE_STATUS.DELETED,
     capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
+    deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
   };
 
   const accessWhereUser = `CS.owner_usr_id = :loggedInUserId`;
@@ -28,7 +29,7 @@ export async function findSubmissionVersionsByIdAndUserDetails({
         FROM episteme.content_review_assignment CRA
         WHERE CRA.content_submission_id = CS.id
           AND CRA.reviewer_usr_id = :loggedInUserId
-          AND CRA.status NOT IN (3, 9)
+          AND CRA.status <> :deletedAssignmentStatus
       )
     )
   `;
@@ -130,7 +131,7 @@ export async function canCreateSubmissionVersion({
       FROM episteme.content_review_assignment CRA
       WHERE CRA.content_submission_id = :submissionId
         AND CRA.reviewer_usr_id = :loggedInUserId
-        AND CRA.status IN (:includedAssignmentStatus)
+        AND CRA.status = :acceptedAssignmentStatus
     ) AS "isAssignedReviewer"
   ;
 `;
@@ -144,7 +145,7 @@ export async function canCreateSubmissionVersion({
       allowedSubmissionStatuses: [CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, CONTENT_SUBMISSION_STATUS.RETURNED,],
       capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
       conferenceStatusExcluded: [CONFERENCE_STATUS.DELETED, CONFERENCE_STATUS.INACTIVE],
-      includedAssignmentStatus: [REVIEW_ASSIGNMENT_STATUS.ACCEPTED, REVIEW_ASSIGNMENT_STATUS.COMPLETED],
+      acceptedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
     },
   });
 

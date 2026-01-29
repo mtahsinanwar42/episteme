@@ -86,6 +86,7 @@ Example:
 
 **PUT /:id/status**
 Access: ADMIN
+Notes: Can update PENDING_APPROVAL/RETURNED submission.
 
 ### Request Body
 

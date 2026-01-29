@@ -19,6 +19,7 @@ Required:
 
 **POST /**
 Access: REVIEWER
+Notes: Can save PENDING_APPROVAL/RETURNED submission reviews.
 
 ### Request Body:
 

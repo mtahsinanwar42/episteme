@@ -23,15 +23,6 @@ function Login() {
     }
   }, [user, navigate]);
 
-  const handleSignIn = async () => {
-    try {
-      // TODO: Implement Google sign-in logic and dispatch to Redux
-      console.log("Implement Google sign-in with Redux dispatch");
-    } catch (error) {
-      console.error("Login error:", error);
-    }
-  };
-
   const handleEmailPasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");

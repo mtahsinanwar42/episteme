@@ -1,56 +1,25 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { useBlogById } from "@/hooks/useBlogs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ImageIcon, Pencil } from "lucide-react";
-import { BlogStatus } from "@/models/blog";
+import { ImageIcon } from "lucide-react";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { useSelector } from "react-redux";
-import { type RootState } from "@/stores/store";
-import { UserRole } from "@/models/user";
+import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { getResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
 
 export default function BlogDetails() {
   const { blogId } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useBlogById(blogId);
-  const user = useSelector((state: RootState) => state.auth.user);
-  const isAdmin = user?.roles?.includes(UserRole.ADMIN);
-  const [metadata, setMetadata] = useState<any>(null);
-  const [metadataLoading, setMetadataLoading] = useState(false);
-  const [metadataError, setMetadataError] = useState<string | null>(null);
+  const blog = data?.data;
 
-  // Fetch metadata JSON file
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      if (!data?.data?.metadataFilePath) return;
-
-      try {
-        setMetadataLoading(true);
-        setMetadataError(null);
-        const metadataUrl = `${new URL(config.baseUrl).origin}/${data.data.metadataFilePath}`;
-        const response = await fetch(metadataUrl);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch metadata: ${response.statusText}`);
-        }
-
-        const jsonData = await response.json();
-        setMetadata(jsonData);
-      } catch (err) {
-        console.error("Error fetching metadata:", err);
-        setMetadataError(
-          err instanceof Error ? err.message : "Failed to load metadata",
-        );
-      } finally {
-        setMetadataLoading(false);
-      }
-    };
-
-    fetchMetadata();
-  }, [data?.data?.metadataFilePath]);
+  const { data: metadata, isLoading: metadataLoading } = useMetadataFile({
+    filePath: blog?.metadataFilePath || "",
+    resourceId: blog?.id || "",
+    enabled: !!blog, // Only fetch metadata after blog is loaded
+  });
 
   if (isLoading) {
     return (
@@ -93,34 +62,18 @@ export default function BlogDetails() {
     );
   }
 
-  const blog = data.data;
-
-  const getStatusBadge = (status: BlogStatus) => {
-    switch (status) {
-      case BlogStatus.DRAFT:
-        return "Draft";
-      case BlogStatus.PUBLISHED:
-        return "Published";
-      case BlogStatus.DELETED:
-        return "Deleted";
-      default:
-        return `${status}`;
-    }
-  };
-
-  const handleEdit = () => {
-    navigate(`/blogs/edit/${blogId}`);
-  };
-
   return (
     <div>
       <Breadcrumb
-        items={[{ label: "Blogs", href: "/blogs" }, { label: blog.title }]}
+        items={[
+          { label: "Blogs", href: "/blogs" },
+          { label: blog?.title || "" },
+        ]}
       />
 
       <div className="space-y-6">
         <div className="rounded-lg border border-border shadow-sm relative gradient-card">
-          {!metadataLoading && !metadataError && metadata ? (
+          {!metadataLoading && metadata?.heroImagePath ? (
             <img
               src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
               crossOrigin="anonymous"
@@ -138,40 +91,30 @@ export default function BlogDetails() {
           <div className="flex flex-col gap-4 p-4">
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <h3 className="font-bold text-2xl">{blog.title}</h3>
+                <h3 className="font-semibold">{blog?.title}</h3>
                 <h6 className="text-foreground/60">{metadata?.summary}</h6>
               </div>
-              {isAdmin && (
-                <Button
-                  onClick={handleEdit}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <Pencil className="w-4 h-4" />
-                  Edit
-                </Button>
-              )}
             </div>
 
             <div className="flex gap-4 flex-wrap">
-              <Badge variant="outline">ID: {blog.id}</Badge>
-              <Badge variant="outline">{getStatusBadge(blog?.status)}</Badge>
               <Badge variant="outline">
-                Created: {new Date(blog.createdAt).toLocaleString()}
+                {getResourceStatusEnum(blog?.status)}
               </Badge>
               <Badge variant="outline">
-                Updated: {new Date(blog.updatedAt).toLocaleString()}
+                Created: {new Date(blog?.createdAt || "").toLocaleString()}
+              </Badge>
+              <Badge variant="outline">
+                Updated: {new Date(blog?.updatedAt || "").toLocaleString()}
               </Badge>
             </div>
           </div>
         </div>
 
-        {!metadataLoading && !metadataError && metadata && (
-          <>
-            {metadata?.sections &&
-              metadata?.sections?.length > 0 &&
-              metadata?.sections?.map((section: any, index: number) => (
+        {!metadataLoading &&
+          metadata?.sections &&
+          metadata?.sections?.length > 0 && (
+            <>
+              {metadata?.sections?.map((section: any, index: number) => (
                 <div
                   key={index}
                   className="rounded-lg border border-border shadow-sm"
@@ -185,8 +128,8 @@ export default function BlogDetails() {
                   </div>
                 </div>
               ))}
-          </>
-        )}
+            </>
+          )}
       </div>
     </div>
   );

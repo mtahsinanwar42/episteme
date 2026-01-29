@@ -57,4 +57,7 @@ export const fileService = {
       throw error;
     }
   },
+  getMetadataFile: async (filePath: string): Promise<any> => {
+    return api.metadataFile<any>(`/${filePath}`, false);
+  },
 };
