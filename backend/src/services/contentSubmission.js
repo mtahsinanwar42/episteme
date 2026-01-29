@@ -134,6 +134,14 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       throw new ErrorResponse(404, "ContentSubmission not found");
     }
 
+    if ([
+      CONTENT_SUBMISSION_STATUS.APPROVED,
+      CONTENT_SUBMISSION_STATUS.REJECTED,
+      CONTENT_SUBMISSION_STATUS.DELETED
+    ].includes(submission.currentStatus)) {
+      throw new ErrorResponse(400, "cannot update approved/rejected/deleted submission.");
+    }
+
     await sequelize.transaction(async (t) => {
       if (status === CONTENT_SUBMISSION_STATUS.DELETED) {
         await markSubmissionAsDeleted(

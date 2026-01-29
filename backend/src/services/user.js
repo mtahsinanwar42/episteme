@@ -160,6 +160,10 @@ export function createUserService({ User, fileService }) {
       throw new ErrorResponse(404, "User not found");
     }
 
+    if (user.status === USER_STATUS.DELETED) {
+      throw new ErrorResponse(400, "Cannot update deleted user");
+    }
+
     await user.update(updates);
 
     return serializeUser(user, cvFilePath, photoFilePath);
@@ -183,6 +187,10 @@ export function createUserService({ User, fileService }) {
 
     if (!user) {
       throw new ErrorResponse(404, "User not found");
+    }
+
+    if (user.status === USER_STATUS.DELETED) {
+      throw new ErrorResponse(400, "Cannot update deleted user");
     }
 
     await user.update(updates);

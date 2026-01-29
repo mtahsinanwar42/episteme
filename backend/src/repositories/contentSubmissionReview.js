@@ -14,7 +14,7 @@ export async function findSubmissionReviewsByIdAndUserDetails({
     submissionId: Number(submissionId),
     loggedInUserId: Number(loggedInUserId),
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
-    excludedAssignmentStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+    deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
   };
 
   const selectAndJoins = `
@@ -77,7 +77,7 @@ export async function findSubmissionReviewsByIdAndUserDetails({
     WHERE
       CS.id = :submissionId
       AND CS.current_status <> :deletedSubmissionStatus
-      AND CRA.status NOT IN (:excludedAssignmentStatuses)
+      AND CRA.status <> :deletedAssignmentStatus
   `;
 
   const reviewWhereReviewer = `AND CRA.reviewer_usr_id = :loggedInUserId`;
@@ -130,7 +130,7 @@ export async function findSubmissionReviewersById({
       ON U.id = CRA.reviewer_usr_id
     WHERE
       CRA.content_submission_id = :submissionId
-      AND CRA.status NOT IN (:excludedAssignmentStatuses)
+      AND CRA.status <> :deletedAssignmentStatus
     ORDER BY CRA.assigned_at DESC, U.last_name ASC, U.first_name ASC
     LIMIT :limit OFFSET :offset;
   `;
@@ -139,7 +139,7 @@ export async function findSubmissionReviewersById({
     type: QueryTypes.SELECT,
     replacements: {
       submissionId: Number(submissionId),
-      excludedAssignmentStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+      deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
       limit: limitNum,
       offset,
     },
@@ -176,7 +176,7 @@ export async function canCreateSubmissionReview({
         FROM episteme.content_review_assignment CRA
         WHERE CRA.content_submission_id = :submissionId
           AND CRA.reviewer_usr_id = :loggedInUserId
-          AND CRA.status = :allowedAssignmentStatus
+          AND CRA.status = :acceptedAssignmentStatus
       ) AS "isAssignedReviewer";
   `;
 
@@ -188,7 +188,7 @@ export async function canCreateSubmissionReview({
       allowedSubmissionStatuses: [CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, CONTENT_SUBMISSION_STATUS.RETURNED,],
       capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
       conferenceStatusExcluded: [CONFERENCE_STATUS.DELETED, CONFERENCE_STATUS.INACTIVE],
-      allowedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
+      acceptedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
     },
   });
 

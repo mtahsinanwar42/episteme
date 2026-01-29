@@ -52,6 +52,10 @@ export function createActivityService({ Activity, fileService }) {
       throw new ErrorResponse(404, "Activity not found");
     }
 
+    if (activity.status === ACTIVITY_STATUS.DELETED) {
+      throw new ErrorResponse(400, "Cannot update DELETED resource");
+    }
+
     const updates = {};
 
     if (isNotEmpty(title)) {

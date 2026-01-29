@@ -23,7 +23,7 @@ export async function findSubmissionsByUserDetails({
 
   const baseWhere = `
     ${ownershipPredicate}
-    AND CS.current_status <> :deletedSubmissionStatus
+    ${!isAdmin ? `AND CS.current_status <> :deletedSubmissionStatus` : ``}
     AND C.status NOT IN (:excludedConferenceStatus)
     ${paymentWhere}
   `;
@@ -100,7 +100,7 @@ export async function findSubmissionByIdAndUserDetails({
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
     excludedConferenceStatus: [CONFERENCE_STATUS.INACTIVE, CONFERENCE_STATUS.DELETED],
     capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
-    excludedAssignmentStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+    deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
   };
 
   const baseSelect = `
@@ -140,7 +140,7 @@ export async function findSubmissionByIdAndUserDetails({
         FROM episteme.content_review_assignment CRA
         WHERE CRA.content_submission_id = CS.id
           AND CRA.reviewer_usr_id = :loggedInUserId
-          AND CRA.status NOT IN (:excludedAssignmentStatuses)
+          AND CRA.status <> :deletedAssignmentStatus
       )
     )
     AND CSP.status = :capturedPaymentStatus`;

@@ -62,7 +62,7 @@ export async function findReviewAssignmentsByUserId({
     ${GET_REVIEW_ASSIGNMENTS_BASE_FROM_JOINS}
     WHERE
       CRA.reviewer_usr_id = :reviewerUserId
-      AND CRA.status NOT IN (:excludedStatuses)
+      AND CRA.status <> :deletedStatus
     ORDER BY CRA.assigned_at DESC
     LIMIT :limit OFFSET :offset;
   `;
@@ -71,7 +71,7 @@ export async function findReviewAssignmentsByUserId({
     type: QueryTypes.SELECT,
     replacements: {
       reviewerUserId: Number(userId),
-      excludedStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+      deletedStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
       limit: limitNum,
       offset,
     },
@@ -130,7 +130,7 @@ export async function canCreateReviewAssignment({
         LEFT JOIN episteme.content_submission_payment CSP
           ON CSP.content_submission_id = CS.id
         WHERE CS.id = :contentSubmissionId
-        AND CS.current_status <> :deletedSubmissionStatus
+        AND CS.current_status IN (:allowedSubmissionStatus)
         AND CSP.status = :capturedPaymentStatus
       ) AS "submissionExists",
       EXISTS (
@@ -145,9 +145,37 @@ export async function canCreateReviewAssignment({
     type: QueryTypes.SELECT,
     replacements: {
       contentSubmissionId: Number(contentSubmissionId),
-      deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
+      allowedSubmissionStatus: [CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, CONTENT_SUBMISSION_STATUS.RETURNED],
       capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
       reviewerUsrId: Number(reviewerUsrId),
+    },
+  });
+
+  return row;
+}
+
+export async function canUpdateReviewAssignmentStatus({
+  contentSubmissionId,
+}) {
+  const sql = `
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM episteme.content_submission CS
+        LEFT JOIN episteme.content_submission_payment CSP
+          ON CSP.content_submission_id = CS.id
+        WHERE CS.id = :contentSubmissionId
+        AND CS.current_status IN (:allowedSubmissionStatus)
+        AND CSP.status = :capturedPaymentStatus
+      ) AS "submissionExists";
+  `;
+
+  const [row] = await sequelize.query(sql, {
+    type: QueryTypes.SELECT,
+    replacements: {
+      contentSubmissionId: Number(contentSubmissionId),
+      allowedSubmissionStatus: [CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, CONTENT_SUBMISSION_STATUS.RETURNED],
+      capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
     },
   });
 

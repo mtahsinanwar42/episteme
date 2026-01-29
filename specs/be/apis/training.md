@@ -65,6 +65,7 @@ Example:
 
 **PUT /:id**  
 Access: ADMIN
+Notes: Cannot update DELETED Training
 
 ### Request Body
 

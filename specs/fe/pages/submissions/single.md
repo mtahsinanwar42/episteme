@@ -15,7 +15,7 @@
 
 - Display detailed information about a submission.
 - Provide access to related sections in Tabs: Versions, Messages, Reviews.
-- Allow ADMIN to update submission status and statusUpdateNotes.
+- Allow ADMIN to update submission status and statusUpdateNotes for DRAFT, PENDING_APPROVAL and RETURNED submissions.
 - Allow role-based interaction with submission-related data.
 
 ---
@@ -55,7 +55,7 @@ Display submission-level information in a read-only format (unless specified).
 
 **Actions**
 
-- Status Update (ADMIN only). Shown for submissions of PENDING_APPROVAL or RETURNED status
+- Status Update (ADMIN only). Shown for submissions of DRAFT, PENDING_APPROVAL or RETURNED status
   - Opens status update control (inline or modal)
   - Triggers submission status update API
 - DOI Update (ADMIN only). Shown for submissions of APPROVED status.
