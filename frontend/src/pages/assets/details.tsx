@@ -1,7 +1,15 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, User as UserIcon, Edit, X, Image } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  User as UserIcon,
+  Edit,
+  X,
+  Image,
+  DownloadCloud,
+} from "lucide-react";
 import { UserStatus } from "@/models/user";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
@@ -93,8 +101,8 @@ export default function AssetDetails() {
 
       <div>
         <div className="rounded-lg shadow-small border border-border">
-          <div className="p-4 bg-accent/5 shadow-sm">
-            <h3 className="text-accent text-lg font-semibold">Information</h3>
+          <div className="p-4 gradient-card shadow-sm">
+            <h3 className="font-semibold">Information</h3>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -132,24 +140,19 @@ export default function AssetDetails() {
 
               <div className="flex items-start gap-3">
                 <Image className="w-5 h-5 text-accent mt-0.5" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Image</p>
+                <div className="group">
+                  <p className="text-sm text-muted-foreground mb-2">Image</p>
 
-                  <p className="font-medium">
-                    <img
-                      src={`${new URL(config.baseUrl).origin}/${file.storageKey}`}
-                      alt="Asset Image"
-                      crossOrigin="anonymous"
-                      className="w-24 h-24 object-cover"
+                  <div
+                    onClick={() => handleDownload()}
+                    className="cursor-pointer w-24 h-24 rounded-md border border-dashed border-accent grid place-content-center "
+                  >
+                    <DownloadCloud
+                      size={36}
+                      className="transform transition duration-300 group-hover:scale-125 text-accent group-hover:text-foreground"
                     />
-                  </p>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="flex gap-4 justify-end mt-6">
-              <div className="">
-                <Button onClick={() => handleDownload()}>Download Asset</Button>
               </div>
             </div>
           </div>

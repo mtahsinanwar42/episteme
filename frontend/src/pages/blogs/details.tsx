@@ -138,20 +138,9 @@ export default function BlogDetails() {
           <div className="flex flex-col gap-4 p-4">
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <h3 className="font-bold text-2xl">{blog.title}</h3>
+                <h3 className="font-semibold">{blog.title}</h3>
                 <h6 className="text-foreground/60">{metadata?.summary}</h6>
               </div>
-              {isAdmin && (
-                <Button
-                  onClick={handleEdit}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <Pencil className="w-4 h-4" />
-                  Edit
-                </Button>
-              )}
             </div>
 
             <div className="flex gap-4 flex-wrap">

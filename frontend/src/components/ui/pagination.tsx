@@ -117,7 +117,7 @@ export function Pagination({
                 {page}
               </Button>
             ) : (
-              <span key={index} className="px-2 py-2 text-slate-400">
+              <span key={index} className="px-2 text-slate-400">
                 {page}
               </span>
             ),

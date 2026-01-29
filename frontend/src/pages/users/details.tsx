@@ -16,6 +16,7 @@ import {
   Edit,
   X,
   User,
+  Notebook,
 } from "lucide-react";
 import {
   Select,
@@ -138,7 +139,7 @@ export default function UserDetails() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading user details...</p>
+          <p className="">Loading user details...</p>
         </div>
       </div>
     );
@@ -161,11 +162,9 @@ export default function UserDetails() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <UserIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <UserIcon className="w-16 h-16  mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">User Not Found</h3>
-          <p className="text-muted-foreground mb-4">
-            The user you're looking for doesn't exist.
-          </p>
+          <p className=" mb-4">The user you're looking for doesn't exist.</p>
           <Button onClick={() => navigate("/users")}>Back to Users</Button>
         </div>
       </div>
@@ -203,76 +202,75 @@ export default function UserDetails() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div>
-          <div className="rounded-lg shadow-small p-4 pt-8 relative border border-border ">
-            <div className="flex gap-4 z-0">
-              {user.photoFilePath ? (
-                <img
-                  src={`${new URL(config.baseUrl).origin}/${user.photoFilePath}`}
-                  alt={`${user.firstName}'s photo`}
-                  crossOrigin="anonymous"
-                  className="w-20 h-20 rounded-full object-cover border-4 border-border mb-4"
-                />
-              ) : (
-                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center border border-accent mb-4">
-                  <UserIcon className="w-10 h-10 text-accent" />
-                </div>
-              )}
+        <div className="rounded-lg shadow-small p-4 pt-8 relative border border-border gradient-card flex flex-col justify-between">
+          <div className="flex gap-4 z-0">
+            {user.photoFilePath ? (
+              <img
+                src={`${new URL(config.baseUrl).origin}/${user.photoFilePath}`}
+                alt={`${user.firstName}'s photo`}
+                crossOrigin="anonymous"
+                className="w-20 h-20 rounded-full object-cover border-4 border-border mb-4"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center border border-accent mb-4">
+                <UserIcon className="w-10 h-10 text-accent" />
+              </div>
+            )}
 
-              <div className="flex flex-col justify-between gap-2">
-                {isEdit ? (
-                  <div>
-                    <div className="mb-2">
-                      <p className="text-sm text-muted-foreground">
-                        First name
-                      </p>
+            <div className="w-full flex flex-col justify-between gap-2">
+              {isEdit ? (
+                <div>
+                  <div className="mb-4">
+                    <p className="text-sm mb-1">First name</p>
 
-                      <Input
-                        type="text"
-                        value={formData.firstName || ""}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            firstName: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-muted-foreground">Last name</p>{" "}
-                      <Input
-                        type="text"
-                        value={formData.lastName || ""}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            lastName: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
+                    <Input
+                      type="text"
+                      value={formData.firstName || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          firstName: e.target.value,
+                        })
+                      }
+                    />
                   </div>
-                ) : (
-                  <h2 className="text-2xl text-accent font-bold">
-                    {user.firstName} {user.lastName}
-                  </h2>
-                )}
-                <div className="flex flex-wrap gap-2">
-                  {user.roles.map((role) => (
-                    <Badge key={role} variant="outline" className="gap-1">
-                      {role}
-                    </Badge>
-                  ))}
+
+                  <div className="mb-4">
+                    <p className="text-sm mb-1">Last name</p>{" "}
+                    <Input
+                      type="text"
+                      value={formData.lastName || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          lastName: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
                 </div>
-                <div className="absolute top-2 right-2 z-10">
-                  {getStatusBadge(user.status)}
-                </div>
+              ) : (
+                <h2 className="font-semibold">
+                  {user.firstName} {user.lastName}
+                </h2>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {user.roles.map((role) => (
+                  <Badge key={role} variant="outline" className="gap-1">
+                    {role}
+                  </Badge>
+                ))}
+              </div>
+              <div className="absolute top-2 right-2 z-10">
+                {getStatusBadge(user.status)}
               </div>
             </div>
+          </div>
 
-            <div className="space-y-3 pt-4">
-              {isEdit ? (
+          <div className="space-y-3 pt-4">
+            {isEdit ? (
+              <>
+                <p className="text-sm ">LinkedIn URL</p>
                 <Input
                   type="text"
                   value={formData.linkedinUrl || ""}
@@ -280,41 +278,39 @@ export default function UserDetails() {
                     setFormData({ ...formData, linkedinUrl: e.target.value })
                   }
                 />
-              ) : (
-                <>
-                  {user.linkedinUrl && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full border-none! text-accent! justify-start focus:outline-none! focus:ring-0!"
-                      onClick={() => window.open(user.linkedinUrl, "_blank")}
-                    >
-                      <Linkedin className="w-4 h-4" />
-                      View LinkedIn
-                    </Button>
-                  )}
-                </>
-              )}
+              </>
+            ) : (
+              <>
+                {user.linkedinUrl && (
+                  <Button
+                    size="sm"
+                    className="w-full justify-start focus:outline-none! focus:ring-0!"
+                    onClick={() => window.open(user.linkedinUrl, "_blank")}
+                  >
+                    <Linkedin className="w-4 h-4" />
+                    View LinkedIn
+                  </Button>
+                )}
+              </>
+            )}
 
-              {user.cvFilePath && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full border-none! text-accent! justify-start focus:outline-none! focus:ring-0!"
-                  onClick={() => window.open(user.cvFilePath, "_blank")}
-                >
-                  <FileText className="w-4 h-4" />
-                  Download CV
-                </Button>
-              )}
-            </div>
+            {user.cvFilePath && (
+              <Button
+                size="sm"
+                className="w-full justify-start focus:outline-none! focus:ring-0!"
+                onClick={() => window.open(user.cvFilePath, "_blank")}
+              >
+                <FileText className="w-4 h-4" />
+                Download CV
+              </Button>
+            )}
           </div>
         </div>
 
         <div className="lg:col-span-2">
           <div className="rounded-lg shadow-small border border-border">
-            <div className="p-4 bg-accent/5 shadow-sm flex justify-between items-center">
-              <h3 className="text-accent text-lg font-semibold">Information</h3>
+            <div className="p-4 gradient-card shadow-sm flex justify-between items-center">
+              <h3 className="font-semibold">Information</h3>
 
               {isEdit ? (
                 <X
@@ -331,29 +327,21 @@ export default function UserDetails() {
                 />
               )}
             </div>
+
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-start gap-3">
                   <Mail className="w-5 h-5 text-accent mt-0.5" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Email</p>
-                    {isEdit ? (
-                      <Input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
-                      />
-                    ) : (
-                      <p className="font-medium">{user.email}</p>
-                    )}
+                    <p className="text-sm ">Email</p>
+
+                    <p className="font-medium">{user.email}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Phone className="w-5 h-5 text-accent mt-0.5" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Phone</p>
+                  <div className="w-full">
+                    <p className="text-sm ">Phone</p>
 
                     {isEdit ? (
                       <Input
@@ -372,8 +360,8 @@ export default function UserDetails() {
                 </div>
                 <div className="flex items-start gap-3">
                   <Building2 className="w-5 h-5 text-accent mt-0.5" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Institution</p>
+                  <div className="w-full">
+                    <p className="text-sm ">Institution</p>
                     {isEdit ? (
                       <Input
                         type="text"
@@ -394,8 +382,8 @@ export default function UserDetails() {
                 </div>
                 <div className="flex items-start gap-3">
                   <Briefcase className="w-5 h-5 text-accent mt-0.5" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Occupation</p>
+                  <div className="w-full">
+                    <p className="text-sm ">Occupation</p>
                     {isEdit ? (
                       <Input
                         type="text"
@@ -416,8 +404,8 @@ export default function UserDetails() {
                 </div>
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-accent mt-0.5" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Country</p>
+                  <div className="w-full">
+                    <p className="text-sm ">Country</p>
                     {isEdit ? (
                       <Input
                         type="text"
@@ -435,8 +423,8 @@ export default function UserDetails() {
                 </div>
                 <div className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-accent mt-0.5" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Created At</p>
+                  <div className="w-full">
+                    <p className="text-sm ">Created At</p>
                     <p className="font-medium">
                       {new Date(user.createdAt).toLocaleString()}
                     </p>
@@ -449,10 +437,8 @@ export default function UserDetails() {
                       <User className="w-5 h-5 text-accent mt-0.5" />
                     </div>
 
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Profile picture
-                      </p>
+                    <div className="w-full">
+                      <p className="text-sm ">Profile picture</p>
                       <div>
                         <Input
                           id="photo"
@@ -480,8 +466,8 @@ export default function UserDetails() {
                       <FileText className="w-5 h-5 text-accent mt-0.5" />
                     </div>
 
-                    <div>
-                      <p className="text-sm text-muted-foreground">CV</p>
+                    <div className="w-full">
+                      <p className="text-sm ">CV</p>
                       <div>
                         <Input
                           id="cv"
@@ -509,16 +495,17 @@ export default function UserDetails() {
                       <Shield className="w-5 h-5 text-accent mt-0.5" />
                     </div>
 
-                    <div>
-                      <p className="text-sm text-muted-foreground">Status</p>
-                      <div className="w-46">
+                    <div className="w-full">
+                      <p className="text-sm ">Status</p>
+                      <div className="w-full">
                         <Select
                           value={selectedStatus.toString()}
-                          onValueChange={(value) =>
+                          onValueChange={(value) => {
+                            setSelectedStatus(Number(value));
                             setFormData((prev) => {
                               return { ...prev, status: Number(value) };
-                            })
-                          }
+                            });
+                          }}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select a status" />
@@ -542,6 +529,29 @@ export default function UserDetails() {
                     </div>
                   </div>
                 )}
+
+                <div className="flex items-start gap-3">
+                  <Notebook className="w-5 h-5 text-accent mt-0.5" />
+                  <div className="w-full">
+                    <p className="text-sm ">Status Update Notes</p>
+                    {isEdit ? (
+                      <Input
+                        type="text"
+                        value={formData.statusUpdateNotes}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            statusUpdateNotes: e.target.value,
+                          })
+                        }
+                      />
+                    ) : (
+                      <p className="font-medium">
+                        {user.statusUpdateNotes || "Not provided"}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

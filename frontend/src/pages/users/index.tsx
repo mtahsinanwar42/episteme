@@ -27,11 +27,13 @@ import {
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import PageTitle from "@/components/common/PageTitle";
+import { Input } from "@/components/ui/input";
 
 export default function Users() {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<number>(1);
+  const [statusUpdateNotes, setStatusUpdateNotes] = useState<string>("");
   const updateStatusMutation = useUserDetailsMutation();
 
   const columns: ColumnDef<User>[] = [
@@ -183,7 +185,10 @@ export default function Users() {
     updateStatusMutation.mutate(
       {
         userId: selectedUser.id,
-        postData: { status: selectedStatus },
+        postData: {
+          status: selectedStatus,
+          statusUpdateNotes,
+        },
       },
       {
         onSuccess: () => {
@@ -242,6 +247,7 @@ export default function Users() {
                   {selectedUser && UserStatus[selectedUser.status]}
                 </p>
               </div>
+
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Select new status
@@ -268,6 +274,24 @@ export default function Users() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label
+                  htmlFor="statusUpdateNotes"
+                  className="text-sm font-medium"
+                >
+                  Status Update Notes
+                </label>
+                <Input
+                  id="statusUpdateNotes"
+                  name="statusUpdateNotes"
+                  type="text"
+                  placeholder="Enter status update notes"
+                  value={statusUpdateNotes}
+                  onChange={(e) => setStatusUpdateNotes(e.target.value)}
+                  required
+                />
               </div>
             </div>
           </DialogBody>
