@@ -1,12 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ActivityStatus, type Activity } from "@/models/activity";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { UserRole } from "@/models/user";
 import type { RootState } from "@/stores/store";
-import { Edit, Pencil } from "lucide-react";
+import { Edit } from "lucide-react";
 
 interface ActivityCardProps {
   activity: Activity;

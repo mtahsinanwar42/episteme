@@ -3,12 +3,10 @@ import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,12 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
 
 interface DataTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[];
@@ -37,7 +29,6 @@ export function DataTable<TData, TValue = unknown>({
   data,
   isLoading = false,
   error = null,
-  pageSize = 10,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
