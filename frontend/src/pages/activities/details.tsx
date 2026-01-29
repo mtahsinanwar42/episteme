@@ -99,7 +99,6 @@ export default function ActivityDetails() {
             </div>
 
             <div className="flex gap-4">
-              <Badge variant="outline">ID: {activity?.id}</Badge>
               <Badge variant="outline">
                 {getResourceStatusEnum(activity?.status)}
               </Badge>

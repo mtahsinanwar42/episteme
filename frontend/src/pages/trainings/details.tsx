@@ -99,7 +99,6 @@ export default function TrainingDetails() {
             </div>
 
             <div className="flex gap-4">
-              <Badge variant="outline">ID: {training?.id}</Badge>
               <Badge variant="outline">
                 {getResourceStatusEnum(training?.status)}
               </Badge>

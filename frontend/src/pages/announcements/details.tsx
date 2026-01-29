@@ -102,7 +102,6 @@ export default function AnnouncementDetails() {
             </div>
 
             <div className="flex gap-4">
-              <Badge variant="outline">ID: {announcement?.id}</Badge>
               <Badge variant="outline">
                 {getResourceStatusEnum(announcement?.status)}
               </Badge>

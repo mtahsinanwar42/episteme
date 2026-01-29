@@ -97,7 +97,6 @@ export default function BlogDetails() {
             </div>
 
             <div className="flex gap-4 flex-wrap">
-              <Badge variant="outline">ID: {blog?.id}</Badge>
               <Badge variant="outline">
                 {getResourceStatusEnum(blog?.status)}
               </Badge>
