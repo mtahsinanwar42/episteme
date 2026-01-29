@@ -45,16 +45,16 @@ export function DataTable<TData, TValue = unknown>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     state: {
       sorting,
     },
     initialState: {
-      pagination: {
-        pageSize: pageSize,
-      },
+      // pagination: {
+      //   pageSize: pageSize,
+      // },
     },
   });
 
@@ -78,7 +78,7 @@ export function DataTable<TData, TValue = unknown>({
     );
   }
 
-  const pageCount = table.getPageCount();
+  // const pageCount = table.getPageCount();
 
   return (
     <div>
@@ -146,7 +146,7 @@ export function DataTable<TData, TValue = unknown>({
       </div>
 
       {/* Pagination Controls */}
-      {pageCount > 1 && (
+      {/* {pageCount > 1 && (
         <div className="flex items-center justify-between mt-8 p-4 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-900/50 dark:to-slate-800/30 rounded-2xl border border-slate-200 dark:border-slate-700">
           <div className="text-sm font-medium text-slate-600 dark:text-slate-300">
             Showing page{" "}
@@ -244,7 +244,7 @@ export function DataTable<TData, TValue = unknown>({
             </Button>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
