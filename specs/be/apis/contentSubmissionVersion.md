@@ -19,6 +19,7 @@ Required:
 
 **POST /**
 Access: USER/ADMIN/REVIEWER
+Notes: Can save PENDING_APPROVAL/RETURNED submission versions.
 
 ### Request Body:
 
@@ -34,7 +35,7 @@ Example:
 
 ```json
 {
-  "contentFilePath": "storage/private/papers/paper1_b32e94f6_20260119T003737_499.docx",
+  "contentFilePath": "storage/private/submissions/paper1_b32e94f6_20260119T003737_499.docx",
   "message": "hello, I've done the changes accordingly!"
 }
 ```

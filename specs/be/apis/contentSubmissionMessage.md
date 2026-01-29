@@ -19,6 +19,7 @@ Required:
 
 **POST /**
 Access: USER/ADMIN/REVIEWER
+Notes: Can save PENDING_APPROVAL/RETURNED submission messages.
 
 ### Request Body:
 
@@ -26,6 +27,10 @@ Required:
 
 - message (string)
 - scope (string)
+
+Optional:
+
+- receiverUsrId (integer, required for ADMIN)
 
 Example:
 

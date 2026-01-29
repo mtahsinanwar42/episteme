@@ -1,10 +1,4 @@
-// User service can be used for user-related operations other than auth
-
-import type {
-  UserDeleteResponse,
-  UserDetailsResponse,
-  UserResponse,
-} from "@/models/user";
+import type { UserDetailsResponse, UserResponse } from "@/models/user";
 import { api } from "./api";
 
 export interface GetUsersParams {
@@ -18,7 +12,6 @@ export interface GetUsersParams {
   paginate?: boolean;
 }
 
-// Auth operations are in authService.ts
 export const userService = {
   getUsers: async (params?: GetUsersParams): Promise<UserResponse> => {
     const queryParams = new URLSearchParams();

@@ -20,7 +20,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-linear-to-br from-slate-100 via-slate-50 to-indigo-100 text-foreground grid grid-rows-[1fr_auto]">
+      <div className="min-h-screen text-foreground grid grid-rows-[1fr_auto]">
         <div className="h-full flex flex-col">
           <div className="sticky top-0 left-0 z-100">
             <Navbar />

@@ -88,7 +88,7 @@ export function createUserService({ User, fileService }) {
 
   async function updateUserById(id, payload) {
     const { firstName, lastName, phone, institution, occupation, country,
-      linkedinUrl, photoFilePath, cvFilePath, roles, status } = payload;
+      linkedinUrl, photoFilePath, cvFilePath, roles, status, statusUpdateNotes, } = payload;
 
     const updates = {};
 
@@ -149,11 +149,19 @@ export function createUserService({ User, fileService }) {
       }
 
       updates.status = status;
+
+      if (isNotEmpty(statusUpdateNotes)) {
+        updates.statusUpdateNotes = statusUpdateNotes;
+      }
     }
 
     const user = await User.findByPk(id);
     if (!user) {
       throw new ErrorResponse(404, "User not found");
+    }
+
+    if (user.status === USER_STATUS.DELETED) {
+      throw new ErrorResponse(400, "Cannot update deleted user");
     }
 
     await user.update(updates);
@@ -161,9 +169,18 @@ export function createUserService({ User, fileService }) {
     return serializeUser(user, cvFilePath, photoFilePath);
   }
 
-  async function updateUserStatusById(id, status) {
+  async function updateUserStatusById(id, payload) {
+    const { status, statusUpdateNotes, } = payload;
+    const updates = {};
+
     if (!Object.values(USER_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid user status");
+    }
+
+    updates.status = status;
+
+    if (isNotEmpty(statusUpdateNotes)) {
+      updates.statusUpdateNotes = statusUpdateNotes;
     }
 
     const user = await User.findByPk(id);
@@ -172,7 +189,11 @@ export function createUserService({ User, fileService }) {
       throw new ErrorResponse(404, "User not found");
     }
 
-    await user.update({ status });
+    if (user.status === USER_STATUS.DELETED) {
+      throw new ErrorResponse(400, "Cannot update deleted user");
+    }
+
+    await user.update(updates);
 
     return serializeUser(user);
   }

@@ -3,12 +3,10 @@ import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,12 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
 
 interface DataTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[];
@@ -37,7 +29,6 @@ export function DataTable<TData, TValue = unknown>({
   data,
   isLoading = false,
   error = null,
-  pageSize = 10,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
@@ -45,16 +36,16 @@ export function DataTable<TData, TValue = unknown>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     state: {
       sorting,
     },
     initialState: {
-      pagination: {
-        pageSize: pageSize,
-      },
+      // pagination: {
+      //   pageSize: pageSize,
+      // },
     },
   });
 
@@ -78,12 +69,12 @@ export function DataTable<TData, TValue = unknown>({
     );
   }
 
-  const pageCount = table.getPageCount();
+  // const pageCount = table.getPageCount();
 
   return (
     <div>
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm">
+      <div className="rounded-2xl border border-border shadow-lg overflow-hidden">
+        <div className="bg-linear-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -115,12 +106,12 @@ export function DataTable<TData, TValue = unknown>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="border-b border-slate-300! dark:border-slate-700 hover:bg-slate-100! dark:hover:bg-blue-950/20 transition-colors duration-200 group"
+                    className="border-b border-slate-300! dark:border-slate-700 hover:bg-slate-900! dark:hover:bg-blue-950/20 transition-colors duration-200 group"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="group-hover:text-accent dark:group-hover:text-accent transition-colors"
+                        className="group-hover:text-foreground dark:group-hover:text-foreground/90 transition-colors"
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -146,7 +137,7 @@ export function DataTable<TData, TValue = unknown>({
       </div>
 
       {/* Pagination Controls */}
-      {pageCount > 1 && (
+      {/* {pageCount > 1 && (
         <div className="flex items-center justify-between mt-8 p-4 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-900/50 dark:to-slate-800/30 rounded-2xl border border-slate-200 dark:border-slate-700">
           <div className="text-sm font-medium text-slate-600 dark:text-slate-300">
             Showing page{" "}
@@ -244,7 +235,7 @@ export function DataTable<TData, TValue = unknown>({
             </Button>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

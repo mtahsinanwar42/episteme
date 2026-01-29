@@ -1,6 +1,7 @@
-import { canCreateReviewAssignment, findReviewAssignments, findReviewAssignmentsByUserId } from "../repositories/contentReviewAssignment.js";
+import { canCreateReviewAssignment, canUpdateReviewAssignmentStatus, findReviewAssignments, findReviewAssignmentsByUserId } from "../repositories/contentReviewAssignment.js";
 import { REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
+import { isNotEmpty } from "../utils/string.js";
 
 export function createReviewAssignmentService({ ContentReviewAssignment, fileService }) {
   if (!ContentReviewAssignment) {
@@ -51,23 +52,39 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
     return assignment;
   }
 
-  async function updateReviewAssignmentStatusById(user, id, status) {
+  async function updateReviewAssignmentStatusById(user, id, payload) {
     const userId = Number(user.id);
     const userRoles = Array.isArray(user.roles) ? user.roles : [];
     const isAdmin = userRoles.includes(USER_ROLE.ADMIN);
+
+    const { status, statusUpdateNotes, } = payload;
+    const updates = {};
 
     if (!Object.values(REVIEW_ASSIGNMENT_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid assignment status");
     }
 
-    if (!isAdmin
-      && ![
+    if (isAdmin) {
+      if (![
+        REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
+        REVIEW_ASSIGNMENT_STATUS.CANCELLED,
+        REVIEW_ASSIGNMENT_STATUS.DELETED,
+      ].includes(status)) {
+        throw new ErrorResponse(400, "Invalid assignment status");
+      }
+    } else {
+      if (![
         REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
         REVIEW_ASSIGNMENT_STATUS.DECLINED,
-        REVIEW_ASSIGNMENT_STATUS.COMPLETED,
-      ].includes(status)
-    ) {
-      throw new ErrorResponse(400, "Invalid assignment status");
+      ].includes(status)) {
+        throw new ErrorResponse(400, "Invalid assignment status");
+      }
+    }
+
+    updates.status = status;
+
+    if (isAdmin && isNotEmpty(statusUpdateNotes)) {
+      updates.statusUpdateNotes = statusUpdateNotes;
     }
 
     const where = isAdmin
@@ -80,7 +97,19 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
       throw new ErrorResponse(404, "ContentReviewAssignment not found");
     }
 
-    await assignment.update({ status });
+    if ([REVIEW_ASSIGNMENT_STATUS.CANCELLED, REVIEW_ASSIGNMENT_STATUS.DELETED].includes(assignment.status)) {
+      throw new ErrorResponse(400, "Cannot update cancelled/deleted review assignment.");
+    }
+
+    const { submissionExists } = await canUpdateReviewAssignmentStatus({
+      contentSubmissionId: assignment.contentSubmissionId,
+    });
+
+    if (!submissionExists) {
+      throw new ErrorResponse(400, "ContentSubmission should be in Pending Approval or Returned status");
+    }
+
+    await assignment.update(updates);
 
     return assignment;
   }

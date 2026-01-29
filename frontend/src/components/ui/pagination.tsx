@@ -66,7 +66,7 @@ export function Pagination({
 
   return (
     <div className="flex items-center justify-between py-4 rounded">
-      <div className="flex items-center gap-4 text-sm text-slate-600">
+      <div className="flex items-center gap-4 text-sm text-foreground/80">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
           <Select
@@ -96,9 +96,10 @@ export function Pagination({
       <div className="flex items-center gap-2">
         <Button
           size="sm"
+          variant="outline"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="bg-transparent! border-accent! text-heading! text-accent! hover:ring-accent/30! hover:ring-2"
+          className="border-accent! text-accent!"
         >
           {"<<"}
         </Button>
@@ -111,12 +112,12 @@ export function Pagination({
                 variant={currentPage === page ? "default" : "outline"}
                 size="sm"
                 onClick={() => onPageChange(page)}
-                className={`min-w-10 bg-transparent! border-accent! text-heading! text-accent! hover:ring-accent/30! hover:ring-2 focus:outline-none! ${currentPage === page && "bg-accent! text-white!"}`}
+                className={`min-w-10 border-accent! ${currentPage === page ? "bg-accent!" : "text-accent!"}`}
               >
                 {page}
               </Button>
             ) : (
-              <span key={index} className="px-2 py-2 text-slate-400">
+              <span key={index} className="px-2 text-slate-400">
                 {page}
               </span>
             ),
@@ -125,9 +126,10 @@ export function Pagination({
 
         <Button
           size="sm"
+          variant="outline"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="bg-transparent! border-accent! text-heading! text-accent! hover:ring-accent/30! hover:ring-2"
+          className="border-accent! text-accent!"
         >
           {">>"}
         </Button>

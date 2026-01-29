@@ -1,5 +1,5 @@
 import { sequelize } from "../config/db.js";
-import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails } from "../repositories/contentSubmission.js";
+import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails, markSubmissionAsApprovedOrRejected, markSubmissionAsDeleted, markSubmissionAsStatus } from "../repositories/contentSubmission.js";
 import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { serializeContentSubmission } from "../utils/serializers.js";
@@ -101,33 +101,71 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     });
   }
 
-  async function updateSubmissionStatusById(user, id, status) {
+  async function updateSubmissionDoiById(id, doi) {
+    if (isEmpty(doi)) {
+      throw new ErrorResponse(400, "DOI should not be empty");
+    }
+
+    const where = { id };
+    const submission = await ContentSubmission.findOne({
+      where,
+    });
+
+    if (submission.currentStatus !== CONTENT_SUBMISSION_STATUS.APPROVED) {
+      throw new ErrorResponse(400, "DOI should be set for approved submissions.");
+    }
+
+    await submission.update({ doi });
+
+    return submission;
+  }
+
+  async function updateSubmissionStatusById(user, id, payload) {
+    const { status, statusUpdateNotes, } = payload;
+
     if (!Object.values(CONTENT_SUBMISSION_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid ContentSubmission status");
     }
 
-    const roles = Array.isArray(user.roles) ? user.roles : [];
-    const isUser = roles.includes(USER_ROLE.USER);
-
-    if (isUser && status !== CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL) {
-      throw new ErrorResponse(400, "Invalid ContentSubmission status");
-    }
-
     const where = { id };
-
-    if (isUser) {
-      where.ownerUsrId = Number(user.id);
-    }
-
-    const submission = await ContentSubmission.findOne({
-      where,
-    });
+    const submission = await ContentSubmission.findOne({ where });
 
     if (!submission) {
       throw new ErrorResponse(404, "ContentSubmission not found");
     }
 
-    await submission.update({ currentStatus: status });
+    if ([
+      CONTENT_SUBMISSION_STATUS.APPROVED,
+      CONTENT_SUBMISSION_STATUS.REJECTED,
+      CONTENT_SUBMISSION_STATUS.DELETED
+    ].includes(submission.currentStatus)) {
+      throw new ErrorResponse(400, "cannot update approved/rejected/deleted submission.");
+    }
+
+    await sequelize.transaction(async (t) => {
+      if (status === CONTENT_SUBMISSION_STATUS.DELETED) {
+        await markSubmissionAsDeleted(
+          { submissionId: id, statusUpdateNotes },
+          { t }
+        );
+      } else if ([
+        CONTENT_SUBMISSION_STATUS.APPROVED,
+        CONTENT_SUBMISSION_STATUS.REJECTED
+      ].includes(status)) {
+        await markSubmissionAsApprovedOrRejected(
+          { submissionId: id, status, statusUpdateNotes },
+          { t }
+        );
+      } else {
+        await markSubmissionAsStatus(
+          { submissionId: id, status, statusUpdateNotes },
+          { t }
+        );
+      }
+    });
+
+    submission.set("currentStatus", status);
+    submission.set("statusUpdateNotes", statusUpdateNotes ?? null);
 
     return submission;
   }
@@ -136,6 +174,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     getSubmissionsByUserIdAndRoles,
     getSubmissionById,
     saveSubmission,
+    updateSubmissionDoiById,
     updateSubmissionStatusById
   };
 }

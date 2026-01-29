@@ -23,15 +23,6 @@ function Login() {
     }
   }, [user, navigate]);
 
-  const handleSignIn = async () => {
-    try {
-      // TODO: Implement Google sign-in logic and dispatch to Redux
-      console.log("Implement Google sign-in with Redux dispatch");
-    } catch (error) {
-      console.error("Login error:", error);
-    }
-  };
-
   const handleEmailPasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -68,20 +59,16 @@ function Login() {
   };
 
   return (
-    <div className="h-full text-slate-900 flex items-center justify-center">
+    <div className="h-full flex items-center justify-center">
       <div className="relative max-w-lg w-full">
         <div className="absolute -inset-[1px] bg-gradient-to-br from-indigo-300/35 via-sky-200/30 to-emerald-200/25 rounded-3xl blur opacity-70" />
-        <div className="relative rounded-3xl border border-slate-200 bg-white/90 backdrop-blur-md shadow-2xl p-10 text-slate-900">
+        <div className="relative rounded-3xl border border-border bg-card backdrop-blur-md shadow-2xl p-10 ">
           <div className="flex flex-col gap-3 text-center mb-8">
-            <p className="text-sm text-slate-500 tracking-[0.12em] uppercase">
-              Welcome back
-            </p>
+            <p className="text-sm tracking-[0.12em] uppercase">Welcome back</p>
             <h1 className="text-4xl font-semibold leading-tight bg-linear-to-r from-indigo-500 via-violet-500 to-indigo-500 bg-clip-text text-transparent">
               Sign in to Episteme
             </h1>
-            <p className="text-base text-slate-600">
-              Access your dashboard and manage your account
-            </p>
+            <p>Access your dashboard and manage your account</p>
           </div>
 
           <form onSubmit={handleEmailPasswordLogin} className="space-y-5">
@@ -127,7 +114,7 @@ function Login() {
 
             <Button
               type="submit"
-              className="w-full text-white! shadow-lg shadow-indigo-200/50 hover:brightness-105"
+              className="w-full text-white! shadow-lg hover:brightness-105"
               style={{
                 background:
                   "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
@@ -139,7 +126,10 @@ function Login() {
 
             <div className="text-center">
               New here?{" "}
-              <Link to="/register" className="text-accent hover:brightness-80">
+              <Link
+                to="/register"
+                className="text-indigo-300 hover:brightness-90"
+              >
                 Register here
               </Link>
             </div>

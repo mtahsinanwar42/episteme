@@ -70,6 +70,7 @@ Example:
 
 **PUT /:id/status**  
 Access: ADMIN / REVIEWER
+Notes: Cannot update CANCELLED/DELETED assignment.
 
 ### Request Body
 
@@ -77,10 +78,15 @@ Required:
 
 - status (integer)
 
+Optional:
+
+- statusUpdateNotes (text), shown for ADMIN only
+
 Example:
 
 ```json
 {
-  "status": 1
+  "status": 1,
+  "statusUpdateNotes": "Accepted" // ADMIN only
 }
 ```

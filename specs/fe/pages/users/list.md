@@ -37,8 +37,9 @@
 
 ## Status Update (Action Column)
 
-- Provide a status update control per row:
+- Provide a status update control (maybe a modal) per row:
   - Status — single select (integer, numeric-to-label mapping, can be found in utils/constants.js)
+  - Status Update Notes (Optional) - Text
   - Update action triggers: `PUT /api/v1/users/:id/status`
 
 ## Pagination Requirements

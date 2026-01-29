@@ -1,6 +1,6 @@
 import { sequelize } from "../config/db.js";
 import { QueryTypes } from "sequelize";
-import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, CONTENT_SUBMISSION_PAYMENT_STATUS, REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, CONTENT_SUBMISSION_PAYMENT_STATUS, REVIEW_ASSIGNMENT_STATUS, USER_ROLE, STATUS_UPDATE_NOTES } from "../utils/constants.js";
 
 export async function findSubmissionsByUserDetails({
   loggedInUserId,
@@ -23,7 +23,7 @@ export async function findSubmissionsByUserDetails({
 
   const baseWhere = `
     ${ownershipPredicate}
-    AND CS.current_status <> :deletedSubmissionStatus
+    ${!isAdmin ? `AND CS.current_status <> :deletedSubmissionStatus` : ``}
     AND C.status NOT IN (:excludedConferenceStatus)
     ${paymentWhere}
   `;
@@ -100,7 +100,7 @@ export async function findSubmissionByIdAndUserDetails({
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
     excludedConferenceStatus: [CONFERENCE_STATUS.INACTIVE, CONFERENCE_STATUS.DELETED],
     capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
-    excludedAssignmentStatuses: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+    deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
   };
 
   const baseSelect = `
@@ -110,6 +110,7 @@ export async function findSubmissionByIdAndUserDetails({
       CS.topics          AS "topics",
       CS.doi             AS "doi",
       CS.current_status  AS "status",
+      CS.status_update_notes AS "statusUpdateNotes",
       CS.created_at      AS "createdAt",
       CS.updated_at      AS "updatedAt",
 
@@ -139,7 +140,7 @@ export async function findSubmissionByIdAndUserDetails({
         FROM episteme.content_review_assignment CRA
         WHERE CRA.content_submission_id = CS.id
           AND CRA.reviewer_usr_id = :loggedInUserId
-          AND CRA.status NOT IN (:excludedAssignmentStatuses)
+          AND CRA.status <> :deletedAssignmentStatus
       )
     )
     AND CSP.status = :capturedPaymentStatus`;
@@ -160,4 +161,137 @@ export async function findSubmissionByIdAndUserDetails({
   });
 
   return rows[0] ?? null;
+}
+
+export async function markSubmissionAsStatus(
+  { submissionId, status, statusUpdateNotes },
+  { t }
+) {
+  const replacements = {
+    submissionId: Number(submissionId),
+    submissionStatus: Number(status),
+    statusUpdateNotes: statusUpdateNotes ?? null,
+  };
+
+  const submissionSql = `
+    UPDATE episteme.content_submission cs
+    SET
+      current_status = :submissionStatus,
+      status_update_notes = :statusUpdateNotes
+    WHERE cs.id = :submissionId
+    RETURNING cs.id;
+  `;
+
+  await sequelize.query(submissionSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+
+  return {
+    submissionUpdated: 1,
+  };
+}
+
+export async function markSubmissionAsApprovedOrRejected(
+  { submissionId, status, statusUpdateNotes },
+  { t }
+) {
+  const replacements = {
+    submissionId: Number(submissionId),
+    submissionStatus: Number(status),
+    submissionStatusUpdateNotes: statusUpdateNotes ?? null,
+
+    assignmentCancelledStatus: REVIEW_ASSIGNMENT_STATUS.CANCELLED,
+    assignmentStatusUpdateNotes: STATUS_UPDATE_NOTES.REVIEW_ASSIGNMENT_CANCELLATION_DUE_TO_SUBMISSION_ACCEPT_REJECT,
+    assignmentToBeCancelledStatus: [
+      REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
+      REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
+    ],
+  };
+
+  const submissionSql = `
+    UPDATE episteme.content_submission cs
+    SET
+      current_status = :submissionStatus,
+      status_update_notes = :submissionStatusUpdateNotes
+    WHERE cs.id = :submissionId
+    RETURNING cs.id;
+  `;
+  await sequelize.query(submissionSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+
+  const assocAssignmentsSql = `
+    UPDATE episteme.content_review_assignment cra
+    SET
+      status = :assignmentCancelledStatus,
+      status_update_notes = :assignmentStatusUpdateNotes
+    WHERE cra.content_submission_id = :submissionId
+      AND cra.status IN (:assignmentToBeCancelledStatus)
+    RETURNING cra.id;
+  `;
+
+  const assignmentsUpdateRes = await sequelize.query(assocAssignmentsSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+  const assignmentsUpdateResRows = assignmentsUpdateRes?.[0] ?? [];
+
+  return {
+    submissionUpdated: 1,
+    assignmentsUpdated: assignmentsUpdateResRows.length,
+  };
+}
+
+export async function markSubmissionAsDeleted({ submissionId, statusUpdateNotes, }, { t }) {
+  const replacements = {
+    submissionId: Number(submissionId),
+    submissionDeletedStatus: CONTENT_SUBMISSION_STATUS.DELETED,
+    submissionStatusUpdateNotes: statusUpdateNotes ?? null,
+
+    assignmentDeletedStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
+    assignmentStatusUpdateNotes: STATUS_UPDATE_NOTES.REVIEW_ASSIGNMENT_DELETION_DUE_TO_SUBMISSION_DELETE,
+  };
+
+  const submissionSql = `
+    UPDATE episteme.content_submission cs
+    SET
+      current_status = :submissionDeletedStatus,
+      status_update_notes = :submissionStatusUpdateNotes
+    WHERE cs.id = :submissionId
+      AND cs.current_status <> :submissionDeletedStatus
+    RETURNING cs.id;
+  `;
+
+  await sequelize.query(submissionSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+
+  const assocAssignmentsSql = `
+    UPDATE episteme.content_review_assignment cra
+    SET
+      status = :assignmentDeletedStatus,
+      status_update_notes = :assignmentStatusUpdateNotes
+    WHERE cra.content_submission_id = :submissionId
+      AND cra.status <> :assignmentDeletedStatus
+    RETURNING cra.id;
+  `;
+
+  const assignmentsUpdateRes = await sequelize.query(assocAssignmentsSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+  const assignmentsUpdateResRows = assignmentsUpdateRes?.[0] ?? [];
+
+  return {
+    submissionUpdated: 1,
+    assignmentsUpdated: assignmentsUpdateResRows.length,
+  };
 }

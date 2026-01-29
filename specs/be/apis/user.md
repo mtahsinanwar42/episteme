@@ -108,6 +108,7 @@ Optional:
 - occupation (string)
 - country (string)
 - status (integer)
+- statusUpdateNotes (text)
 - roles (string[])
 - cvFilePath
 - photoFilePath
@@ -127,6 +128,7 @@ Example:
   "photoFilePath": "storage/public/profile_photos/rm-ooti_portretten_24-010_81c60f13_20260118T224237_779.jpg",
   "cvFilePath": "storage/private/cvs/cv_m_tahsin_anwar_oct_2025_4b9e76d7_20260118T224158_601.pdf",
   "status": 1,
+  "statusUpdateNotes": "Activated"
   "roles": ["ADMIN"]
 }
 ```
@@ -148,10 +150,15 @@ Required:
 
 - status (integer)
 
+Optional:
+
+- statusUpdateNotes (text)
+
 Example:
 
 ```json
 {
-  "status": 1
+  "status": 9,
+  "statusUpdateNotes": "Deleted"
 }
 ```

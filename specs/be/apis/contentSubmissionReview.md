@@ -19,17 +19,18 @@ Required:
 
 **POST /**
 Access: REVIEWER
+Notes: Can save PENDING_APPROVAL/RETURNED submission reviews.
 
 ### Request Body:
 
 Required:
 
-- reviewerContentSubmissionVersionId (integer)
-- recommendation
+- recommendation (integer)
 
 Optional:
 
-- comment
+- comment (text)
+- reviewerContentSubmissionVersionId (integer)
 
 Example:
 

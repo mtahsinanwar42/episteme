@@ -74,7 +74,7 @@ export function createSubmissionReviewService({ ContentReview, ContentSubmission
       const review = await ContentReview.create({
         contentReviewAssignmentId: assignment.id,
         contentSubmissionVersionId: submission.currentContentSubmissionVersionId,
-        reviewerContentSubmissionVersionId,
+        reviewerContentSubmissionVersionId: reviewerContentSubmissionVersionId ?? null,
         comment: comment ?? null,
         recommendation,
       },

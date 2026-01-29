@@ -1,6 +1,6 @@
 import { sequelize } from "../config/db.js";
 import { QueryTypes } from "sequelize";
-import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, REVIEW_ASSIGNMENT_STATUS, STATUS_UPDATE_NOTES } from "../utils/constants.js";
 
 
 export async function findConferencePublicationsById({
@@ -70,5 +70,171 @@ export async function findConferencePublicationsById({
     limit: safeLimit,
     total: rows.length ? Number(rows[0].total) : 0,
     data: rows.map(({ total, ...row }) => row),
+  };
+}
+
+export async function markConferenceAsStatus(
+  { conferenceId, status },
+  { t }
+) {
+  const sql = `
+    UPDATE episteme.conference
+    SET
+      status = :status
+    WHERE id = :conferenceId
+    RETURNING id;
+  `;
+
+  await sequelize.query(sql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements: { conferenceId: Number(conferenceId), status: Number(status) },
+  });
+
+  return {
+    conferenceUpdated: 1,
+  };
+}
+
+export async function markConferenceAsDeleted(
+  { conferenceId, },
+  { t }
+) {
+  const replacements = {
+    conferenceId: Number(conferenceId),
+    conferenceDeletedStatus: CONFERENCE_STATUS.DELETED,
+
+    submissionDeletedStatus: CONTENT_SUBMISSION_STATUS.DELETED,
+    submissionStatusUpdateNotes: STATUS_UPDATE_NOTES.SUBMISSION_DELETION_DUE_TO_CONF_DELETE,
+
+    assignmentDeletedStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
+    assignmentStatusUpdateNotes: STATUS_UPDATE_NOTES.REVIEW_ASSIGNMENT_DELETION_DUE_TO_CONF_DELETE,
+  };
+
+  const conferenceUpdateSql = `
+    UPDATE episteme.conference
+    SET status = :conferenceDeletedStatus
+    WHERE id = :conferenceId
+    RETURNING id;
+  `;
+  await sequelize.query(conferenceUpdateSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+
+  const assocSubmissionsUpdateSql = `
+    UPDATE episteme.content_submission cs
+    SET current_status = :submissionDeletedStatus,
+        status_update_notes = :submissionStatusUpdateNotes
+    WHERE cs.conference_id = :conferenceId
+      AND cs.current_status <> :submissionDeletedStatus
+    RETURNING cs.id;
+  `;
+  const submissionsUpdateRes = await sequelize.query(assocSubmissionsUpdateSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+  const submissionsUpdateResRows = submissionsUpdateRes?.[0] ?? [];
+
+  const assocReviewAssignmentsUpdateSql = `
+    UPDATE episteme.content_review_assignment cra
+    SET status = :assignmentDeletedStatus,
+        status_update_notes = :assignmentStatusUpdateNotes
+    WHERE cra.content_submission_id IN (
+      SELECT cs.id FROM episteme.content_submission cs
+      WHERE cs.conference_id = :conferenceId
+    )
+      AND cra.status <> :assignmentDeletedStatus
+    RETURNING cra.id;
+  `;
+  const assignmentsUpdateRes = await sequelize.query(assocReviewAssignmentsUpdateSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+  const assignmentsUpdateResRows = assignmentsUpdateRes?.[0] ?? [];
+
+  return {
+    conferenceUpdated: 1,
+    submissionsUpdated: submissionsUpdateResRows.length,
+    assignmentsUpdated: assignmentsUpdateResRows.length,
+  };
+}
+
+export async function markConferenceAsFinished(
+  { conferenceId, },
+  { t }
+) {
+  const replacements = {
+    conferenceId: Number(conferenceId),
+    conferenceFinishedStatus: CONFERENCE_STATUS.FINISHED,
+
+    submissionRejectedStatus: CONTENT_SUBMISSION_STATUS.REJECTED,
+    submissionStatusUpdateNotes: STATUS_UPDATE_NOTES.SUBMISSION_DELETION_DUE_TO_CONF_FINISH,
+    submissionToBeRejectedStatus: [
+      CONTENT_SUBMISSION_STATUS.DRAFT,
+      CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL,
+      CONTENT_SUBMISSION_STATUS.RETURNED,
+    ],
+
+    assignmentCancelledStatus: REVIEW_ASSIGNMENT_STATUS.CANCELLED,
+    assignmentStatusUpdateNotes: STATUS_UPDATE_NOTES.REVIEW_ASSIGNMENT_DELETION_DUE_TO_CONF_FINISH,
+    assignmentToBeCancelledStatus: [
+      REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
+      REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
+    ],
+  };
+
+  const confSql = `
+    UPDATE episteme.conference
+    SET status = :conferenceFinishedStatus
+    WHERE id = :conferenceId
+    RETURNING id;
+  `;
+  await sequelize.query(confSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+
+  const assocSubmissionsUpdateSql = `
+    UPDATE episteme.content_submission cs
+    SET current_status = :submissionRejectedStatus,
+        status_update_notes = :submissionStatusUpdateNotes
+    WHERE cs.conference_id = :conferenceId
+      AND cs.current_status IN (:submissionToBeRejectedStatus)
+    RETURNING cs.id;
+  `;
+  const submissionsUpdateRes = await sequelize.query(assocSubmissionsUpdateSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+  const submissionsUpdateResRows = submissionsUpdateRes?.[0] ?? [];
+
+  const assocReviewAssignmentsUpdateSql = `
+    UPDATE episteme.content_review_assignment cra
+    SET status = :assignmentCancelledStatus,
+        status_update_notes = :assignmentStatusUpdateNotes
+    WHERE cra.content_submission_id IN (
+      SELECT cs.id FROM episteme.content_submission cs
+      WHERE cs.conference_id = :conferenceId
+    )
+      AND cra.status IN (:assignmentToBeCancelledStatus)
+    RETURNING cra.id;
+  `;
+  const assignmentsUpdateRes = await sequelize.query(assocReviewAssignmentsUpdateSql, {
+    type: QueryTypes.UPDATE,
+    transaction: t,
+    replacements,
+  });
+  const assignmentsUpdateResRows = assignmentsUpdateRes?.[0] ?? [];
+
+  return {
+    conferenceUpdated: 1,
+    submissionsUpdated: submissionsUpdateResRows.length,
+    assignmentsUpdated: assignmentsUpdateResRows.length,
   };
 }

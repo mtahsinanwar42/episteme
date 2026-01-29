@@ -128,10 +128,32 @@ async function importData() {
     });
     const conference = await Conference.create(conferenceData);
 
-    await Activity.create(activityData);
-    await Blog.create(blogData);
-    await Training.create(trainingData);
-    await Announcement.create(announcementData);
+    const metadataFile = File.build({
+      name: "test.json",
+      storageKey: "assets/test.json",
+      size: 120000,
+      mimeType: "image",
+      uploadedBy: author.id,
+    });
+    metadataFile.setFileBuffer(Buffer.from("V1"));
+    await metadataFile.save();
+
+    await Activity.create({
+      ...activityData,
+      metadataFileId: metadataFile.id,
+    });
+    await Blog.create({
+      ...blogData,
+      metadataFileId: metadataFile.id,
+    });
+    await Training.create({
+      ...trainingData,
+      metadataFileId: metadataFile.id,
+    });
+    await Announcement.create({
+      ...announcementData,
+      metadataFileId: metadataFile.id,
+    });
 
     const file1 = File.build({
       name: "paper_v1.pdf",

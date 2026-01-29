@@ -53,6 +53,10 @@ export function createTrainingService({ Training, fileService }) {
       throw new ErrorResponse(404, "Training not found");
     }
 
+    if (training.status === TRAINING_STATUS.DELETED) {
+      throw new ErrorResponse(400, "Cannot update DELETED resource");
+    }
+
     const updates = {};
 
     if (isNotEmpty(title)) {

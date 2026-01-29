@@ -22,6 +22,7 @@ export interface User {
   phone: string;
   roles: UserRole[];
   status: number;
+  statusUpdateNotes: string;
   institution: string;
   occupation: string;
   country: string;
@@ -49,9 +50,4 @@ export enum UserStatus {
 export interface UserDetailsResponse {
   data: User;
   success: boolean;
-}
-
-export interface UserDeleteResponse {
-  success: boolean;
-  message: string;
 }
