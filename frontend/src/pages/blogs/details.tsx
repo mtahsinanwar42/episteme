@@ -3,11 +3,11 @@ import { useBlogById } from "@/hooks/useBlogs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImageIcon } from "lucide-react";
-import { BlogStatus } from "@/models/blog";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { getResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
 
 export default function BlogDetails() {
   const { blogId } = useParams();
@@ -62,19 +62,6 @@ export default function BlogDetails() {
     );
   }
 
-  const getStatusBadge = (status: BlogStatus | undefined) => {
-    switch (status) {
-      case BlogStatus.DRAFT:
-        return "Draft";
-      case BlogStatus.PUBLISHED:
-        return "Published";
-      case BlogStatus.DELETED:
-        return "Deleted";
-      default:
-        return `${status}`;
-    }
-  };
-
   return (
     <div>
       <Breadcrumb
@@ -111,7 +98,9 @@ export default function BlogDetails() {
 
             <div className="flex gap-4 flex-wrap">
               <Badge variant="outline">ID: {blog?.id}</Badge>
-              <Badge variant="outline">{getStatusBadge(blog?.status)}</Badge>
+              <Badge variant="outline">
+                {getResourceStatusEnum(blog?.status)}
+              </Badge>
               <Badge variant="outline">
                 Created: {new Date(blog?.createdAt || "").toLocaleString()}
               </Badge>

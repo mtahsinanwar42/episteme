@@ -3,11 +3,11 @@ import { useAnnouncementById } from "@/hooks/useAnnouncements";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImageIcon } from "lucide-react";
-import { AnnouncementStatus } from "@/models/announcement";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { getResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
 
 export default function AnnouncementDetails() {
   const { announcementId } = useParams();
@@ -69,19 +69,6 @@ export default function AnnouncementDetails() {
     );
   }
 
-  const getStatusBadge = (status: AnnouncementStatus | undefined) => {
-    switch (status) {
-      case AnnouncementStatus.DRAFT:
-        return "Draft";
-      case AnnouncementStatus.PUBLISHED:
-        return "Published";
-      case AnnouncementStatus.DELETED:
-        return "deleted";
-      default:
-        return `${status}`;
-    }
-  };
-
   return (
     <div>
       <Breadcrumb
@@ -117,7 +104,7 @@ export default function AnnouncementDetails() {
             <div className="flex gap-4">
               <Badge variant="outline">ID: {announcement?.id}</Badge>
               <Badge variant="outline">
-                {getStatusBadge(announcement?.status)}
+                {getResourceStatusEnum(announcement?.status)}
               </Badge>
               <Badge variant="outline">
                 Created:{" "}

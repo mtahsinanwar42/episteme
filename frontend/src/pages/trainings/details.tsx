@@ -3,11 +3,11 @@ import { useTrainingById } from "@/hooks/useTrainings";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImageIcon } from "lucide-react";
-import { TrainingStatus } from "@/models/training";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { getResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
 
 export default function TrainingDetails() {
   const { trainingId } = useParams();
@@ -66,19 +66,6 @@ export default function TrainingDetails() {
     );
   }
 
-  const getStatusBadge = (status: TrainingStatus | undefined) => {
-    switch (status) {
-      case TrainingStatus.DRAFT:
-        return "Draft";
-      case TrainingStatus.PUBLISHED:
-        return "Published";
-      case TrainingStatus.DELETED:
-        return "deleted";
-      default:
-        return `${status}`;
-    }
-  };
-
   return (
     <div>
       <Breadcrumb
@@ -114,7 +101,7 @@ export default function TrainingDetails() {
             <div className="flex gap-4">
               <Badge variant="outline">ID: {training?.id}</Badge>
               <Badge variant="outline">
-                {getStatusBadge(training?.status)}
+                {getResourceStatusEnum(training?.status)}
               </Badge>
               <Badge variant="outline">
                 Created: {new Date(training?.createdAt || "").toLocaleString()}
