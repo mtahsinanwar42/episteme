@@ -24,16 +24,19 @@ import NewAsset from "@/pages/assets/new";
 import Activities from "@/pages/activities";
 import ActivityDetails from "@/pages/activities/details";
 import NewActivity from "@/pages/activities/new";
-import EditActivity from "./pages/activities/edit";
-import TrainingDetails from "./pages/trainings/details";
-import NewTraining from "./pages/trainings/new";
-import EditTraining from "./pages/trainings/edit";
-import AnnouncementDetails from "./pages/announcements/details";
-import NewAnnouncement from "./pages/announcements/new";
-import EditAnnouncement from "./pages/announcements/edit";
-import BlogDetails from "./pages/blogs/details";
-import NewBlog from "./pages/blogs/new";
-import EditBlog from "./pages/blogs/edit";
+import EditActivity from "@/pages/activities/edit";
+import TrainingDetails from "@/pages/trainings/details";
+import NewTraining from "@/pages/trainings/new";
+import EditTraining from "@/pages/trainings/edit";
+import AnnouncementDetails from "@/pages/announcements/details";
+import NewAnnouncement from "@/pages/announcements/new";
+import EditAnnouncement from "@/pages/announcements/edit";
+import BlogDetails from "@/pages/blogs/details";
+import NewBlog from "@/pages/blogs/new";
+import EditBlog from "@/pages/blogs/edit";
+import ConferenceDetails from "@/pages/conferences/details";
+import NewConference from "@/pages/conferences/new";
+import EditConference from "@/pages/conferences/edit";
 
 export default function RouteConfig() {
   return (
@@ -118,6 +121,17 @@ export default function RouteConfig() {
       />
 
       <Route path="/conferences" element={<Conferences />} />
+      <Route
+        path="/conferences/:conferenceId"
+        element={<ConferenceDetails />}
+      />
+
+      <Route path="/conferences/new" element={<NewConference />} />
+
+      <Route
+        path="/conferences/edit/:conferenceId"
+        element={<EditConference />}
+      />
 
       <Route path="/blogs" element={<Blogs />} />
       <Route path="/blogs/:blogId" element={<BlogDetails />} />
