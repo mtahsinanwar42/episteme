@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { useTrainingById } from "@/hooks/useTrainings";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,44 +7,19 @@ import { TrainingStatus } from "@/models/training";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { useMetadataFile } from "@/hooks/useMetadataFiles";
 
 export default function TrainingDetails() {
   const { trainingId } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useTrainingById(trainingId);
-  const [metadata, setMetadata] = useState<any>(null);
-  const [metadataLoading, setMetadataLoading] = useState(false);
-  const [metadataError, setMetadataError] = useState<string | null>(null);
+  const training = data?.data;
 
-  // Fetch metadata JSON file
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      if (!data?.data?.metadataFilePath) return;
-
-      try {
-        setMetadataLoading(true);
-        setMetadataError(null);
-        const metadataUrl = `${new URL(config.baseUrl).origin}/${data.data.metadataFilePath}`;
-        const response = await fetch(metadataUrl);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch metadata: ${response.statusText}`);
-        }
-
-        const jsonData = await response.json();
-        setMetadata(jsonData);
-      } catch (err) {
-        console.error("Error fetching metadata:", err);
-        setMetadataError(
-          err instanceof Error ? err.message : "Failed to load metadata",
-        );
-      } finally {
-        setMetadataLoading(false);
-      }
-    };
-
-    fetchMetadata();
-  }, [data?.data?.metadataFilePath]);
+  const { data: metadata, isLoading: metadataLoading } = useMetadataFile({
+    filePath: training?.metadataFilePath || "",
+    resourceId: training?.id || "",
+    enabled: !!training, // Only fetch metadata after training is loaded
+  });
 
   if (isLoading) {
     return (
@@ -92,9 +66,7 @@ export default function TrainingDetails() {
     );
   }
 
-  const training = data.data;
-
-  const getStatusBadge = (status: TrainingStatus) => {
+  const getStatusBadge = (status: TrainingStatus | undefined) => {
     switch (status) {
       case TrainingStatus.DRAFT:
         return "Draft";
@@ -112,13 +84,13 @@ export default function TrainingDetails() {
       <Breadcrumb
         items={[
           { label: "Trainings", href: "/trainings" },
-          { label: training.title },
+          { label: training?.title || "" },
         ]}
       />
 
       <div className="space-y-6">
         <div className="rounded-lg border border-border shadow-sm relative gradient-card">
-          {!metadataLoading && !metadataError && metadata ? (
+          {!metadataLoading && metadata?.heroImagePath ? (
             <img
               src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
               crossOrigin="anonymous"
@@ -135,33 +107,33 @@ export default function TrainingDetails() {
 
           <div className="flex flex-col gap-4 p-4">
             <div>
-              <h3 className="font-bold">{training.title}</h3>
+              <h3 className="font-bold">{training?.title}</h3>
               <h6 className="text-foreground/60">{metadata?.summary}</h6>
             </div>
 
             <div className="flex gap-4">
-              <Badge variant="outline">ID: {training.id}</Badge>
+              <Badge variant="outline">ID: {training?.id}</Badge>
               <Badge variant="outline">
                 {getStatusBadge(training?.status)}
               </Badge>
               <Badge variant="outline">
-                Created: {new Date(training.createdAt).toLocaleString()}
+                Created: {new Date(training?.createdAt || "").toLocaleString()}
               </Badge>
               <Badge variant="outline">
-                Updated: {new Date(training.updatedAt).toLocaleString()}
+                Updated: {new Date(training?.updatedAt || "").toLocaleString()}
               </Badge>
             </div>
           </div>
         </div>
 
-        {!metadataLoading && !metadataError && metadata && (
-          <>
-            {metadata?.sections &&
-              metadata?.sections?.length > 0 &&
-              metadata?.sections?.map((section: any, index: number) => (
+        {!metadataLoading &&
+          metadata?.sections &&
+          metadata?.sections?.length > 0 && (
+            <>
+              {metadata?.sections?.map((section: any, index: number) => (
                 <div
                   key={index}
-                  className="rounded-lg border border-border shadow-sm"
+                  className="rounded-lg border border-border shadow-sm "
                 >
                   <div className="p-4 gradient-card shadow-sm rounded-t-lg">
                     <h3 className="font-semibold">{section.heading}</h3>
@@ -172,8 +144,8 @@ export default function TrainingDetails() {
                   </div>
                 </div>
               ))}
-          </>
-        )}
+            </>
+          )}
       </div>
     </div>
   );

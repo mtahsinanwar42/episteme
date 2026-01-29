@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { useAnnouncementById } from "@/hooks/useAnnouncements";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,45 +7,20 @@ import { AnnouncementStatus } from "@/models/announcement";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { useMetadataFile } from "@/hooks/useMetadataFiles";
 
 export default function AnnouncementDetails() {
   const { announcementId } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isError, error } =
     useAnnouncementById(announcementId);
-  const [metadata, setMetadata] = useState<any>(null);
-  const [metadataLoading, setMetadataLoading] = useState(false);
-  const [metadataError, setMetadataError] = useState<string | null>(null);
+  const announcement = data?.data;
 
-  // Fetch metadata JSON file
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      if (!data?.data?.metadataFilePath) return;
-
-      try {
-        setMetadataLoading(true);
-        setMetadataError(null);
-        const metadataUrl = `${new URL(config.baseUrl).origin}/${data.data.metadataFilePath}`;
-        const response = await fetch(metadataUrl);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch metadata: ${response.statusText}`);
-        }
-
-        const jsonData = await response.json();
-        setMetadata(jsonData);
-      } catch (err) {
-        console.error("Error fetching metadata:", err);
-        setMetadataError(
-          err instanceof Error ? err.message : "Failed to load metadata",
-        );
-      } finally {
-        setMetadataLoading(false);
-      }
-    };
-
-    fetchMetadata();
-  }, [data?.data?.metadataFilePath]);
+  const { data: metadata, isLoading: metadataLoading } = useMetadataFile({
+    filePath: announcement?.metadataFilePath || "",
+    resourceId: announcement?.id || "",
+    enabled: !!announcement, // Only fetch metadata after announcement is loaded
+  });
 
   if (isLoading) {
     return (
@@ -95,9 +69,7 @@ export default function AnnouncementDetails() {
     );
   }
 
-  const announcement = data.data;
-
-  const getStatusBadge = (status: AnnouncementStatus) => {
+  const getStatusBadge = (status: AnnouncementStatus | undefined) => {
     switch (status) {
       case AnnouncementStatus.DRAFT:
         return "Draft";
@@ -115,13 +87,13 @@ export default function AnnouncementDetails() {
       <Breadcrumb
         items={[
           { label: "Announcements", href: "/announcements" },
-          { label: announcement.title },
+          { label: announcement?.title || "" },
         ]}
       />
 
       <div className="space-y-6">
         <div className="rounded-lg border border-border shadow-sm relative gradient-card">
-          {!metadataLoading && !metadataError && metadata ? (
+          {!metadataLoading && metadata?.heroImagePath ? (
             <img
               src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
               crossOrigin="anonymous"
@@ -138,30 +110,32 @@ export default function AnnouncementDetails() {
 
           <div className="flex flex-col gap-4 p-4">
             <div>
-              <h3 className="font-bold">{announcement.title}</h3>
+              <h3 className="font-bold">{announcement?.title}</h3>
               <h6 className="text-foreground/60">{metadata?.summary}</h6>
             </div>
 
             <div className="flex gap-4">
-              <Badge variant="outline">ID: {announcement.id}</Badge>
+              <Badge variant="outline">ID: {announcement?.id}</Badge>
               <Badge variant="outline">
                 {getStatusBadge(announcement?.status)}
               </Badge>
               <Badge variant="outline">
-                Created: {new Date(announcement.createdAt).toLocaleString()}
+                Created:{" "}
+                {new Date(announcement?.createdAt || "").toLocaleString()}
               </Badge>
               <Badge variant="outline">
-                Updated: {new Date(announcement.updatedAt).toLocaleString()}
+                Updated:{" "}
+                {new Date(announcement?.updatedAt || "").toLocaleString()}
               </Badge>
             </div>
           </div>
         </div>
 
-        {!metadataLoading && !metadataError && metadata && (
-          <>
-            {metadata?.sections &&
-              metadata?.sections?.length > 0 &&
-              metadata?.sections?.map((section: any, index: number) => (
+        {!metadataLoading &&
+          metadata?.sections &&
+          metadata?.sections?.length > 0 && (
+            <>
+              {metadata?.sections?.map((section: any, index: number) => (
                 <div
                   key={index}
                   className="rounded-lg border border-border shadow-sm"
@@ -175,8 +149,8 @@ export default function AnnouncementDetails() {
                   </div>
                 </div>
               ))}
-          </>
-        )}
+            </>
+          )}
       </div>
     </div>
   );
