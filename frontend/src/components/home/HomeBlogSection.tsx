@@ -1,30 +1,18 @@
-import { useEffect, useState } from "react";
-import { blogService } from "@/services/blogService";
+import { useBlogs } from "@/hooks/useBlogs";
 import type { Blog } from "@/models/blog";
+import { config } from "@/config/config";
+import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { Link } from "react-router-dom";
 
 export default function HomeBlogSection() {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: response, isLoading } = useBlogs({
+    limit: 3,
+    sort: "-createdAt",
+  });
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const response = await blogService.getBlogs({
-          limit: 3,
-          sort: "-createdAt",
-        });
-        setBlogs(response.data || []);
-      } catch (error) {
-        console.error("Failed to fetch blogs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const blogs = response?.data || [];
 
-    fetchBlogs();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <section className="mb-20">
         <div className="flex items-center justify-between mb-12">
@@ -76,60 +64,85 @@ export default function HomeBlogSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         {blogs.map((blog) => (
-          <article
-            key={blog.id}
-            className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-200 dark:border-gray-700 group"
-          >
-            {/* Image */}
-            <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-900">
-              <div className="w-full h-full flex items-center justify-center text-6xl">
-                📝
-              </div>
-              <div className="absolute top-4 left-4">
-                <span className="bg-slate-800 dark:bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                  Blog
-                </span>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="h-48 p-6 flex flex-col justify-between">
-              <div>
-                <h3 className="text-xl font-bold mb-3 line-clamp-2 transition-colors">
-                  {blog.title}
-                </h3>
-
-                {/* Meta */}
-                <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  {new Date(blog.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </div>
-              </div>
-
-              <a
-                href={`/blogs/${blog.id}`}
-                className="text-gray-900 dark:text-gray-100 font-semibold hover:underline inline-flex items-center gap-1"
-              >
-                Read More
-                <span>→</span>
-              </a>
-            </div>
-          </article>
+          <BlogCard key={blog.id} blog={blog} />
         ))}
       </div>
 
       {/* See More Button */}
       <div className="text-center">
-        <a
-          href="/blogs"
+        <Link
+          to="/blogs"
           className="inline-block bg-linear-to-r from-purple-600 to-pink-500 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition-all"
         >
           See All Blogs
-        </a>
+        </Link>
       </div>
     </section>
+  );
+}
+
+interface BlogCardProps {
+  blog: Blog;
+}
+
+function BlogCard({ blog }: BlogCardProps) {
+  const { data: metadata, isLoading } = useMetadataFile({
+    filePath: blog.metadataFilePath || "",
+    resourceId: blog.id,
+  });
+
+  const imageUrl = metadata?.heroImagePath
+    ? `${new URL(config.baseUrl).origin}/${metadata.heroImagePath}`
+    : null;
+
+  return (
+    <article className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-200 dark:border-gray-700 group">
+      {/* Image */}
+      <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-900">
+        {!isLoading && imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={blog.title}
+            crossOrigin="anonymous"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-6xl">
+            📝
+          </div>
+        )}
+        <div className="absolute top-4 left-4">
+          <span className="bg-slate-800 dark:bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-semibold">
+            Blog
+          </span>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="h-48 p-6 flex flex-col justify-between">
+        <div>
+          <h3 className="text-xl font-bold mb-3 line-clamp-2 transition-colors">
+            {blog.title}
+          </h3>
+
+          {/* Meta */}
+          <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            {new Date(blog.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+        </div>
+
+        <Link
+          to={`/blogs/${blog.id}`}
+          className="text-gray-900 dark:text-gray-100 font-semibold hover:underline inline-flex items-center gap-1"
+        >
+          Read More
+          <span>→</span>
+        </Link>
+      </div>
+    </article>
   );
 }

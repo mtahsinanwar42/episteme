@@ -10,7 +10,6 @@ export function useActivities(params?: GetActivitiesParams) {
   return useQuery({
     queryKey: ["activities", params],
     queryFn: () => activityService.getActivities(params),
-    staleTime: 30000, // 30 seconds
   });
 }
 
@@ -19,7 +18,6 @@ export function useActivityById(activityId: string | number | undefined) {
     queryKey: ["activity", activityId],
     queryFn: () => activityService.getActivityById(activityId!),
     enabled: !!activityId,
-    staleTime: 30000, // 30 seconds
   });
 }
 

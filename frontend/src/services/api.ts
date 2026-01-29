@@ -160,7 +160,10 @@ class BaseApiService {
     });
   }
 
-  async getBlob(endpoint: string, requiresAuth: boolean = false): Promise<Blob> {
+  async getBlob(
+    endpoint: string,
+    requiresAuth: boolean = false,
+  ): Promise<Blob> {
     const url = `${this.baseUrl}${endpoint}`;
 
     // Check token validity for authenticated requests
@@ -179,9 +182,7 @@ class BaseApiService {
       });
 
       if (!response.ok) {
-        throw new Error(
-          `Request failed with status ${response.status}`,
-        );
+        throw new Error(`Request failed with status ${response.status}`);
       }
 
       return response.blob();
@@ -230,6 +231,44 @@ class BaseApiService {
         throw error;
       }
       throw new Error("An unexpected error occurred during upload");
+    }
+  }
+
+  async metadataFile<T>(
+    endpoint: string,
+    requiresAuth: boolean = false,
+  ): Promise<T> {
+    const headers: HeadersInit = {};
+    if (requiresAuth) {
+      const token = Cookies.get("token");
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+    }
+
+    const url = `${new URL(this.baseUrl).origin}${endpoint}`;
+
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers,
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({
+          message: `HTTP error! status: ${response.status}`,
+        }));
+        throw new Error(
+          error.message || `Request failed with status ${response.status}`,
+        );
+      }
+
+      return response.json();
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("An unexpected error occurred during request");
     }
   }
 }

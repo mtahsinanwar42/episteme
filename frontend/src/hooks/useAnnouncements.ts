@@ -10,7 +10,6 @@ export function useAnnouncements(params?: GetAnnouncementsParams) {
   return useQuery({
     queryKey: ["announcements", params],
     queryFn: () => announcementService.getAnnouncements(params),
-    staleTime: 30000, // 30 seconds
   });
 }
 
@@ -21,7 +20,6 @@ export function useAnnouncementById(
     queryKey: ["announcement", announcementId],
     queryFn: () => announcementService.getAnnouncementById(announcementId!),
     enabled: !!announcementId,
-    staleTime: 30000, // 30 seconds
   });
 }
 

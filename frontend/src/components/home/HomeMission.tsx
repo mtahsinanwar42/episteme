@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function HomeMission() {
   return (
     <section className="mb-20">
@@ -19,12 +21,12 @@ export default function HomeMission() {
             models to meet open science principles, removing barriers and
             promoting inclusion in knowledge creation and sharing.
           </p>
-          <a
-            href="/about/mission"
+          <Link
+            to="/about/mission"
             className="inline-block mt-6 text-purple-600 dark:text-purple-400 font-semibold hover:underline"
           >
             Learn more about our mission →
-          </a>
+          </Link>
         </div>
         <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-8 h-80 flex items-center justify-center border border-gray-200 dark:border-gray-700">
           <div className="text-center">

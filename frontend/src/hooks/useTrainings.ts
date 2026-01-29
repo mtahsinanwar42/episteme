@@ -10,7 +10,6 @@ export function useTrainings(params?: GetTrainingsParams) {
   return useQuery({
     queryKey: ["trainings", params],
     queryFn: () => trainingService.getTrainings(params),
-    staleTime: 30000, // 30 seconds
   });
 }
 
@@ -19,7 +18,6 @@ export function useTrainingById(trainingId: string | number | undefined) {
     queryKey: ["training", trainingId],
     queryFn: () => trainingService.getTrainingById(trainingId!),
     enabled: !!trainingId,
-    staleTime: 30000, // 30 seconds
   });
 }
 
