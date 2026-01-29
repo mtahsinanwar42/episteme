@@ -17,6 +17,7 @@ export async function findSubmissionMessagesByIdAndUserDetails({
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
     excludedConferenceStatus: [CONFERENCE_STATUS.INACTIVE, CONFERENCE_STATUS.DELETED],
     capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
+    deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
   };
 
   const accessWhereUser = `CS.owner_usr_id = :loggedInUserId`;
@@ -28,7 +29,7 @@ export async function findSubmissionMessagesByIdAndUserDetails({
         FROM episteme.content_review_assignment CRA
         WHERE CRA.content_submission_id = CS.id
           AND CRA.reviewer_usr_id = :loggedInUserId
-          AND CRA.status NOT IN (3, 9)
+          AND CRA.status <> :deletedAssignmentStatus
       )
     )
   `;
@@ -130,7 +131,7 @@ export async function canCreateSubmissionMessage({ submissionId,
         FROM episteme.content_review_assignment CRA
         WHERE CRA.content_submission_id = :submissionId
           AND CRA.reviewer_usr_id = :loggedInUserId
-          AND CRA.status NOT IN (:deletedAssignmentStatus)
+          AND CRA.status = :acceptedAssignmentStatus
       ) AS "isAssignedReviewer",
       EXISTS (
         SELECT 1
@@ -143,7 +144,7 @@ export async function canCreateSubmissionMessage({ submissionId,
         FROM episteme.content_review_assignment CRA
         WHERE CRA.content_submission_id = :submissionId
           AND CRA.reviewer_usr_id = :receiverUsrId
-          AND CRA.status NOT IN (:deletedAssignmentStatus)
+          AND CRA.status = :acceptedAssignmentStatus
       ) AS "adminReceiverIsAssignedReviewer"
     ;
   `;
@@ -158,7 +159,7 @@ export async function canCreateSubmissionMessage({ submissionId,
       allowedSubmissionStatuses: [CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, CONTENT_SUBMISSION_STATUS.RETURNED,],
       capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
       conferenceStatusExcluded: [CONFERENCE_STATUS.DELETED, CONFERENCE_STATUS.INACTIVE],
-      deletedAssignmentStatus: [REVIEW_ASSIGNMENT_STATUS.DECLINED, REVIEW_ASSIGNMENT_STATUS.DELETED],
+      acceptedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
     },
   });
 

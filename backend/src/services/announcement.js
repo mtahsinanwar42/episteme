@@ -52,6 +52,10 @@ export function createAnnouncementService({ Announcement, fileService }) {
       throw new ErrorResponse(404, "Announcement not found");
     }
 
+    if (announcement.status === ANNOUNCEMENT_STATUS.DELETED) {
+      throw new ErrorResponse(400, "Cannot update DELETED resource");
+    }
+
     const updates = {};
 
     if (isNotEmpty(title)) {

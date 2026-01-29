@@ -53,6 +53,10 @@ export function createBlogService({ Blog, fileService }) {
       throw new ErrorResponse(404, "Blog not found");
     }
 
+    if (blog.status === BLOG_STATUS.DELETED) {
+      throw new ErrorResponse(400, "Cannot update DELETED resource");
+    }
+
     const updates = {};
 
     if (isNotEmpty(title)) {

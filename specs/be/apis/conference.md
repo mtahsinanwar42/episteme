@@ -86,6 +86,7 @@ Example:
 
 **PUT /:id**  
 Access: ADMIN
+Notes: Cannot update DELETED/FINISHED conference.
 
 ### Request Body
 
@@ -119,6 +120,7 @@ Example:
 
 **PUT /:id/status**  
 Access: ADMIN
+Notes: Cannot update DELETED/FINISHED conference.
 
 ### Request Body
 

@@ -1,4 +1,4 @@
-import { canCreateReviewAssignment, findReviewAssignments, findReviewAssignmentsByUserId } from "../repositories/contentReviewAssignment.js";
+import { canCreateReviewAssignment, canUpdateReviewAssignmentStatus, findReviewAssignments, findReviewAssignmentsByUserId } from "../repositories/contentReviewAssignment.js";
 import { REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { isNotEmpty } from "../utils/string.js";
@@ -64,14 +64,21 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
       throw new ErrorResponse(400, "Invalid assignment status");
     }
 
-    if (!isAdmin
-      && ![
+    if (isAdmin) {
+      if (![
+        REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
+        REVIEW_ASSIGNMENT_STATUS.CANCELLED,
+        REVIEW_ASSIGNMENT_STATUS.DELETED,
+      ].includes(status)) {
+        throw new ErrorResponse(400, "Invalid assignment status");
+      }
+    } else {
+      if (![
         REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
         REVIEW_ASSIGNMENT_STATUS.DECLINED,
-        REVIEW_ASSIGNMENT_STATUS.COMPLETED,
-      ].includes(status)
-    ) {
-      throw new ErrorResponse(400, "Invalid assignment status");
+      ].includes(status)) {
+        throw new ErrorResponse(400, "Invalid assignment status");
+      }
     }
 
     updates.status = status;
@@ -88,6 +95,18 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
 
     if (!assignment) {
       throw new ErrorResponse(404, "ContentReviewAssignment not found");
+    }
+
+    if ([REVIEW_ASSIGNMENT_STATUS.CANCELLED, REVIEW_ASSIGNMENT_STATUS.DELETED].includes(assignment.status)) {
+      throw new ErrorResponse(400, "Cannot update cancelled/deleted review assignment.");
+    }
+
+    const { submissionExists } = await canUpdateReviewAssignmentStatus({
+      contentSubmissionId: assignment.contentSubmissionId,
+    });
+
+    if (!submissionExists) {
+      throw new ErrorResponse(400, "ContentSubmission should be in Pending Approval or Returned status");
     }
 
     await assignment.update(updates);

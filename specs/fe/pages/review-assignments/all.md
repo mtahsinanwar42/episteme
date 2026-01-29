@@ -27,7 +27,7 @@
 ### Update Assignment Status
 
 - `PUT /api/v1/review-assignments/:id/status`
-- Trigger: Assignment status update action
+- Trigger: Assignment status update action (assign/complete/cancel/delete)
 - Request body: As defined in Reviewer Assignment API spec
 
 ---
