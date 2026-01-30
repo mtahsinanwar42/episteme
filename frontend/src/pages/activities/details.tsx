@@ -7,7 +7,7 @@ import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
-import { getResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
+import { getBlogActivityResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
 
 export default function ActivityDetails() {
   const { activityId } = useParams();
@@ -100,7 +100,7 @@ export default function ActivityDetails() {
 
             <div className="flex gap-4">
               <Badge variant="outline">
-                {getResourceStatusEnum(activity?.status)}
+                {getBlogActivityResourceStatusEnum(activity?.status)}
               </Badge>
               <Badge variant="outline">
                 Created: {new Date(activity?.createdAt || "").toLocaleString()}

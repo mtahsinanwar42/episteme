@@ -11,11 +11,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { TrainingStatus } from "@/models/training";
+import { ConferenceStatus } from "@/models/conference";
 import {
-  useUpdateTrainingMutation,
-  useTrainingById,
-} from "@/hooks/useTrainings";
+  useUpdateConferenceMutation,
+  useConferenceById,
+} from "@/hooks/useConferences";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
@@ -23,39 +23,74 @@ import { fileService } from "@/services/fileService";
 import { FileTypeEnum } from "@/models/file";
 import { FileText, Upload, Loader2 } from "lucide-react";
 
-export default function EditTraining() {
+const formatDateForInput = (value?: string | null) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().split("T")[0];
+};
+
+export default function EditConference() {
   const navigate = useNavigate();
-  const { trainingId } = useParams<{ trainingId: string }>();
-  const { data: trainingData, isLoading: isLoadingTraining } =
-    useTrainingById(trainingId);
-  const updateTrainingMutation = useUpdateTrainingMutation(trainingId!);
+  const { conferenceId } = useParams<{ conferenceId: string }>();
+  const { data: conferenceData, isLoading: isLoadingConference } =
+    useConferenceById(conferenceId);
+  const updateConferenceMutation = useUpdateConferenceMutation(conferenceId!);
   const [error, setError] = useState<string | null>(null);
   const [metadataFile, setMetadataFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
+    startAt: "",
+    endAt: "",
+    submissionPeriodStartAt: "",
+    submissionPeriodEndAt: "",
     metadataFilePath: "",
-    status: TrainingStatus.COMPLETED.toString(),
+    status: ConferenceStatus.ACTIVE.toString(),
   });
 
-  // Pre-fill form with existing training data
   useEffect(() => {
-    if (trainingData?.data) {
+    if (conferenceData?.data) {
       setFormData((prev) => ({
         ...prev,
-        title: trainingData.data.title,
-        metadataFilePath: trainingData.data.metadataFilePath || "",
-        status: trainingData.data.status.toString(),
+        title: conferenceData.data.title,
+        slug: conferenceData.data.slug,
+        startAt: formatDateForInput(conferenceData.data.startAt),
+        endAt: formatDateForInput(conferenceData.data.endAt),
+        submissionPeriodStartAt: formatDateForInput(
+          conferenceData.data.submissionPeriodStartAt,
+        ),
+        submissionPeriodEndAt: formatDateForInput(
+          conferenceData.data.submissionPeriodEndAt,
+        ),
+        metadataFilePath: conferenceData.data.metadataFilePath || "",
+        status: conferenceData.data.status.toString(),
       }));
     }
-  }, [trainingData]);
+  }, [conferenceData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.title.trim()) {
       setError("Title is required");
+      return;
+    }
+
+    if (!formData.slug.trim()) {
+      setError("Slug is required");
+      return;
+    }
+
+    if (
+      !formData.startAt ||
+      !formData.endAt ||
+      !formData.submissionPeriodStartAt ||
+      !formData.submissionPeriodEndAt
+    ) {
+      setError("All date fields are required");
       return;
     }
 
@@ -66,19 +101,24 @@ export default function EditTraining() {
 
     setError(null);
 
-    updateTrainingMutation.mutate(
+    updateConferenceMutation.mutate(
       {
         title: formData.title,
+        slug: formData.slug,
+        startAt: formData.startAt,
+        endAt: formData.endAt,
+        submissionPeriodStartAt: formData.submissionPeriodStartAt,
+        submissionPeriodEndAt: formData.submissionPeriodEndAt,
         metadataFilePath: formData.metadataFilePath,
         status: Number(formData.status),
       },
       {
         onSuccess: () => {
-          navigate("/trainings");
+          navigate("/conferences");
         },
         onError: (err: any) => {
           setError(
-            err instanceof Error ? err.message : "Failed to update training",
+            err instanceof Error ? err.message : "Failed to update conference",
           );
         },
       },
@@ -106,7 +146,6 @@ export default function EditTraining() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type (JSON only)
     if (file.type !== "application/json" && !file.name.endsWith(".json")) {
       setError("Please upload a JSON file");
       return;
@@ -137,8 +176,8 @@ export default function EditTraining() {
         setError("Failed to upload file");
         setMetadataFile(null);
       }
-    } catch (error) {
-      console.error("Metadata file upload error:", error);
+    } catch (uploadError) {
+      console.error("Metadata file upload error:", uploadError);
       setError("Failed to upload metadata file");
       setMetadataFile(null);
       setFormData((prev) => ({
@@ -150,7 +189,7 @@ export default function EditTraining() {
     }
   };
 
-  if (isLoadingTraining) {
+  if (isLoadingConference) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin" />
@@ -158,51 +197,118 @@ export default function EditTraining() {
     );
   }
 
-  if (!trainingData?.data) {
-    return <div className="text-center text-red-600">Training not found</div>;
+  if (!conferenceData?.data) {
+    return <div className="text-center text-red-600">Conference not found</div>;
   }
 
   return (
     <div>
       <Breadcrumb
         items={[
-          { label: "Trainings", href: "/trainings" },
-          { label: "Edit Training" },
+          { label: "Conferences", href: "/conferences" },
+          { label: "Edit Conference" },
         ]}
       />
 
       <div className="mb-8">
-        <PageTitle title="Edit Training" />
-        <PageSubTitle text="Update training details and metadata configuration" />
+        <PageTitle title="Edit Conference" />
+        <PageSubTitle text="Update conference details and metadata" />
       </div>
 
       <div className="rounded-lg border border-border bg-card shadow-md p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && <div className="text-red-600">{error}</div>}
 
-          {/* Title Field */}
           <div>
             <label className="block text-sm font-medium mb-2 text-heading">
-              Training Title *
+              Conference Title *
             </label>
             <Input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              placeholder="e.g., Professional Development Workshop"
-              disabled={updateTrainingMutation.isPending}
+              placeholder="e.g., Episteme Conference 2027"
+              disabled={updateConferenceMutation.isPending}
               required
             />
           </div>
 
-          {/* Metadata File Upload */}
+          <div>
+            <label className="block text-sm font-medium mb-2 text-heading">
+              Slug *
+            </label>
+            <Input
+              type="text"
+              name="slug"
+              value={formData.slug}
+              onChange={handleInputChange}
+              placeholder="e.g., episteme-2027"
+              disabled={updateConferenceMutation.isPending}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Start Date *
+              </label>
+              <Input
+                type="date"
+                name="startAt"
+                value={formData.startAt}
+                onChange={handleInputChange}
+                disabled={updateConferenceMutation.isPending}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                End Date *
+              </label>
+              <Input
+                type="date"
+                name="endAt"
+                value={formData.endAt}
+                onChange={handleInputChange}
+                disabled={updateConferenceMutation.isPending}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Submission Start Date *
+              </label>
+              <Input
+                type="date"
+                name="submissionPeriodStartAt"
+                value={formData.submissionPeriodStartAt}
+                onChange={handleInputChange}
+                disabled={updateConferenceMutation.isPending}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Submission End Date *
+              </label>
+              <Input
+                type="date"
+                name="submissionPeriodEndAt"
+                value={formData.submissionPeriodEndAt}
+                onChange={handleInputChange}
+                disabled={updateConferenceMutation.isPending}
+                required
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-2 text-heading">
               Metadata File (JSON) *
             </label>
             <div className="space-y-3">
-              {/* Current file info */}
               {formData.metadataFilePath && !metadataFile && (
                 <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded">
                   <FileText className="w-4 h-4 text-blue-600" />
@@ -216,7 +322,7 @@ export default function EditTraining() {
                 <label
                   htmlFor="metadata-file"
                   className={`flex items-center gap-2 px-4 py-2 border border-accent rounded cursor-pointer hover:bg-accent/10 transition-colors ${
-                    uploading || updateTrainingMutation.isPending
+                    uploading || updateConferenceMutation.isPending
                       ? "opacity-50 cursor-not-allowed"
                       : ""
                   }`}
@@ -231,7 +337,7 @@ export default function EditTraining() {
                   type="file"
                   accept=".json,application/json"
                   onChange={handleMetadataFileChange}
-                  disabled={uploading || updateTrainingMutation.isPending}
+                  disabled={uploading || updateConferenceMutation.isPending}
                   className="hidden"
                 />
               </div>
@@ -252,13 +358,12 @@ export default function EditTraining() {
 
               {!metadataFile && !formData.metadataFilePath && (
                 <p className="text-xs text-body">
-                  Upload a JSON file containing training metadata
+                  Upload a JSON file containing conference metadata
                 </p>
               )}
             </div>
           </div>
 
-          {/* Status Field */}
           <div>
             <label className="block text-sm font-medium mb-2 text-heading">
               Status *
@@ -266,43 +371,42 @@ export default function EditTraining() {
             <Select
               value={formData.status.toString()}
               onValueChange={handleStatusChange}
-              disabled={updateTrainingMutation.isPending}
+              disabled={updateConferenceMutation.isPending}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={TrainingStatus.UPCOMING.toString()}>
-                  Upcoming
+                <SelectItem value={ConferenceStatus.INACTIVE.toString()}>
+                  Inactive
                 </SelectItem>
-                <SelectItem value={TrainingStatus.ONGOING.toString()}>
-                  Ongoing
+                <SelectItem value={ConferenceStatus.ACTIVE.toString()}>
+                  Active
                 </SelectItem>
-                <SelectItem value={TrainingStatus.COMPLETED.toString()}>
-                  Completed
+                <SelectItem value={ConferenceStatus.FINISHED.toString()}>
+                  Finished
                 </SelectItem>
-                <SelectItem value={TrainingStatus.DELETED.toString()}>
+                <SelectItem value={ConferenceStatus.DELETED.toString()}>
                   Deleted
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Actions */}
           <div className="flex justify-end gap-3">
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/trainings")}
-              disabled={updateTrainingMutation.isPending}
+              onClick={() => navigate("/conferences")}
+              disabled={updateConferenceMutation.isPending}
             >
               Cancel
             </Button>
 
-            <Button type="submit" disabled={updateTrainingMutation.isPending}>
-              {updateTrainingMutation.isPending
+            <Button type="submit" disabled={updateConferenceMutation.isPending}>
+              {updateConferenceMutation.isPending
                 ? "Updating..."
-                : "Update Training"}
+                : "Update Conference"}
             </Button>
           </div>
         </form>

@@ -38,17 +38,18 @@ export default function EditAnnouncement() {
   const [formData, setFormData] = useState({
     title: "",
     metadataFilePath: "",
-    status: AnnouncementStatus.PUBLISHED,
+    status: AnnouncementStatus.COMPLETED.toString(),
   });
 
   // Pre-fill form with existing announcement data
   useEffect(() => {
     if (announcementData?.data) {
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         title: announcementData.data.title,
         metadataFilePath: announcementData.data.metadataFilePath || "",
-        status: announcementData.data.status,
-      });
+        status: announcementData.data.status.toString(),
+      }));
     }
   }, [announcementData]);
 
@@ -71,7 +72,7 @@ export default function EditAnnouncement() {
       {
         title: formData.title,
         metadataFilePath: formData.metadataFilePath,
-        status: formData.status,
+        status: Number(formData.status),
       },
       {
         onSuccess: () => {
@@ -99,7 +100,7 @@ export default function EditAnnouncement() {
   const handleStatusChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      status: parseInt(value, 10),
+      status: value ? value : prev.status,
     }));
   };
 
@@ -277,11 +278,17 @@ export default function EditAnnouncement() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={AnnouncementStatus.DRAFT.toString()}>
-                  Draft
+                <SelectItem value={AnnouncementStatus.UPCOMING.toString()}>
+                  Upcoming
                 </SelectItem>
-                <SelectItem value={AnnouncementStatus.PUBLISHED.toString()}>
-                  Published
+                <SelectItem value={AnnouncementStatus.ONGOING.toString()}>
+                  Ongoing
+                </SelectItem>
+                <SelectItem value={AnnouncementStatus.COMPLETED.toString()}>
+                  Completed
+                </SelectItem>
+                <SelectItem value={AnnouncementStatus.DELETED.toString()}>
+                  Deleted
                 </SelectItem>
               </SelectContent>
             </Select>

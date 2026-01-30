@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { UserRole } from "@/models/user";
 import type { RootState } from "@/stores/store";
 import { Edit } from "lucide-react";
-import { getResourceStatusBadge } from "../common/ResourceStatusBadge";
+import { getBlogActivityResourceStatusBadge } from "../common/ResourceStatusBadge";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -27,7 +27,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   return (
     <Card
       title={activity.title}
-      statusBadge={<>{getResourceStatusBadge(activity.status)}</>}
+      statusBadge={<>{getBlogActivityResourceStatusBadge(activity.status)}</>}
       metadata={<span className="text-slate-500 text-sm">{createdDate}</span>}
       actions={
         isAdmin ? <Edit onClick={handleEdit} className="w-4 h-4" /> : undefined

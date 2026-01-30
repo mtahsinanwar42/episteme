@@ -2,7 +2,7 @@ import { useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye } from "lucide-react";
+import { ArrowUpDown, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useFiles } from "@/hooks/useFiles";
@@ -31,21 +31,46 @@ export default function Assets() {
     },
     {
       accessorKey: "storageKey",
-      header: "Storage Key",
+      header: ({ column }) => {
+        return (
+          <div
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex items-center gap-4 justify-center w-full"
+          >
+            Storage Key
+            <ArrowUpDown className="size-4 text-muted-foreground" />
+          </div>
+        );
+      },
       cell: ({ row }) => (
-        <div className="text-sm max-w-96 break-all">
+        <div className="text-sm text-left lg:max-w-lg break-all">
           {row.getValue("storageKey")}
         </div>
       ),
+      sortingFn: (rowA, rowB, columnId) => {
+        const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
+        const b = String(rowB.getValue(columnId) ?? "").toLowerCase();
+        return a.localeCompare(b);
+      },
     },
     {
       accessorKey: "createdAt",
-      header: "Created At",
+      header: ({ column }) => {
+        return (
+          <div
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex items-center gap-4 justify-center w-full"
+          >
+            Created At
+            <ArrowUpDown className="size-4 text-muted-foreground" />
+          </div>
+        );
+      },
       cell: ({ row }) => {
         return (
-          <span className="text-sm">
+          <div className="text-sm text-center">
             {new Date(row.getValue("createdAt") as string).toLocaleString()}
-          </span>
+          </div>
         );
       },
     },

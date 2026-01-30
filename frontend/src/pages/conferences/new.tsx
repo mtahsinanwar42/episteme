@@ -11,8 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { AnnouncementStatus } from "@/models/announcement";
-import { useCreateAnnouncementMutation } from "@/hooks/useAnnouncements";
+import { ConferenceStatus } from "@/models/conference";
+import { useCreateConferenceMutation } from "@/hooks/useConferences";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
@@ -20,17 +20,22 @@ import { fileService } from "@/services/fileService";
 import { FileTypeEnum } from "@/models/file";
 import { FileText, Upload } from "lucide-react";
 
-export default function NewAnnouncement() {
+export default function NewConference() {
   const navigate = useNavigate();
-  const createAnnouncementMutation = useCreateAnnouncementMutation();
+  const createConferenceMutation = useCreateConferenceMutation();
   const [error, setError] = useState<string | null>(null);
   const [metadataFile, setMetadataFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
+    startAt: "",
+    endAt: "",
+    submissionPeriodStartAt: "",
+    submissionPeriodEndAt: "",
     metadataFilePath: "",
-    status: AnnouncementStatus.UPCOMING,
+    status: ConferenceStatus.ACTIVE,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,6 +46,21 @@ export default function NewAnnouncement() {
       return;
     }
 
+    if (!formData.slug.trim()) {
+      setError("Slug is required");
+      return;
+    }
+
+    if (
+      !formData.startAt ||
+      !formData.endAt ||
+      !formData.submissionPeriodStartAt ||
+      !formData.submissionPeriodEndAt
+    ) {
+      setError("All date fields are required");
+      return;
+    }
+
     if (!formData.metadataFilePath) {
       setError("Metadata file is required");
       return;
@@ -48,21 +68,24 @@ export default function NewAnnouncement() {
 
     setError(null);
 
-    createAnnouncementMutation.mutate(
+    createConferenceMutation.mutate(
       {
         title: formData.title,
+        slug: formData.slug,
+        startAt: formData.startAt,
+        endAt: formData.endAt,
+        submissionPeriodStartAt: formData.submissionPeriodStartAt,
+        submissionPeriodEndAt: formData.submissionPeriodEndAt,
         metadataFilePath: formData.metadataFilePath,
         status: formData.status,
       },
       {
         onSuccess: () => {
-          navigate("/announcements");
+          navigate("/conferences");
         },
         onError: (err: any) => {
           setError(
-            err instanceof Error
-              ? err.message
-              : "Failed to create announcement",
+            err instanceof Error ? err.message : "Failed to create conference",
           );
         },
       },
@@ -90,7 +113,6 @@ export default function NewAnnouncement() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type (JSON only)
     if (file.type !== "application/json" && !file.name.endsWith(".json")) {
       setError("Please upload a JSON file");
       return;
@@ -121,8 +143,8 @@ export default function NewAnnouncement() {
         setError("Failed to upload file");
         setMetadataFile(null);
       }
-    } catch (error) {
-      console.error("Metadata file upload error:", error);
+    } catch (uploadError) {
+      console.error("Metadata file upload error:", uploadError);
       setError("Failed to upload metadata file");
       setMetadataFile(null);
       setFormData((prev) => ({
@@ -138,37 +160,105 @@ export default function NewAnnouncement() {
     <div>
       <Breadcrumb
         items={[
-          { label: "Announcements", href: "/announcements" },
-          { label: "New Announcement" },
+          { label: "Conferences", href: "/conferences" },
+          { label: "New Conference" },
         ]}
       />
 
       <div className="mb-8">
-        <PageTitle title="Create New Announcement" />
-        <PageSubTitle text="Add a new announcement with metadata configuration" />
+        <PageTitle title="Create New Conference" />
+        <PageSubTitle text="Add a new conference and submission details" />
       </div>
 
       <div className="rounded-lg border border-border bg-card shadow-md p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && <div className="text-red-600">{error}</div>}
 
-          {/* Title Field */}
           <div>
             <label className="block text-sm font-medium mb-2 text-heading">
-              Announcement Title *
+              Conference Title *
             </label>
             <Input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              placeholder="e.g., Important System Update"
-              disabled={createAnnouncementMutation.isPending}
+              placeholder="e.g., Episteme Conference 2027"
+              disabled={createConferenceMutation.isPending}
               required
             />
           </div>
 
-          {/* Metadata File Upload */}
+          <div>
+            <label className="block text-sm font-medium mb-2 text-heading">
+              Slug *
+            </label>
+            <Input
+              type="text"
+              name="slug"
+              value={formData.slug}
+              onChange={handleInputChange}
+              placeholder="e.g., episteme-2027"
+              disabled={createConferenceMutation.isPending}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Start Date *
+              </label>
+              <Input
+                type="date"
+                name="startAt"
+                value={formData.startAt}
+                onChange={handleInputChange}
+                disabled={createConferenceMutation.isPending}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                End Date *
+              </label>
+              <Input
+                type="date"
+                name="endAt"
+                value={formData.endAt}
+                onChange={handleInputChange}
+                disabled={createConferenceMutation.isPending}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Submission Start Date *
+              </label>
+              <Input
+                type="date"
+                name="submissionPeriodStartAt"
+                value={formData.submissionPeriodStartAt}
+                onChange={handleInputChange}
+                disabled={createConferenceMutation.isPending}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Submission End Date *
+              </label>
+              <Input
+                type="date"
+                name="submissionPeriodEndAt"
+                value={formData.submissionPeriodEndAt}
+                onChange={handleInputChange}
+                disabled={createConferenceMutation.isPending}
+                required
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-2 text-heading">
               Metadata File (JSON) *
@@ -178,7 +268,7 @@ export default function NewAnnouncement() {
                 <label
                   htmlFor="metadata-file"
                   className={`flex items-center gap-2 px-4 py-2 border border-accent rounded cursor-pointer hover:bg-accent/10 transition-colors ${
-                    uploading || createAnnouncementMutation.isPending
+                    uploading || createConferenceMutation.isPending
                       ? "opacity-50 cursor-not-allowed"
                       : ""
                   }`}
@@ -193,7 +283,7 @@ export default function NewAnnouncement() {
                   type="file"
                   accept=".json,application/json"
                   onChange={handleMetadataFileChange}
-                  disabled={uploading || createAnnouncementMutation.isPending}
+                  disabled={uploading || createConferenceMutation.isPending}
                   className="hidden"
                 />
               </div>
@@ -214,13 +304,12 @@ export default function NewAnnouncement() {
 
               {!metadataFile && (
                 <p className="text-xs text-body">
-                  Upload a JSON file containing announcement metadata
+                  Upload a JSON file containing conference metadata
                 </p>
               )}
             </div>
           </div>
 
-          {/* Status Field */}
           <div>
             <label className="block text-sm font-medium mb-2 text-heading">
               Status *
@@ -228,43 +317,39 @@ export default function NewAnnouncement() {
             <Select
               value={formData.status.toString()}
               onValueChange={handleStatusChange}
-              disabled={createAnnouncementMutation.isPending}
+              disabled={createConferenceMutation.isPending}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={AnnouncementStatus.UPCOMING.toString()}>
-                  Upcoming
+                <SelectItem value={ConferenceStatus.INACTIVE.toString()}>
+                  Inactive
                 </SelectItem>
-                <SelectItem value={AnnouncementStatus.ONGOING.toString()}>
-                  Ongoing
+                <SelectItem value={ConferenceStatus.ACTIVE.toString()}>
+                  Active
                 </SelectItem>
-                <SelectItem value={AnnouncementStatus.COMPLETED.toString()}>
-                  Completed
+                <SelectItem value={ConferenceStatus.FINISHED.toString()}>
+                  Finished
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Actions */}
           <div className="flex justify-end gap-3">
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/announcements")}
-              disabled={createAnnouncementMutation.isPending}
+              onClick={() => navigate("/conferences")}
+              disabled={createConferenceMutation.isPending}
             >
               Cancel
             </Button>
 
-            <Button
-              type="submit"
-              disabled={createAnnouncementMutation.isPending}
-            >
-              {createAnnouncementMutation.isPending
+            <Button type="submit" disabled={createConferenceMutation.isPending}>
+              {createConferenceMutation.isPending
                 ? "Creating..."
-                : "Create Announcement"}
+                : "Create Conference"}
             </Button>
           </div>
         </form>

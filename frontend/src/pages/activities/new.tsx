@@ -30,7 +30,7 @@ export default function NewActivity() {
   const [formData, setFormData] = useState({
     title: "",
     metadataFilePath: "",
-    status: ActivityStatus.PUBLISHED,
+    status: ActivityStatus.DRAFT,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

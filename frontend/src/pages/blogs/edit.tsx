@@ -32,17 +32,18 @@ export default function EditBlog() {
   const [formData, setFormData] = useState({
     title: "",
     metadataFilePath: "",
-    status: BlogStatus.PUBLISHED,
+    status: BlogStatus.PUBLISHED.toString(),
   });
 
   // Pre-fill form with existing blog data
   useEffect(() => {
     if (blogData?.data) {
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         title: blogData.data.title,
         metadataFilePath: blogData.data.metadataFilePath || "",
-        status: blogData.data.status,
-      });
+        status: blogData.data.status.toString(),
+      }));
     }
   }, [blogData]);
 
@@ -65,7 +66,7 @@ export default function EditBlog() {
       {
         title: formData.title,
         metadataFilePath: formData.metadataFilePath,
-        status: formData.status,
+        status: Number(formData.status),
       },
       {
         onSuccess: () => {
@@ -91,7 +92,7 @@ export default function EditBlog() {
   const handleStatusChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      status: parseInt(value, 10),
+      status: value ? value : prev.status,
     }));
   };
 
@@ -269,6 +270,9 @@ export default function EditBlog() {
                 </SelectItem>
                 <SelectItem value={BlogStatus.PUBLISHED.toString()}>
                   Published
+                </SelectItem>
+                <SelectItem value={BlogStatus.DELETED.toString()}>
+                  Deleted
                 </SelectItem>
               </SelectContent>
             </Select>
