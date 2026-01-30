@@ -2,7 +2,9 @@ import { ResourceStatus } from "@/models/common";
 import { Badge } from "@/components/ui/badge";
 import { TrainingStatus } from "@/models/training";
 
-export const getBlogActivityResourceStatusEnum = (status: ResourceStatus) => {
+export const getBlogActivityResourceStatusEnum = (
+  status: ResourceStatus | undefined,
+) => {
   switch (status) {
     case ResourceStatus.DRAFT:
       return "Draft";

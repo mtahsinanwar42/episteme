@@ -30,7 +30,7 @@ export default function NewTraining() {
   const [formData, setFormData] = useState({
     title: "",
     metadataFilePath: "",
-    status: TrainingStatus.PUBLISHED,
+    status: TrainingStatus.UPCOMING,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -232,11 +232,14 @@ export default function NewTraining() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={TrainingStatus.DRAFT.toString()}>
-                  Draft
+                <SelectItem value={TrainingStatus.UPCOMING.toString()}>
+                  Upcoming
                 </SelectItem>
-                <SelectItem value={TrainingStatus.PUBLISHED.toString()}>
-                  Published
+                <SelectItem value={TrainingStatus.ONGOING.toString()}>
+                  Ongoing
+                </SelectItem>
+                <SelectItem value={TrainingStatus.COMPLETED.toString()}>
+                  Completed
                 </SelectItem>
               </SelectContent>
             </Select>

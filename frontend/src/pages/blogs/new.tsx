@@ -30,7 +30,7 @@ export default function NewBlog() {
   const [formData, setFormData] = useState({
     title: "",
     metadataFilePath: "",
-    status: BlogStatus.PUBLISHED,
+    status: BlogStatus.DRAFT,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

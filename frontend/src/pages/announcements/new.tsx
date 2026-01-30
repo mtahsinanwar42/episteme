@@ -30,7 +30,7 @@ export default function NewAnnouncement() {
   const [formData, setFormData] = useState({
     title: "",
     metadataFilePath: "",
-    status: AnnouncementStatus.PUBLISHED,
+    status: AnnouncementStatus.UPCOMING,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -234,11 +234,14 @@ export default function NewAnnouncement() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={AnnouncementStatus.DRAFT.toString()}>
-                  Draft
+                <SelectItem value={AnnouncementStatus.UPCOMING.toString()}>
+                  Upcoming
                 </SelectItem>
-                <SelectItem value={AnnouncementStatus.PUBLISHED.toString()}>
-                  Published
+                <SelectItem value={AnnouncementStatus.ONGOING.toString()}>
+                  Ongoing
+                </SelectItem>
+                <SelectItem value={AnnouncementStatus.COMPLETED.toString()}>
+                  Completed
                 </SelectItem>
               </SelectContent>
             </Select>
