@@ -5,7 +5,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Edit, RefreshCw } from "lucide-react";
+import { ArrowUpDown, Edit, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
@@ -36,16 +36,16 @@ export default function Users() {
   const currentLimit = response?.pagination?.next?.limit || pageSize;
   const totalPages = Math.ceil(total / currentLimit);
 
-  const getStatusBadge = useCallback((status: number) => {
+  const getStatusBadge = useCallback((status: UserStatus) => {
     switch (status) {
-      case 0:
-        return <Badge variant="destructive">{UserStatus[status]}</Badge>;
-      case 1:
-        return <Badge variant="default">{UserStatus[status]}</Badge>;
-      case 2:
-        return <Badge variant="secondary">{UserStatus[status]}</Badge>;
-      case 9:
+      case UserStatus.INACTIVE:
         return <Badge variant="disabled">{UserStatus[status]}</Badge>;
+      case UserStatus.ACTIVE:
+        return <Badge variant="default">{UserStatus[status]}</Badge>;
+      case UserStatus.SUSPENDED:
+        return <Badge variant="secondary">{UserStatus[status]}</Badge>;
+      case UserStatus.DELETED:
+        return <Badge variant="destructive">{UserStatus[status]}</Badge>;
       default:
         return <Badge variant="default">{UserStatus[status]}</Badge>;
     }
@@ -84,15 +84,49 @@ export default function Users() {
       },
       {
         accessorKey: "firstName",
-        header: "First Name",
+        header: ({ column }) => {
+          return (
+            <div
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="flex items-center gap-4 justify-center w-full"
+            >
+              First Name
+              <ArrowUpDown className="size-4 text-muted-foreground" />
+            </div>
+          );
+        },
         cell: ({ row }) => {
           const firstName = row.getValue("firstName") as string;
           return <span className="font-medium">{firstName}</span>;
         },
+        sortingFn: (rowA, rowB, columnId) => {
+          const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
+          const b = String(rowB.getValue(columnId) ?? "").toLowerCase();
+          return a.localeCompare(b);
+        },
       },
       {
         accessorKey: "lastName",
-        header: "Last Name",
+        header: ({ column }) => {
+          return (
+            <div
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="flex items-center gap-4 justify-center w-full"
+            >
+              Last Name
+              <ArrowUpDown className="size-4 text-muted-foreground" />
+            </div>
+          );
+        },
+        sortingFn: (rowA, rowB, columnId) => {
+          const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
+          const b = String(rowB.getValue(columnId) ?? "").toLowerCase();
+          return a.localeCompare(b);
+        },
       },
       {
         accessorKey: "email",
@@ -126,9 +160,20 @@ export default function Users() {
       },
       {
         accessorKey: "status",
-        header: () => {
-          return <div className="text-center">Status</div>;
+        header: ({ column }) => {
+          return (
+            <div
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="flex items-center gap-4 justify-center w-full"
+            >
+              Status
+              <ArrowUpDown className="size-4 text-muted-foreground" />
+            </div>
+          );
         },
+        enableSorting: true,
         cell: ({ row }) => {
           const status = row.getValue("status") as number;
           return (

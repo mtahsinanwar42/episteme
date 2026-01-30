@@ -39,6 +39,7 @@ export function DataTable<TData, TValue = unknown>({
     // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
+    // enableSortingRemoval: false,
     state: {
       sorting,
     },
@@ -83,10 +84,18 @@ export function DataTable<TData, TValue = unknown>({
                   className="bg-accent border-b border-slate-200 dark:border-slate-700"
                 >
                   {headerGroup.headers.map((header) => {
+                    const canSort = header.column.getCanSort();
                     return (
                       <TableHead
                         key={header.id}
-                        className="font-semibold transition-colors cursor-pointer text-accent-foreground"
+                        onClick={
+                          canSort
+                            ? header.column.getToggleSortingHandler()
+                            : undefined
+                        }
+                        className={`font-semibold transition-colors text-accent-foreground ${
+                          canSort ? "cursor-pointer select-none" : ""
+                        }`}
                       >
                         {header.isPlaceholder
                           ? null
