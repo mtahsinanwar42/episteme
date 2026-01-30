@@ -36,17 +36,17 @@ export default function EditActivity() {
   const [formData, setFormData] = useState({
     title: "",
     metadataFilePath: "",
-    status: ActivityStatus.PUBLISHED,
+    status: ActivityStatus.PUBLISHED.toString(),
   });
 
-  // Pre-fill form with existing activity data
   useEffect(() => {
     if (activityData?.data) {
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         title: activityData.data.title,
         metadataFilePath: activityData.data.metadataFilePath || "",
-        status: activityData.data.status,
-      });
+        status: activityData.data.status.toString(),
+      }));
     }
   }, [activityData]);
 
@@ -69,7 +69,7 @@ export default function EditActivity() {
       {
         title: formData.title,
         metadataFilePath: formData.metadataFilePath,
-        status: formData.status,
+        status: Number(formData.status),
       },
       {
         onSuccess: () => {
@@ -95,7 +95,7 @@ export default function EditActivity() {
   const handleStatusChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      status: parseInt(value, 10),
+      status: value ? value : prev.status,
     }));
   };
 
@@ -276,6 +276,9 @@ export default function EditActivity() {
                 </SelectItem>
                 <SelectItem value={ActivityStatus.PUBLISHED.toString()}>
                   Published
+                </SelectItem>
+                <SelectItem value={ActivityStatus.DELETED.toString()}>
+                  Deleted
                 </SelectItem>
               </SelectContent>
             </Select>

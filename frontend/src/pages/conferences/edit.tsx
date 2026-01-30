@@ -48,12 +48,13 @@ export default function EditConference() {
     submissionPeriodStartAt: "",
     submissionPeriodEndAt: "",
     metadataFilePath: "",
-    status: ConferenceStatus.ACTIVE,
+    status: ConferenceStatus.ACTIVE.toString(),
   });
 
   useEffect(() => {
     if (conferenceData?.data) {
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         title: conferenceData.data.title,
         slug: conferenceData.data.slug,
         startAt: formatDateForInput(conferenceData.data.startAt),
@@ -65,8 +66,8 @@ export default function EditConference() {
           conferenceData.data.submissionPeriodEndAt,
         ),
         metadataFilePath: conferenceData.data.metadataFilePath || "",
-        status: conferenceData.data.status,
-      });
+        status: conferenceData.data.status.toString(),
+      }));
     }
   }, [conferenceData]);
 
@@ -109,7 +110,7 @@ export default function EditConference() {
         submissionPeriodStartAt: formData.submissionPeriodStartAt,
         submissionPeriodEndAt: formData.submissionPeriodEndAt,
         metadataFilePath: formData.metadataFilePath,
-        status: formData.status,
+        status: Number(formData.status),
       },
       {
         onSuccess: () => {
@@ -135,7 +136,7 @@ export default function EditConference() {
   const handleStatusChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      status: parseInt(value, 10),
+      status: value ? value : prev.status,
     }));
   };
 

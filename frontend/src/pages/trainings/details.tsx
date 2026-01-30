@@ -7,7 +7,7 @@ import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
-import { getResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
+import { getBlogActivityResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
 
 export default function TrainingDetails() {
   const { trainingId } = useParams();
@@ -100,7 +100,7 @@ export default function TrainingDetails() {
 
             <div className="flex gap-4">
               <Badge variant="outline">
-                {getResourceStatusEnum(training?.status)}
+                {getBlogActivityResourceStatusEnum(training?.status)}
               </Badge>
               <Badge variant="outline">
                 Created: {new Date(training?.createdAt || "").toLocaleString()}

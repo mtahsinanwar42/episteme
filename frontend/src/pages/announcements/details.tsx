@@ -7,7 +7,7 @@ import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
-import { getResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
+import { getAnnouncementTrainingResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
 
 export default function AnnouncementDetails() {
   const { announcementId } = useParams();
@@ -103,7 +103,9 @@ export default function AnnouncementDetails() {
 
             <div className="flex gap-4">
               <Badge variant="outline">
-                {getResourceStatusEnum(announcement?.status)}
+                {getAnnouncementTrainingResourceStatusEnum(
+                  announcement?.status,
+                )}
               </Badge>
               <Badge variant="outline">
                 Created:{" "}

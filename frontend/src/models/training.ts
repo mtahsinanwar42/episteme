@@ -29,8 +29,9 @@ export interface Training {
 }
 
 export enum TrainingStatus {
-  DRAFT = 0,
-  PUBLISHED = 1,
+  UPCOMING = 0,
+  ONGOING = 1,
+  COMPLETED = 2,
   DELETED = 9,
 }
 

@@ -36,17 +36,18 @@ export default function EditTraining() {
   const [formData, setFormData] = useState({
     title: "",
     metadataFilePath: "",
-    status: TrainingStatus.PUBLISHED,
+    status: TrainingStatus.COMPLETED.toString(),
   });
 
   // Pre-fill form with existing training data
   useEffect(() => {
     if (trainingData?.data) {
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         title: trainingData.data.title,
         metadataFilePath: trainingData.data.metadataFilePath || "",
-        status: trainingData.data.status,
-      });
+        status: trainingData.data.status.toString(),
+      }));
     }
   }, [trainingData]);
 
@@ -69,7 +70,7 @@ export default function EditTraining() {
       {
         title: formData.title,
         metadataFilePath: formData.metadataFilePath,
-        status: formData.status,
+        status: Number(formData.status),
       },
       {
         onSuccess: () => {
@@ -95,7 +96,7 @@ export default function EditTraining() {
   const handleStatusChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      status: parseInt(value, 10),
+      status: value ? value : prev.status,
     }));
   };
 
@@ -271,11 +272,17 @@ export default function EditTraining() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={TrainingStatus.DRAFT.toString()}>
-                  Draft
+                <SelectItem value={TrainingStatus.UPCOMING.toString()}>
+                  Upcoming
                 </SelectItem>
-                <SelectItem value={TrainingStatus.PUBLISHED.toString()}>
-                  Published
+                <SelectItem value={TrainingStatus.ONGOING.toString()}>
+                  Ongoing
+                </SelectItem>
+                <SelectItem value={TrainingStatus.COMPLETED.toString()}>
+                  Completed
+                </SelectItem>
+                <SelectItem value={TrainingStatus.DELETED.toString()}>
+                  Deleted
                 </SelectItem>
               </SelectContent>
             </Select>
