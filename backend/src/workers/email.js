@@ -1,7 +1,7 @@
 import { Kafka, logLevel } from "kafkajs";
 import { parseBrokers } from "../utils/kafka.js";
 import { getRedisClient } from "../config/redis.js";
-import { formatRecipientsForLog, sendMail } from "../utils/email.js";
+import { formatRecipientsForLog, sendMail } from "../utils/email/index.js";
 import { CACHE_TTL, KAFKA_CONSUMER_GROUPS, KAFKA_EVENT_TYPES, KAFKA_TOPICS } from "../utils/constants.js";
 
 const enabled = (process.env.KAFKA_ENABLED || "false").toLowerCase() === "true";
@@ -88,7 +88,7 @@ export async function startEmailWorker() {
         await sendMail(envelope.payload);
 
         console.log(
-          `[EmailWorker] SENT id=${envelope.id} to=${formatRecipientsForLog(envelope.payload.to)} subject="${envelope.payload.subject}"`
+          `[EmailWorker] SENT id=${envelope.id} mailType=${envelope.payload?.mailType} to=${formatRecipientsForLog(envelope.payload.to)} subject="${envelope.payload.subject}"`
         );
       } catch (err) {
         console.error("[EmailWorker] FAILED processing message", {

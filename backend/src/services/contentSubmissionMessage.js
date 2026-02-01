@@ -1,15 +1,16 @@
+import { Op } from "sequelize";
 import { canCreateSubmissionMessage, findSubmissionMessagesByIdAndUserDetails } from "../repositories/contentSubmissionMessage.js";
-import { CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE, USER_ROLE } from "../utils/constants.js";
+import { CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { isEmpty } from "../utils/string.js";
 
-export function createSubmissionMessageService({ ContentSubmissionMessage, fileService }) {
-  if (!ContentSubmissionMessage) {
-    throw new Error("createSubmissionMessageService requires { ContentSubmissionMessage } model");
+export function createSubmissionMessageService({ ContentSubmissionMessage, ContentSubmission, User, fileService, emailPublisher }) {
+  if (!ContentSubmissionMessage || !ContentSubmission || !User) {
+    throw new Error("createSubmissionMessageService requires { ContentSubmissionMessage, ContentSubmision, User } model");
   }
 
-  if (!fileService) {
-    throw new Error("createSubmissionMessageService requires { fileService }");
+  if (!fileService || !emailPublisher) {
+    throw new Error("createSubmissionMessageService requires { fileService, emailPublisher }");
   }
 
   async function getSubmissionMessagesById(user, { submissionId }) {
@@ -53,13 +54,19 @@ export function createSubmissionMessageService({ ContentSubmissionMessage, fileS
       throw new ErrorResponse(404, "ContentSubmission not found");
     }
 
+    let contentSubmissionMsg;
+
     if (isAdmin) {
-      return saveSubmissionMessageForAdmin({ user, submissionId, payload, checks });
+      contentSubmissionMsg = await saveSubmissionMessageForAdmin({ user, submissionId, payload, checks });
     } else if (isReviewer) {
-      return saveSubmissionMessageForReviewer({ user, submissionId, payload, checks });
+      contentSubmissionMsg = await saveSubmissionMessageForReviewer({ user, submissionId, payload, checks });
     } else {
-      return saveSubmissionMessageForUser({ user, submissionId, payload, checks });
+      contentSubmissionMsg = await saveSubmissionMessageForUser({ user, submissionId, payload, checks });
     }
+
+    await publishSubmissionMsgCreateMail(user, { contentSubmissionMsg, });
+
+    return contentSubmissionMsg;
   }
 
   async function saveSubmissionMessageForAdmin({ user, submissionId, payload, checks }) {
@@ -123,6 +130,39 @@ export function createSubmissionMessageService({ ContentSubmissionMessage, fileS
     });
   }
 
+  async function publishSubmissionMsgCreateMail(user, { contentSubmissionMsg }) {
+    const receiverUsrId = contentSubmissionMsg.receiverUsrId;
+    const submissionId = contentSubmissionMsg.contentSubmissionId;
+    const message = contentSubmissionMsg.message;
+
+    const receivers = [];
+
+    if (receiverUsrId && !isNaN(receiverUsrId)) {
+      const receiver = await User.findByPk(receiverUsrId);
+      receivers.push(receiver);
+    } else {
+      const admins = await User.findAll({
+        where: {
+          roles: {
+            [Op.contains]: [USER_ROLE.ADMIN],
+          },
+          status: USER_STATUS.ACTIVE,
+        },
+      });
+      receivers.push(...admins);
+    }
+
+    const submission = await ContentSubmission.findByPk(submissionId);
+    const submissionTitle = submission.title;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submissionId}`;
+
+    emailPublisher.publishSubmissionMsgCreateMail(receivers, {
+      sender: user,
+      message,
+      submissionTitle: submissionTitle,
+      submissionUrl,
+    });
+  }
 
   return {
     getSubmissionMessagesById,

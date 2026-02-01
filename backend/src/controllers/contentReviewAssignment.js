@@ -4,10 +4,12 @@ import { initModels } from "../models/index.js";
 import { createFileService } from "../services/file.js";
 import { createReviewAssignmentService } from "../services/contentReviewAssignment.js";
 import { DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO } from "../utils/constants.js";
+import { createEmailPublisher } from "../services/emailPublisher.js";
 
-const { ContentReviewAssignment, File } = initModels(sequelize);
+const { ContentReviewAssignment, ContentSubmission, User, File } = initModels(sequelize);
 const fileService = createFileService({ File });
-const reviewAssignmentService = createReviewAssignmentService({ ContentReviewAssignment, fileService });
+const emailPublisher = createEmailPublisher();
+const reviewAssignmentService = createReviewAssignmentService({ ContentReviewAssignment, ContentSubmission, User, fileService, emailPublisher });
 
 // @desc    Get review assignments
 // @route   GET /api/v1/review-assignments

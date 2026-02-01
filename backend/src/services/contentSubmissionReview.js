@@ -1,16 +1,17 @@
+import { Op } from "sequelize";
 import { sequelize } from "../config/db.js";
 import { findReviewAssignmentBySubmissionIdAndReviewerUsrId } from "../repositories/contentReviewAssignment.js";
 import { canCreateSubmissionReview, findSubmissionReviewersById, findSubmissionReviewsByIdAndUserDetails } from "../repositories/contentSubmissionReview.js";
 import { findSubmissionVersionByIdAndUploaderUsrType } from "../repositories/contentSubmissionVersion.js";
-import { REVIEW_ASSIGNMENT_STATUS, REVIEW_RECOMMENDATION, USER_ROLE } from "../utils/constants.js";
+import { REVIEW_ASSIGNMENT_STATUS, REVIEW_RECOMMENDATION, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 
-export function createSubmissionReviewService({ ContentReview, ContentSubmission, ContentSubmissionVersion, ContentReviewAssignment, fileService }) {
-  if (!ContentReview || !ContentSubmission || !ContentSubmissionVersion || !ContentReviewAssignment) {
-    throw new Error("createSubmissionReviewService requires { ContentSubmission, ContentSubmissionVersion, ContentReviewAssignment, ContentReview } model");
+export function createSubmissionReviewService({ ContentReview, ContentSubmission, ContentSubmissionVersion, ContentReviewAssignment, User, fileService, emailPublisher }) {
+  if (!ContentReview || !ContentSubmission || !ContentSubmissionVersion || !ContentReviewAssignment || !User) {
+    throw new Error("createSubmissionReviewService requires { ContentSubmission, ContentSubmissionVersion, ContentReviewAssignment, ContentReview, User } model");
   }
 
-  if (!fileService) {
+  if (!fileService || !emailPublisher) {
     throw new Error("createSubmissionReviewService requires { fileService }");
   }
 
@@ -70,8 +71,10 @@ export function createSubmissionReviewService({ ContentReview, ContentSubmission
       throw new ErrorResponse(404, "submission/assignment not found");
     }
 
-    return sequelize.transaction(async (t) => {
-      const review = await ContentReview.create({
+    let review;
+
+    await sequelize.transaction(async (t) => {
+      review = await ContentReview.create({
         contentReviewAssignmentId: assignment.id,
         contentSubmissionVersionId: submission.currentContentSubmissionVersionId,
         reviewerContentSubmissionVersionId: reviewerContentSubmissionVersionId ?? null,
@@ -85,8 +88,33 @@ export function createSubmissionReviewService({ ContentReview, ContentSubmission
         { status: REVIEW_ASSIGNMENT_STATUS.COMPLETED },
         { transaction: t }
       );
+    });
 
-      return review;
+    await publishSubmissionReviewCreateEmail(user, { review, submissionId });
+
+    return review;
+  }
+
+  async function publishSubmissionReviewCreateEmail(user, { review, submissionId }) {
+    const admins = await User.findAll({
+      where: {
+        roles: {
+          [Op.contains]: [USER_ROLE.ADMIN],
+        },
+        status: USER_STATUS.ACTIVE,
+      },
+    });
+
+    const submission = await ContentSubmission.findByPk(submissionId);
+    const submissionTitle = submission.title;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submissionId}`;
+
+    emailPublisher.publishSubmissionReviewCreateEmail(admins, {
+      reviewer: user,
+      recommendation: review.recommendation,
+      notes: review.comment,
+      submissionTitle,
+      submissionUrl,
     });
   }
 

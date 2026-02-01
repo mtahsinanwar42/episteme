@@ -1,3 +1,19 @@
+export function getFormattedEnumLabel(enumObj, value, fallback = "Unknown") {
+  const rawLabel = Object.keys(enumObj).find(
+    (key) => enumObj[key] === value
+  );
+
+  if (!rawLabel) {
+    return fallback;
+  }
+
+  return rawLabel
+    .toLowerCase()
+    .split(/[_-]+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export const USER_STATUS = Object.freeze({
   INACTIVE: 0,
   ACTIVE: 1,
@@ -137,6 +153,25 @@ export const CACHE_TTL = Object.freeze({
 export const MAIL_TYPES = Object.freeze({
   USER_REGISTER: 1,
   REVIEWER_REGISTER: 2,
+
+  PASSWORD_UPDATED: 3,
+  PASSWORD_RESET_REQUEST: 4,
+
+  USER_CREATED: 5,
+  USER_ROLES_UPDATED: 6,
+  USER_STATUS_UPDATED: 7,
+
+  SUBMISSION_CREATED_TO_USER: 8,
+  SUBMISSION_CREATED_TO_ADMIN: 9,
+  SUBMISSION_STATUS_UPDATED: 10,
+
+  SUBMISSION_MSG_CREATED: 11,
+  SUBMISSION_VERSION_CREATED: 12,
+  SUBMISSION_REVIEW_CREATED: 13,
+
+  REVIEW_ASSIGNMENT_CREATED: 14,
+  REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_ADMIN: 15,
+  REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_REVIEWER: 16,
 });
 
 export const STATUS_UPDATE_NOTES = Object.freeze({

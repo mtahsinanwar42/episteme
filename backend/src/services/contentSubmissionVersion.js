@@ -1,17 +1,17 @@
-import { QueryTypes } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
 import { canCreateSubmissionVersion, findSubmissionVersionsByIdAndUserDetails } from "../repositories/contentSubmissionVersion.js";
-import { CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE } from "../utils/constants.js";
+import { CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { isEmpty } from "../utils/string.js";
 
-export function createSubmissionVersionService({ ContentSubmissionVersion, ContentSubmission, fileService }) {
-  if (!ContentSubmissionVersion) {
-    throw new Error("createSubmissionVersionService requires { ContentSubmissionVersion, ContentSubmission } model");
+export function createSubmissionVersionService({ ContentSubmissionVersion, ContentSubmission, User, fileService, emailPublisher }) {
+  if (!ContentSubmissionVersion || !ContentSubmission || !User) {
+    throw new Error("createSubmissionVersionService requires { ContentSubmissionVersion, ContentSubmission, User } model");
   }
 
-  if (!fileService) {
-    throw new Error("createSubmissionVersionService requires { fileService }");
+  if (!fileService || !emailPublisher) {
+    throw new Error("createSubmissionVersionService requires { fileService, emailPublisher }");
   }
 
   async function getSubmissionVersionsById(user, { submissionId }) {
@@ -30,6 +30,7 @@ export function createSubmissionVersionService({ ContentSubmissionVersion, Conte
     const roles = Array.isArray(user.roles) ? user.roles : [];
     const isAdmin = roles.includes(USER_ROLE.ADMIN);
     const isReviewer = roles.includes(USER_ROLE.REVIEWER);
+    const isUser = roles.includes(USER_ROLE.USER);
 
     const { contentFilePath, message } = payload;
 
@@ -46,13 +47,21 @@ export function createSubmissionVersionService({ ContentSubmissionVersion, Conte
       throw new ErrorResponse(404, "ContentSubmission not found");
     }
 
+    let submissionVersion;
+
     if (isAdmin) {
-      return saveSubmissionVersionForAdmin({ user, submissionId, payload, checks });
+      submissionVersion = await saveSubmissionVersionForAdmin({ user, submissionId, payload, checks });
     } else if (isReviewer) {
-      return saveSubmissionVersionForReviewer({ user, submissionId, payload, checks });
+      submissionVersion = await saveSubmissionVersionForReviewer({ user, submissionId, payload, checks });
     } else {
-      return saveSubmissionVersionForUser({ user, submissionId, payload, checks });
+      submissionVersion = await saveSubmissionVersionForUser({ user, submissionId, payload, checks });
     }
+
+    if (isAdmin || isUser) {
+      await publishSubmissionVersionCreateMail(user, { submissionVersion });
+    }
+
+    return submissionVersion;
   }
 
   async function saveSubmissionVersionForAdmin({ user, submissionId, payload }) {
@@ -127,6 +136,47 @@ export function createSubmissionVersionService({ ContentSubmissionVersion, Conte
       }
 
       return version;
+    });
+  }
+
+  async function publishSubmissionVersionCreateMail(user, { submissionVersion }) {
+    const submissionId = submissionVersion.contentSubmissionId;
+    const submissionVersionNotes = submissionVersion.changeLog;
+
+    const receivers = [];
+
+    switch (submissionVersion.uploaderUsrType) {
+      case CONTENT_SUBMISSION_UPLOADER_USER_TYPE.ADMIN:
+        const submission = await ContentSubmission.findByPk(submissionId);
+        const owner = await User.findByPk(submission.ownerUsrId);
+        receivers.push(owner);
+
+        break;
+      case CONTENT_SUBMISSION_UPLOADER_USER_TYPE.USER:
+        const admins = await User.findAll({
+          where: {
+            roles: {
+              [Op.contains]: [USER_ROLE.ADMIN],
+            },
+            status: USER_STATUS.ACTIVE,
+          },
+        });
+        receivers.push(...admins);
+
+        break;
+      case CONTENT_SUBMISSION_UPLOADER_USER_TYPE.REVIEWER:
+        return;
+    }
+
+    const submission = await ContentSubmission.findByPk(submissionId);
+    const submissionTitle = submission.title;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submissionId}`;
+
+    emailPublisher.publishSubmissionVersionCreateEmail(receivers, {
+      uploader: user,
+      notes: submissionVersionNotes,
+      submissionTitle,
+      submissionUrl,
     });
   }
 

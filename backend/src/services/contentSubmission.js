@@ -1,17 +1,22 @@
+import { Op } from "sequelize";
 import { sequelize } from "../config/db.js";
 import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails, markSubmissionAsApprovedOrRejected, markSubmissionAsDeleted, markSubmissionAsStatus } from "../repositories/contentSubmission.js";
-import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { serializeContentSubmission } from "../utils/serializers.js";
 import { isEmpty } from "../utils/string.js";
 
-export function createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, conferenceService, fileService }) {
-  if (!ContentSubmission || !ContentSubmissionVersion) {
-    throw new Error("createSubmissionService requires { ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion } model");
+export function createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, User, conferenceService, fileService, emailPublisher }) {
+  if (!ContentSubmission || !ContentSubmissionVersion || !User) {
+    throw new Error("createSubmissionService requires { ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, User } model");
   }
 
   if (!fileService) {
     throw new Error("createSubmissionService requires { fileService }");
+  }
+
+  if (!emailPublisher) {
+    throw new Error("createSubmissionService requires { emailPublisher }");
   }
 
   async function getSubmissionsByUserIdAndRoles(user, { page, limit }) {
@@ -97,6 +102,8 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
         { transaction: t }
       );
 
+      await publishSubmissionCreateEmails(user, { submission });
+
       return serializeContentSubmission(submission, version, contentFilePath);
     });
   }
@@ -142,6 +149,8 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       throw new ErrorResponse(400, "cannot update approved/rejected/deleted submission.");
     }
 
+    const oldStatus = submission.currentStatus;
+
     await sequelize.transaction(async (t) => {
       if (status === CONTENT_SUBMISSION_STATUS.DELETED) {
         await markSubmissionAsDeleted(
@@ -167,7 +176,49 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     submission.set("currentStatus", status);
     submission.set("statusUpdateNotes", statusUpdateNotes ?? null);
 
+    await publishSubmissionStatusUpdateEmail({
+      submission,
+      oldStatus,
+      newStatus: status,
+      notes: statusUpdateNotes,
+    });
+
     return submission;
+  }
+
+  async function publishSubmissionCreateEmails(user, { submission, }) {
+    const admins = await User.findAll({
+      where: {
+        roles: {
+          [Op.contains]: [USER_ROLE.ADMIN],
+        },
+        status: USER_STATUS.ACTIVE,
+      },
+    });
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submission.id}`;
+
+    emailPublisher.publishSubmissionCreateToUserEmail(user, {
+      submissionTitle: submission.title,
+      submissionUrl,
+    });
+    emailPublisher.publishSubmissionCreateToAdminsEmail(admins, {
+      user,
+      submissionTitle: submission.title,
+      submissionUrl,
+    });
+  }
+
+  async function publishSubmissionStatusUpdateEmail({ submission, oldStatus, newStatus, notes }) {
+    const user = await User.findByPk(submission.ownerUsrId);
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submission.id}`;
+
+    emailPublisher.publishSubmissionStatusUpdatedMail(user, {
+      oldStatus,
+      newStatus,
+      notes,
+      submissionTitle: submission.title,
+      submissionUrl,
+    });
   }
 
   return {
