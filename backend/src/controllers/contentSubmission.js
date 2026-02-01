@@ -5,11 +5,13 @@ import { initModels } from "../models/index.js";
 import { createFileService } from "../services/file.js";
 import { createSubmissionService } from "../services/contentSubmission.js";
 import { createConferenceService } from "../services/conference.js";
+import { createEmailPublisher } from "../services/emailPublisher.js";
 
-const { ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, Conference, File } = initModels(sequelize);
+const { ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, Conference, User, File } = initModels(sequelize);
 const fileService = createFileService({ File });
 const conferenceService = createConferenceService({ Conference, fileService });
-const submissionService = createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, conferenceService, fileService });
+const emailPublisher = createEmailPublisher();
+const submissionService = createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, User, conferenceService, fileService, emailPublisher });
 
 // @desc    Get submissions
 // @route   GET /api/v1/submissions

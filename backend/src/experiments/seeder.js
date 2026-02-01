@@ -259,7 +259,7 @@ async function importData() {
       currency: "EUR",
       provider: "stripe",
       providerPaymentId: "pi_test_123456",
-      status: 1,
+      status: 2,
     });
 
     const file3 = File.build({

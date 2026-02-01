@@ -1,15 +1,28 @@
+import { Op } from "sequelize";
 import { canCreateReviewAssignment, canUpdateReviewAssignmentStatus, findReviewAssignments, findReviewAssignmentsByUserId } from "../repositories/contentReviewAssignment.js";
-import { REVIEW_ASSIGNMENT_STATUS, USER_ROLE } from "../utils/constants.js";
+import { CONTENT_SUBMISSION_STATUS, REVIEW_ASSIGNMENT_STATUS, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { isNotEmpty } from "../utils/string.js";
 
-export function createReviewAssignmentService({ ContentReviewAssignment, fileService }) {
+export function createReviewAssignmentService({ ContentReviewAssignment, ContentSubmission, User, fileService, emailPublisher }) {
   if (!ContentReviewAssignment) {
     throw new Error("createReviewAssignmentService requires { ContentReviewAssignment } model");
   }
 
+  if (!User) {
+    throw new Error("createReviewAssignmentService requires { User } model");
+  }
+
+  if (!ContentSubmission) {
+    throw new Error("createReviewAssignmentService requires { ContentSubmission } model");
+  }
+
   if (!fileService) {
     throw new ErrorResponse("createReviewAssignmentService requires { fileService }");
+  }
+
+  if (!emailPublisher) {
+    throw new Error("createReviewAssignmentService requires { emailPublisher }");
   }
 
   async function getMyReviewAssignments(user, page, limit) {
@@ -47,6 +60,12 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
       assignedByUsrId: Number(user.id),
       assignedByNotes: assignedByNotes ?? null,
       status: REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
+    });
+
+    await publishReviewAssignmentCreateEmail(user, {
+      reviewerUsrId: Number(reviewerUsrId),
+      contentSubmissionId: Number(contentSubmissionId),
+      notes: assignedByNotes ?? null,
     });
 
     return assignment;
@@ -97,6 +116,8 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
       throw new ErrorResponse(404, "ContentReviewAssignment not found");
     }
 
+    const oldStatus = assignment.status;
+
     if ([REVIEW_ASSIGNMENT_STATUS.CANCELLED, REVIEW_ASSIGNMENT_STATUS.DELETED].includes(assignment.status)) {
       throw new ErrorResponse(400, "Cannot update cancelled/deleted review assignment.");
     }
@@ -111,9 +132,90 @@ export function createReviewAssignmentService({ ContentReviewAssignment, fileSer
 
     await assignment.update(updates);
 
+    if (isAdmin) {
+      await publishReviewAssignmentUpdateStatusByAdminEmail(user, {
+        oldStatus,
+        newStatus: updates.status,
+        reviewerUsrId: Number(assignment.reviewerUsrId),
+        contentSubmissionId: Number(assignment.contentSubmissionId),
+        notes: updates.statusUpdateNotes,
+      });
+    } else {
+      await publishReviewAssignmentUpdateStatusByReviewerEmail(user, {
+        oldStatus,
+        newStatus: updates.status,
+        contentSubmissionId: Number(assignment.contentSubmissionId),
+      });
+    }
+
     return assignment;
   }
 
+  async function publishReviewAssignmentCreateEmail(user, { reviewerUsrId, contentSubmissionId, notes, }) {
+    const reviewer = await User.findByPk(reviewerUsrId);
+
+    const submission = await ContentSubmission.findByPk(contentSubmissionId);
+    const submissionTitle = submission.title;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${contentSubmissionId}`;
+
+    const assignedBy = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
+
+    emailPublisher.publishReviewAssignmentCreateEmail(reviewer, {
+      submissionTitle,
+      submissionUrl,
+      assignedBy,
+      notes,
+    })
+  }
+
+  async function publishReviewAssignmentUpdateStatusByAdminEmail(user, { oldStatus, newStatus, reviewerUsrId, contentSubmissionId, notes, }) {
+    const reviewer = await User.findByPk(reviewerUsrId);
+    const assignedBy = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
+
+    const submission = await ContentSubmission.findByPk(contentSubmissionId);
+    const submissionTitle = submission.title;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${contentSubmissionId}`;
+
+    emailPublisher.publishReviewAssignmentUpdateStatusByAdminEmail(reviewer, {
+      oldStatus,
+      newStatus,
+      submissionTitle,
+      submissionUrl: submission.status !== CONTENT_SUBMISSION_STATUS.DELETED && submissionUrl,
+      assignedBy,
+      notes,
+    });
+  }
+
+  async function publishReviewAssignmentUpdateStatusByReviewerEmail(user, { oldStatus, newStatus, contentSubmissionId, }) {
+    const admins = await User.findAll({
+      where: {
+        roles: {
+          [Op.contains]: [USER_ROLE.ADMIN],
+        },
+        status: USER_STATUS.ACTIVE,
+      },
+    });
+
+    const submission = await ContentSubmission.findByPk(contentSubmissionId);
+    const submissionTitle = submission.title;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${contentSubmissionId}`;
+
+    emailPublisher.publishReviewAssignmentUpdateStatusByReviewerEmail(admins, {
+      oldStatus,
+      newStatus,
+      reviewer: user,
+      submissionTitle,
+      submissionUrl,
+    });
+  }
 
   return {
     getMyReviewAssignments,

@@ -2,13 +2,14 @@ import asyncHandler from "express-async-handler";
 
 import { sequelize } from "../config/db.js";
 import { initModels } from "../models/index.js";
-import ErrorResponse from "../utils/ErrorResponse.js";
 import { createFileService } from "../services/file.js";
 import { createUserService } from "../services/user.js";
+import { createEmailPublisher } from "../services/emailPublisher.js";
 
 const { User, File } = initModels(sequelize);
 const fileService = createFileService({ File });
-const userService = createUserService({ User, fileService });
+const emailPublisher = createEmailPublisher();
+const userService = createUserService({ User, fileService, emailPublisher });
 
 // @desc    Get all users
 // @route   GET /api/v1/users

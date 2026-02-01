@@ -3,13 +3,17 @@ import { USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import { serializeUser } from "../utils/serializers.js";
 import { isEmpty, isNotEmpty } from "../utils/string.js";
 
-export function createUserService({ User, fileService }) {
+export function createUserService({ User, fileService, emailPublisher }) {
   if (!User) {
     throw new Error("createUserService requires { User } model");
   }
 
   if (!fileService) {
     throw new Error("createUserService requires { fileService }");
+  }
+
+  if (!emailPublisher) {
+    throw new Error("createUserService requires { emailPublisher }");
   }
 
   function normalizeRoles(roles) {
@@ -82,6 +86,8 @@ export function createUserService({ User, fileService }) {
       photoFileId,
       linkedinUrl,
     }], { individualHooks: true, returning: true });
+
+    await publishUserCreateEmail(user);
 
     return serializeUser(user, cvFilePath, photoFilePath);
   }
@@ -160,11 +166,35 @@ export function createUserService({ User, fileService }) {
       throw new ErrorResponse(404, "User not found");
     }
 
+    const oldRoles = user.roles;
+    const oldStatus = user.status;
+
     if (user.status === USER_STATUS.DELETED) {
       throw new ErrorResponse(400, "Cannot update deleted user");
     }
 
     await user.update(updates);
+
+    const rolesChanged = Array.isArray(updates.roles)
+      && (JSON.stringify([...(oldRoles ?? [])].map(String).sort())
+        !== JSON.stringify([...(updates.roles ?? [])].map(String).sort()));
+
+    if (rolesChanged) {
+      await publishUserRolesUpdateEmail(user, {
+        oldRoles,
+        newRoles: updates.roles,
+      });
+    }
+
+    const statusChanged = Number.isInteger(updates.status) && updates.status !== oldStatus;
+
+    if (statusChanged) {
+      await publishUserStatusUpdateEmail(user, {
+        oldStatus,
+        newStatus: updates.status,
+        statusUpdateNotes: updates.statusUpdateNotes ?? null,
+      });
+    }
 
     return serializeUser(user, cvFilePath, photoFilePath);
   }
@@ -193,9 +223,41 @@ export function createUserService({ User, fileService }) {
       throw new ErrorResponse(400, "Cannot update deleted user");
     }
 
+    const oldStatus = user.status;
+
     await user.update(updates);
 
+    const statusChanged = Number.isInteger(updates.status) && updates.status !== oldStatus;
+
+    if (statusChanged) {
+      await publishUserStatusUpdateEmail(user, {
+        oldStatus,
+        newStatus: updates.status,
+        statusUpdateNotes: updates.statusUpdateNotes ?? null,
+      });
+    }
+
     return serializeUser(user);
+  }
+
+  async function publishUserCreateEmail(user) {
+    const loginUrl = `${process.env.FRONTEND_BASE_URL}/login`;
+
+    emailPublisher.publishUserCreateEmail(user, { loginUrl });
+  }
+
+  async function publishUserRolesUpdateEmail(user, { oldRoles, newRoles }) {
+    const loginUrl = `${process.env.FRONTEND_BASE_URL}/login`;
+    const supportMail = process.env.MAIL_SUPPORT_ADDRESS;
+
+    emailPublisher.publishUserRolesUpdateEmail(user, { oldRoles, newRoles, loginUrl, supportMail });
+  }
+
+  async function publishUserStatusUpdateEmail(user, { oldStatus, newStatus, statusUpdateNotes }) {
+    const loginUrl = `${process.env.FRONTEND_BASE_URL}/login`;
+    const supportMail = process.env.MAIL_SUPPORT_ADDRESS;
+
+    emailPublisher.publishUserStatusUpdateEmail(user, { oldStatus, newStatus, statusUpdateNotes, loginUrl, supportMail });
   }
 
   return {

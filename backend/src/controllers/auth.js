@@ -5,11 +5,13 @@ import { initModels } from "../models/index.js";
 
 import { createFileService } from "../services/file.js";
 import { createAuthService } from "../services/auth.js";
+import { createEmailPublisher } from "../services/emailPublisher.js";
 
 const { User, File } = initModels(sequelize);
 
 const fileService = createFileService({ File });
-const authService = createAuthService({ User, fileService });
+const emailPublisher = createEmailPublisher();
+const authService = createAuthService({ User, fileService, emailPublisher });
 
 // @desc    Login User & Get Token
 // @route   POST /api/v1/auth/login
@@ -71,17 +73,14 @@ export const updateMyPassword = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/auth/forgotPassword
 // @access  Public
 export const forgotPassword = asyncHandler(async (req, res) => {
-  // TODO: change to mail service
-  const resetUrl = await authService.forgotPassword({
+  const resetToken = await authService.forgotPassword({
     email: req.body.email,
-    protocol: req.protocol,
-    host: req.get("host"),
   });
 
   return res.status(200).json({
     success: true,
     data: {
-      resetUrl,
+      resetToken,
     },
   });
 });

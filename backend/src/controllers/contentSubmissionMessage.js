@@ -3,10 +3,12 @@ import { sequelize } from "../config/db.js";
 import { initModels } from "../models/index.js";
 import { createFileService } from "../services/file.js";
 import { createSubmissionMessageService } from "../services/contentSubmissionMessage.js";
+import { createEmailPublisher } from "../services/emailPublisher.js";
 
-const { ContentSubmissionMessage, File } = initModels(sequelize);
+const { ContentSubmissionMessage, ContentSubmission, User, File } = initModels(sequelize);
 const fileService = createFileService({ File });
-const submissionMessageService = createSubmissionMessageService({ ContentSubmissionMessage, fileService });
+const emailPublisher = createEmailPublisher();
+const submissionMessageService = createSubmissionMessageService({ ContentSubmissionMessage, ContentSubmission, User, fileService, emailPublisher });
 
 // @desc    Get submission messages by id
 // @route   GET /api/v1/submissions/:id/messages
