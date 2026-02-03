@@ -345,6 +345,26 @@ export function getMailContents(mailType, metadata = {}) {
         }),
       };
     },
+
+    [MAIL_TYPES.CONTACT_SUPPORT]: (m) => {
+      return {
+        subject: `Support request: ${esc(m.subject)}`,
+        html: emailLayout({
+          greetingName: `${m.receiver.firstName} ${m.receiver.lastName}`,
+          title: "New support request received",
+          bodyHtml: [
+            p(`<strong>From:</strong> ${esc(m.sender.name)} (${esc(m.sender.email)})`),
+            p(`<strong>Subject:</strong> ${esc(m.subject)}`),
+            `<hr style="border:none;border-top:1px solid #e5e5e5;margin:12px 0;" />`,
+            p(`<strong>Message:</strong>`),
+            p(esc(m.message)),
+            `<hr style="border:none;border-top:1px solid #e5e5e5;margin:12px 0;" />`,
+            p(`You can reply directly to this email to contact the sender.`),
+          ].join(""),
+          footerHtml,
+        }),
+      };
+    },
   };
 
   const generate = MAIL_DEFS[mailType];

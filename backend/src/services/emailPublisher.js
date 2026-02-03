@@ -330,6 +330,27 @@ export function createEmailPublisher() {
         },
       });
     },
+    publishContactSupportMail(support, {
+      name, email, subject, message,
+    }) {
+      return publishEmail({
+        to: buildRecipient(support),
+        mailType: MAIL_TYPES.CONTACT_SUPPORT,
+        metadata: {
+          sender: {
+            name,
+            email,
+          },
+          receiver: {
+            firstName: support.firstName,
+            lastName: support.lastName,
+            email: support.email,
+          },
+          subject,
+          message,
+        },
+      });
+    },
   };
 }
 
