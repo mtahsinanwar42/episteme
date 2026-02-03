@@ -63,7 +63,7 @@ export default function Executive() {
       {/* Leadership Overview */}
       <section className="mb-20">
         <h2 className="text-4xl font-bold mb-8">Our Leadership Team</h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mb-12">
+        <p className="text-lg text-foreground/80 max-w-3xl mb-12">
           Our executive team brings together diverse expertise in research,
           technology, finance, and strategy. With decades of combined experience
           in academic publishing and open science, we're committed to
@@ -84,7 +84,7 @@ export default function Executive() {
                 <p className="text-purple-600 dark:text-purple-400 font-semibold mb-3">
                   {member.role}
                 </p>
-                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
+                <p className="text-foreground/80 text-sm mb-4 leading-relaxed">
                   {member.bio}
                 </p>
                 <div className="flex flex-wrap gap-2">

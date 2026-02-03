@@ -190,7 +190,7 @@ export default function Policies() {
           <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-green-500 shadow-md">
             <div className="text-4xl mb-4">🔒</div>
             <h3 className="text-2xl font-bold mb-3">User Protection</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               We prioritize protecting user data and privacy through
               industry-standard security practices and transparent policies.
             </p>
@@ -198,7 +198,7 @@ export default function Policies() {
           <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-blue-500 shadow-md">
             <div className="text-4xl mb-4">🔬</div>
             <h3 className="text-2xl font-bold mb-3">Research Integrity</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               We maintain rigorous standards for research quality, ethics, and
               integrity across all content and operations.
             </p>
@@ -206,7 +206,7 @@ export default function Policies() {
           <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-purple-500 shadow-md">
             <div className="text-4xl mb-4">📖</div>
             <h3 className="text-2xl font-bold mb-3">Open Access</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               We are committed to making research freely accessible and
               promoting open access principles globally.
             </p>
@@ -214,7 +214,7 @@ export default function Policies() {
           <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-orange-500 shadow-md">
             <div className="text-4xl mb-4">⚖️</div>
             <h3 className="text-2xl font-bold mb-3">Fairness & Equity</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               We ensure fair treatment and equitable access for all users,
               regardless of location or resources.
             </p>

@@ -22,7 +22,7 @@ export default function Sustainability() {
           <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-green-500 shadow-md hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">🎯</div>
             <h3 className="text-2xl font-bold mb-3">Research Focused</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               Our priorities are based on the needs of scholars, librarians,
               funders, and institutional leaders.
             </p>
@@ -30,7 +30,7 @@ export default function Sustainability() {
           <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-teal-500 shadow-md hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">💰</div>
             <h3 className="text-2xl font-bold mb-3">Cost Effective</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               We will not waste public money and ensure our services deliver
               maximum value.
             </p>
@@ -38,7 +38,7 @@ export default function Sustainability() {
           <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-blue-500 shadow-md hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">🌱</div>
             <h3 className="text-2xl font-bold mb-3">Mission Driven</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               Surplus revenue goes toward furthering our open science mission.
             </p>
           </div>
@@ -99,7 +99,7 @@ export default function Sustainability() {
           <h2 className="text-4xl font-bold mb-6">
             Our Commitment to the Future
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p className="text-xl text-foreground/80 leading-relaxed">
             We are committed to building sustainable systems that support open
             science for generations to come. Our goal is to ensure that
             knowledge remains freely accessible and that the research enterprise

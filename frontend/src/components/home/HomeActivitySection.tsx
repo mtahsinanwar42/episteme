@@ -18,7 +18,7 @@ export default function HomeActivitySection() {
         <div className="flex items-center justify-between mb-12">
           <div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Activities</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-foreground/80">
               Join our community events, workshops, and networking opportunities
             </p>
           </div>
@@ -39,7 +39,7 @@ export default function HomeActivitySection() {
     return (
       <section className="mb-20">
         <div className="text-center py-12">
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-xl text-foreground/80">
             No activities available at the moment.
           </p>
         </div>
@@ -52,7 +52,7 @@ export default function HomeActivitySection() {
       <div className="flex items-center justify-between mb-12">
         <div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Activities</h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-xl text-foreground/80">
             Join our community events, workshops, and networking opportunities
           </p>
         </div>
@@ -92,8 +92,8 @@ function ActivityCard({ activity }: ActivityCardProps) {
     : null;
 
   return (
-    <article className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-200 dark:border-gray-700 group">
-      <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-900">
+    <article className="bg-slate-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-700 group">
+      <div className="relative h-48 overflow-hidden bg-slate-900">
         {!isLoading && imageUrl ? (
           <img
             src={imageUrl}
@@ -107,7 +107,7 @@ function ActivityCard({ activity }: ActivityCardProps) {
           </div>
         )}
         <div className="absolute top-4 left-4">
-          <span className="bg-slate-800 dark:bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          <span className="gradient-card text-foreground px-3 py-1 rounded-full text-xs font-semibold">
             Activity
           </span>
         </div>
@@ -120,7 +120,7 @@ function ActivityCard({ activity }: ActivityCardProps) {
           </h3>
 
           <div className="space-y-2 mb-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-foreground/90">
               <span>📅</span>
               <span>
                 {new Date(activity.createdAt).toLocaleDateString("en-US", {
@@ -135,7 +135,7 @@ function ActivityCard({ activity }: ActivityCardProps) {
 
         <Link
           to={`/activities/${activity.id}`}
-          className="block w-full text-center bg-slate-800 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+          className="block w-full text-center  bg-slate-700 hover:bg-slate-600 text-foreground px-4 py-2 rounded-lg font-semibold transition-colors"
         >
           View Details
         </Link>

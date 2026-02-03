@@ -20,7 +20,7 @@ export default function HomeBlogSection() {
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               Latest from Our Blog
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-foreground/80">
               Insights, updates, and stories from the world of open science
             </p>
           </div>
@@ -41,7 +41,7 @@ export default function HomeBlogSection() {
     return (
       <section className="mb-20">
         <div className="text-center py-12">
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-xl text-foreground/80">
             No blogs available at the moment.
           </p>
         </div>
@@ -56,7 +56,7 @@ export default function HomeBlogSection() {
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Latest from Our Blog
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-xl text-foreground/80">
             Insights, updates, and stories from the world of open science
           </p>
         </div>
@@ -96,9 +96,9 @@ function BlogCard({ blog }: BlogCardProps) {
     : null;
 
   return (
-    <article className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-200 dark:border-gray-700 group">
+    <article className="gradient-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-700 group">
       {/* Image */}
-      <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-900">
+      <div className="relative h-48 overflow-hidden gradient-card">
         {!isLoading && imageUrl ? (
           <img
             src={imageUrl}
@@ -112,7 +112,7 @@ function BlogCard({ blog }: BlogCardProps) {
           </div>
         )}
         <div className="absolute top-4 left-4">
-          <span className="bg-slate-800 dark:bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          <span className="gradient-card text-foreground px-3 py-1 rounded-full text-xs font-semibold">
             Blog
           </span>
         </div>
@@ -126,7 +126,7 @@ function BlogCard({ blog }: BlogCardProps) {
           </h3>
 
           {/* Meta */}
-          <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <div className="text-sm text-foreground/80 mb-4">
             {new Date(blog.createdAt).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -137,7 +137,7 @@ function BlogCard({ blog }: BlogCardProps) {
 
         <Link
           to={`/blogs/${blog.id}`}
-          className="text-gray-900 dark:text-gray-100 font-semibold hover:underline inline-flex items-center gap-1"
+          className="text-foreground/80 font-semibold hover:underline inline-flex items-center gap-1"
         >
           Read More
           <span>→</span>

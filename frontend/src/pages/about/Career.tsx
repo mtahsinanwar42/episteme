@@ -80,12 +80,12 @@ export default function Career() {
         <h2 className="text-4xl font-bold mb-8">Why Join Us?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <div>
-            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+            <p className="text-lg text-foreground/80 leading-relaxed mb-4">
               We're building the future of open science. When you join our team,
               you're not just getting a job—you're becoming part of a mission to
               transform how research is shared and accessed globally.
             </p>
-            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-lg text-foreground/80 leading-relaxed">
               We value innovation, collaboration, and impact. Every team member
               contributes to meaningful change in the research ecosystem.
             </p>
@@ -112,9 +112,7 @@ export default function Career() {
             >
               <div className="text-5xl mb-4">{benefit.icon}</div>
               <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                {benefit.description}
-              </p>
+              <p className="text-foreground/80">{benefit.description}</p>
             </div>
           ))}
         </div>
@@ -147,7 +145,7 @@ export default function Career() {
           ))}
         </div>
         <div className="mt-12 text-center">
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
+          <p className="text-foreground/80 mb-4">
             More positions available on our careers page
           </p>
           <button className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">

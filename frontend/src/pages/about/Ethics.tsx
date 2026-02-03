@@ -54,7 +54,7 @@ export default function Ethics() {
             <h3 className="text-2xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">
               Openness & Transparency
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               We believe in transparent processes and openly share our
               methodologies, data, and decision-making frameworks with the
               research community.
@@ -66,7 +66,7 @@ export default function Ethics() {
             <h3 className="text-2xl font-bold mb-4 text-purple-600 dark:text-purple-400">
               Equity & Inclusion
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               We actively work to remove barriers and ensure that all
               researchers, regardless of geography or resources, can fully
               participate.
@@ -78,7 +78,7 @@ export default function Ethics() {
             <h3 className="text-2xl font-bold mb-4 text-pink-600 dark:text-pink-400">
               Research Integrity
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               We maintain rigorous standards for research quality and support
               mechanisms that promote responsible and ethical research
               practices.
@@ -90,7 +90,7 @@ export default function Ethics() {
             <h3 className="text-2xl font-bold mb-4 text-rose-600 dark:text-rose-400">
               Accountability
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               We hold ourselves accountable to the research community and
               continuously work to improve our processes and policies.
             </p>

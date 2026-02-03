@@ -20,12 +20,12 @@ export default function Mission() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
             <h2 className="text-4xl font-bold mb-6">Our Mission</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+            <p className="text-lg text-foreground/80 mb-4 leading-relaxed">
               We are on a mission to advance open science forward with
               measurable, meaningful change in research publishing, policy, and
               practice.
             </p>
-            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-lg text-foreground/80 leading-relaxed">
               Building on a commitment to innovation, we continue to reimagine
               models to meet open science principles, removing barriers and
               promoting inclusion in knowledge creation and sharing.
@@ -45,7 +45,7 @@ export default function Mission() {
       {/* Vision Section */}
       <section className="mb-20">
         <h2 className="text-4xl font-bold mb-4">Our Vision</h2>
-        <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 font-semibold">
+        <p className="text-xl text-foreground/80 mb-12 font-semibold">
           We believe in a better future where science is open to all, for all
         </p>
 
@@ -55,7 +55,7 @@ export default function Mission() {
             <h3 className="text-xl font-bold mb-3 text-purple-600 dark:text-purple-400">
               Open Knowledge Sharing
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Researchers openly share all important research outputs and
               receive recognition for the value of their contributions to
               science and society.
@@ -67,7 +67,7 @@ export default function Mission() {
             <h3 className="text-xl font-bold mb-3 text-pink-600 dark:text-pink-400">
               Accelerated Progress
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Knowledge creation is faster and more efficient as outputs are
               shared and reusable, enabling scrutiny, corrections, and
               collaboration.
@@ -79,7 +79,7 @@ export default function Mission() {
             <h3 className="text-xl font-bold mb-3 text-orange-600 dark:text-orange-400">
               Diverse Perspectives
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Diverse perspectives help make research questions relevant and
               results trustworthy to diverse communities and society as a whole.
             </p>
@@ -90,7 +90,7 @@ export default function Mission() {
             <h3 className="text-xl font-bold mb-3 text-red-600 dark:text-red-400">
               Equitable Access
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Equitable, sustainable models ensure fair participation and access
               for both producers and consumers of research.
             </p>
@@ -108,7 +108,7 @@ export default function Mission() {
               <p className="font-semibold text-lg mb-2">
                 Accelerate Innovation
               </p>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-foreground/80">
                 Acting in partnership with others to advance open science
               </p>
             </div>
@@ -117,7 +117,7 @@ export default function Mission() {
             <div className="text-3xl flex-shrink-0">✅</div>
             <div>
               <p className="font-semibold text-lg mb-2">Distinctive Value</p>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-foreground/80">
                 Openness throughout the research cycle for researchers
               </p>
             </div>
@@ -126,7 +126,7 @@ export default function Mission() {
             <div className="text-3xl flex-shrink-0">✅</div>
             <div>
               <p className="font-semibold text-lg mb-2">Increase Resources</p>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-foreground/80">
                 Steadily grow capabilities dedicated to our vision
               </p>
             </div>
@@ -135,7 +135,7 @@ export default function Mission() {
             <div className="text-3xl flex-shrink-0">✅</div>
             <div>
               <p className="font-semibold text-lg mb-2">Serve Researchers</p>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-foreground/80">
                 Prioritize needs of scholars, librarians, and funders
               </p>
             </div>
