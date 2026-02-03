@@ -158,7 +158,7 @@ export default function Register() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col space-y-2">
                 <label htmlFor="phone" className="text-sm font-medium ">
-                  Phone *
+                  Phone
                 </label>
                 <Input
                   id="phone"
@@ -167,7 +167,6 @@ export default function Register() {
                   placeholder="+1234567890"
                   value={formData.phone}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
