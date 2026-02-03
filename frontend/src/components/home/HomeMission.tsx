@@ -23,7 +23,7 @@ export default function HomeMission() {
           </p>
           <Link
             to="/about/mission"
-            className="inline-block mt-6 text-purple-600 dark:text-purple-400 font-semibold hover:underline"
+            className="inline-block mt-6 text-purple-400 font-semibold hover:underline"
           >
             Learn more about our mission →
           </Link>

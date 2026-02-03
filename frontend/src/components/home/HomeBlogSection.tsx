@@ -29,7 +29,7 @@ export default function HomeBlogSection() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-gray-200 dark:bg-gray-700 rounded-xl h-96 animate-pulse"
+              className="gradient-card rounded-xl h-96 animate-pulse"
             ></div>
           ))}
         </div>

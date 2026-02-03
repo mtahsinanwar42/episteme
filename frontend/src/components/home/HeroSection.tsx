@@ -11,11 +11,9 @@ export default function HeroSection() {
 
   if (isLoading) {
     return (
-      <div className="relative h-[600px] rounded-2xl overflow-hidden mb-16 bg-slate-200 dark:bg-slate-800 animate-pulse">
+      <div className="relative h-[600px] rounded-2xl overflow-hidden mb-16 bg-slate-800 animate-pulse">
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-gray-600 dark:text-gray-400 text-2xl">
-            Loading...
-          </div>
+          <div className="text-foreground text-2xl">Loading...</div>
         </div>
       </div>
     );
