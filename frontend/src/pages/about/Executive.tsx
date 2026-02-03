@@ -104,7 +104,7 @@ export default function Executive() {
       </section>
 
       {/* Core Values */}
-      <section className="mb-20">
+      <section>
         <h2 className="text-4xl font-bold mb-12">Leadership Principles</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-xl p-8">
@@ -138,40 +138,6 @@ export default function Executive() {
               We take responsibility for our decisions and are transparent about
               our progress and challenges.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Organizational Structure */}
-      <section>
-        <h2 className="text-4xl font-bold mb-12">Organizational Structure</h2>
-        <div className="bg-slate-800 rounded-2xl p-12 border border-gray-700">
-          <div className="mb-8">
-            <div className="text-center mb-8">
-              <div className="text-5xl mb-2">👑</div>
-              <p className="text-lg font-bold">Chief Executive Officer</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-              <div className="text-center">
-                <div className="text-3xl mb-2">🔬</div>
-                <p className="font-bold mb-4">Research & Quality</p>
-                <p className="text-sm text-gray-400">
-                  CRO, Standards & Policies
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl mb-2">💻</div>
-                <p className="font-bold mb-4">Technology & Innovation</p>
-                <p className="text-sm text-gray-400">
-                  CTO, Engineering & Product
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl mb-2">📊</div>
-                <p className="font-bold mb-4">Operations & Growth</p>
-                <p className="text-sm text-gray-400">CFO, Strategy & Finance</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
