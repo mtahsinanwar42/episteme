@@ -347,9 +347,7 @@ export default function NewConference() {
             </Button>
 
             <Button type="submit" disabled={createConferenceMutation.isPending}>
-              {createConferenceMutation.isPending
-                ? "Creating..."
-                : "Create Conference"}
+              {createConferenceMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
         </form>

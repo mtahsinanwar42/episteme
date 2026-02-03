@@ -262,9 +262,7 @@ export default function NewAnnouncement() {
               type="submit"
               disabled={createAnnouncementMutation.isPending}
             >
-              {createAnnouncementMutation.isPending
-                ? "Creating..."
-                : "Create Announcement"}
+              {createAnnouncementMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
         </form>

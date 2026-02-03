@@ -296,9 +296,7 @@ export default function EditActivity() {
             </Button>
 
             <Button type="submit" disabled={updateActivityMutation.isPending}>
-              {updateActivityMutation.isPending
-                ? "Updating..."
-                : "Update Activity"}
+              {updateActivityMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>
         </form>

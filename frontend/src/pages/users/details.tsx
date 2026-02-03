@@ -191,10 +191,7 @@ export default function UserDetails() {
   return (
     <div>
       <Breadcrumb
-        items={[
-          { label: "Users", href: "/users" },
-          { label: `${user.firstName} ${user.lastName}` },
-        ]}
+        items={[{ label: "Users", href: "/users" }, { label: `${user.email}` }]}
       />
 
       <div className="mb-6">
@@ -530,28 +527,28 @@ export default function UserDetails() {
                   </div>
                 )}
 
-                <div className="flex items-start gap-3">
-                  <Notebook className="w-5 h-5 text-accent mt-0.5" />
-                  <div className="w-full">
-                    <p className="text-sm ">Status Update Notes</p>
-                    {isEdit ? (
-                      <Input
-                        type="text"
-                        value={formData.statusUpdateNotes}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            statusUpdateNotes: e.target.value,
-                          })
-                        }
-                      />
-                    ) : (
-                      <p className="font-medium">
-                        {user.statusUpdateNotes || "Not provided"}
-                      </p>
-                    )}
+                {user?.statusUpdateNotes && (
+                  <div className="flex items-start gap-3">
+                    <Notebook className="w-5 h-5 text-accent mt-0.5" />
+                    <div className="w-full">
+                      <p className="text-sm ">Status Update Notes</p>
+                      {isEdit ? (
+                        <Input
+                          type="text"
+                          value={formData.statusUpdateNotes}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              statusUpdateNotes: e.target.value,
+                            })
+                          }
+                        />
+                      ) : (
+                        <p className="font-medium">{user.statusUpdateNotes}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

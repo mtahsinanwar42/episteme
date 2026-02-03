@@ -300,9 +300,7 @@ export default function EditTraining() {
             </Button>
 
             <Button type="submit" disabled={updateTrainingMutation.isPending}>
-              {updateTrainingMutation.isPending
-                ? "Updating..."
-                : "Update Training"}
+              {updateTrainingMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>
         </form>

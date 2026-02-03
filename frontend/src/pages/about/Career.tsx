@@ -80,20 +80,20 @@ export default function Career() {
         <h2 className="text-4xl font-bold mb-8">Why Join Us?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <div>
-            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+            <p className="text-lg text-foreground/80 leading-relaxed mb-4">
               We're building the future of open science. When you join our team,
               you're not just getting a job—you're becoming part of a mission to
               transform how research is shared and accessed globally.
             </p>
-            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-lg text-foreground/80 leading-relaxed">
               We value innovation, collaboration, and impact. Every team member
               contributes to meaningful change in the research ecosystem.
             </p>
           </div>
-          <div className="bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-xl p-8 h-64 flex items-center justify-center">
+          <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl p-8 h-64 flex items-center justify-center">
             <div className="text-center">
               <div className="text-6xl mb-4">🚀</div>
-              <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+              <p className="text-xl font-bold text-blue-400">
                 Shape the Future
               </p>
             </div>
@@ -108,13 +108,11 @@ export default function Career() {
           {benefits.map((benefit, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-slate-800 rounded-xl p-8 shadow-md hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-700"
+              className="bg-slate-800 rounded-xl p-8 shadow-md hover:shadow-xl transition-shadow border border-gray-700"
             >
               <div className="text-5xl mb-4">{benefit.icon}</div>
               <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                {benefit.description}
-              </p>
+              <p className="text-foreground/80">{benefit.description}</p>
             </div>
           ))}
         </div>
@@ -127,19 +125,17 @@ export default function Career() {
           {positions.map((position, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-purple-500 shadow-md hover:shadow-lg transition-all cursor-pointer hover:translate-y-[-4px]"
+              className="bg-slate-800 rounded-xl p-8 border-l-4 border-purple-500 shadow-md hover:shadow-lg transition-all cursor-pointer hover:translate-y-[-4px]"
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-2xl font-bold mb-2">{position.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {position.department}
-                  </p>
+                  <p className="text-gray-400">{position.department}</p>
                 </div>
                 <div className="text-4xl">{position.icon}</div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="inline-block px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold">
+                <span className="inline-block px-3 py-1 bg-purple-900 text-purple-300 rounded-full text-sm font-semibold">
                   {position.level}
                 </span>
               </div>
@@ -147,7 +143,7 @@ export default function Career() {
           ))}
         </div>
         <div className="mt-12 text-center">
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
+          <p className="text-foreground/80 mb-4">
             More positions available on our careers page
           </p>
           <button className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
@@ -157,7 +153,7 @@ export default function Career() {
       </section>
 
       {/* Call to Action */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-white text-center">
+      <section className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center">
         <h2 className="text-4xl font-bold mb-4">Ready to Make an Impact?</h2>
         <p className="text-xl mb-8 max-w-2xl mx-auto">
           Apply now and help us advance open science. We review applications on

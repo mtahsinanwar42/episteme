@@ -5,7 +5,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, Edit, RefreshCw } from "lucide-react";
+import { ArrowUpDown, Eye, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
@@ -192,7 +192,7 @@ export default function Users() {
           return (
             <div className="flex gap-4 place-self-center">
               <Link to={`/users/${row?.original?.id}`}>
-                <Edit className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
+                <Eye className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
               </Link>
 
               <div onClick={() => handleOpenStatusModal(row?.original)}>

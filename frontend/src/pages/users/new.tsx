@@ -437,7 +437,7 @@ export default function NewUser() {
                 size="sm"
                 disabled={createUserMutation.isPending}
               >
-                {createUserMutation.isPending ? "Creating..." : "Create User"}
+                {createUserMutation.isPending ? "Creating..." : "Create"}
               </Button>
             </div>
           </form>

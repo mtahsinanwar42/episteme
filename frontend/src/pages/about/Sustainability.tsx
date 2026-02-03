@@ -19,26 +19,26 @@ export default function Sustainability() {
       <section className="mb-20">
         <h2 className="text-4xl font-bold mb-12">Principles, Not Profits</h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-green-500 shadow-md hover:shadow-xl transition-shadow">
+          <div className="bg-slate-800 rounded-xl p-8 border-l-4 border-green-500 shadow-md hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">🎯</div>
             <h3 className="text-2xl font-bold mb-3">Research Focused</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               Our priorities are based on the needs of scholars, librarians,
               funders, and institutional leaders.
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-teal-500 shadow-md hover:shadow-xl transition-shadow">
+          <div className="bg-slate-800 rounded-xl p-8 border-l-4 border-teal-500 shadow-md hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">💰</div>
             <h3 className="text-2xl font-bold mb-3">Cost Effective</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               We will not waste public money and ensure our services deliver
               maximum value.
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-blue-500 shadow-md hover:shadow-xl transition-shadow">
+          <div className="bg-slate-800 rounded-xl p-8 border-l-4 border-blue-500 shadow-md hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">🌱</div>
             <h3 className="text-2xl font-bold mb-3">Mission Driven</h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-foreground/80">
               Surplus revenue goes toward furthering our open science mission.
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function Sustainability() {
 
       {/* Business Model Section */}
       <section className="mb-20">
-        <div className="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 rounded-2xl p-12">
+        <div className="bg-gradient-to-br from-green-900/20 to-teal-900/20 rounded-2xl p-12">
           <h2 className="text-4xl font-bold mb-8">
             Sustainable Business Model
           </h2>
@@ -58,7 +58,7 @@ export default function Sustainability() {
               </div>
               <div>
                 <h3 className="text-xl font-bold mb-2">Equitable Pricing</h3>
-                <p className="text-gray-700 dark:text-gray-300">
+                <p className="text-foreground/80">
                   We prioritize equitable pricing that serves researchers
                   globally, ensuring access is not limited by geography or
                   resources.
@@ -71,7 +71,7 @@ export default function Sustainability() {
               </div>
               <div>
                 <h3 className="text-xl font-bold mb-2">Transparent Finances</h3>
-                <p className="text-gray-700 dark:text-gray-300">
+                <p className="text-foreground/80">
                   Transparent financial practices ensure accountability to our
                   community and stakeholders.
                 </p>
@@ -83,7 +83,7 @@ export default function Sustainability() {
               </div>
               <div>
                 <h3 className="text-xl font-bold mb-2">Long-term Vision</h3>
-                <p className="text-gray-700 dark:text-gray-300">
+                <p className="text-foreground/80">
                   Long-term sustainability ensures continued service to the
                   research community for years to come.
                 </p>
@@ -95,30 +95,30 @@ export default function Sustainability() {
 
       {/* Commitment Section */}
       <section>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-12 border border-gray-200 dark:border-gray-700">
+        <div className="bg-slate-800 rounded-2xl p-12 border border-gray-700">
           <h2 className="text-4xl font-bold mb-6">
             Our Commitment to the Future
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p className="text-xl text-foreground/80 leading-relaxed">
             We are committed to building sustainable systems that support open
             science for generations to come. Our goal is to ensure that
             knowledge remains freely accessible and that the research enterprise
             thrives, strengthened by equitable access and transparent practices.
           </p>
           <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+            <div className="text-center p-4 bg-green-900/20 rounded-lg">
               <div className="text-3xl mb-2">♻️</div>
               <p className="font-semibold text-sm">Circular Impact</p>
             </div>
-            <div className="text-center p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg">
+            <div className="text-center p-4 bg-teal-900/20 rounded-lg">
               <div className="text-3xl mb-2">🌐</div>
               <p className="font-semibold text-sm">Global Access</p>
             </div>
-            <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="text-center p-4 bg-blue-900/20 rounded-lg">
               <div className="text-3xl mb-2">📈</div>
               <p className="font-semibold text-sm">Growing Impact</p>
             </div>
-            <div className="text-center p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
+            <div className="text-center p-4 bg-cyan-900/20 rounded-lg">
               <div className="text-3xl mb-2">🤝</div>
               <p className="font-semibold text-sm">Partnerships</p>
             </div>

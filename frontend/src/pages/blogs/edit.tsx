@@ -290,7 +290,7 @@ export default function EditBlog() {
             </Button>
 
             <Button type="submit" disabled={updateBlogMutation.isPending}>
-              {updateBlogMutation.isPending ? "Updating..." : "Update Blog"}
+              {updateBlogMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>
         </form>

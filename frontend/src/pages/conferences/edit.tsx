@@ -404,9 +404,7 @@ export default function EditConference() {
             </Button>
 
             <Button type="submit" disabled={updateConferenceMutation.isPending}>
-              {updateConferenceMutation.isPending
-                ? "Updating..."
-                : "Update Conference"}
+              {updateConferenceMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>
         </form>
