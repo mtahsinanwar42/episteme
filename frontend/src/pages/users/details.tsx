@@ -191,10 +191,7 @@ export default function UserDetails() {
   return (
     <div>
       <Breadcrumb
-        items={[
-          { label: "Users", href: "/users" },
-          { label: `${user.firstName} ${user.lastName}` },
-        ]}
+        items={[{ label: "Users", href: "/users" }, { label: `${user.email}` }]}
       />
 
       <div className="mb-6">
