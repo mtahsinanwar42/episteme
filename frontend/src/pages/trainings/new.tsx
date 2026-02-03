@@ -257,9 +257,7 @@ export default function NewTraining() {
             </Button>
 
             <Button type="submit" disabled={createTrainingMutation.isPending}>
-              {createTrainingMutation.isPending
-                ? "Creating..."
-                : "Create Training"}
+              {createTrainingMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
         </form>

@@ -251,7 +251,7 @@ export default function NewBlog() {
             </Button>
 
             <Button type="submit" disabled={createBlogMutation.isPending}>
-              {createBlogMutation.isPending ? "Creating..." : "Create Blog"}
+              {createBlogMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
         </form>

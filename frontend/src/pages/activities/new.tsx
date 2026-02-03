@@ -254,9 +254,7 @@ export default function NewActivity() {
             </Button>
 
             <Button type="submit" disabled={createActivityMutation.isPending}>
-              {createActivityMutation.isPending
-                ? "Creating..."
-                : "Create Activity"}
+              {createActivityMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
         </form>

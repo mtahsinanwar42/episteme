@@ -289,7 +289,7 @@ export default function Register() {
               }}
               disabled={isLoading}
             >
-              {isLoading ? "Creating Account..." : "Create Account"}
+              {isLoading ? "Creating Account..." : "Create"}
             </Button>
           </form>
 

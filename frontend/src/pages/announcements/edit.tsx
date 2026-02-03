@@ -309,9 +309,7 @@ export default function EditAnnouncement() {
               type="submit"
               disabled={updateAnnouncementMutation.isPending}
             >
-              {updateAnnouncementMutation.isPending
-                ? "Updating..."
-                : "Update Announcement"}
+              {updateAnnouncementMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>
         </form>

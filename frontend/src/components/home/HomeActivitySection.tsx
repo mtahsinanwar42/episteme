@@ -17,9 +17,7 @@ export default function HomeActivitySection() {
       <section className="mb-20">
         <div className="flex items-center justify-between mb-12">
           <div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Upcoming Activities
-            </h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Activities</h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
               Join our community events, workshops, and networking opportunities
             </p>
@@ -53,9 +51,7 @@ export default function HomeActivitySection() {
     <section className="mb-20">
       <div className="flex items-center justify-between mb-12">
         <div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Upcoming Activities
-          </h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">Activities</h2>
           <p className="text-xl text-gray-600 dark:text-gray-300">
             Join our community events, workshops, and networking opportunities
           </p>
