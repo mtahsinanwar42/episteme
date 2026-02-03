@@ -101,37 +101,37 @@ export default function Policies() {
 
       {/* Introduction */}
       <section className="mb-16">
-        <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-2xl p-12">
+        <div className="bg-gradient-to-r from-indigo-900/20 to-blue-900/20 rounded-2xl p-12">
           <h2 className="text-3xl font-bold mb-4">Our Policy Framework</h2>
-          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+          <p className="text-lg text-foreground/80 leading-relaxed mb-6">
             We are committed to operating with transparency and integrity. Our
             comprehensive policies ensure that we protect user privacy, maintain
             research integrity, and provide a secure platform for open science.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex gap-4">
-              <div className="text-3xl flex-shrink-0">📋</div>
+              <div className="text-3xl shrink-0">📋</div>
               <div>
                 <p className="font-bold mb-1">Clear Guidelines</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-foreground/70">
                   Easy-to-understand policies
                 </p>
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="text-3xl flex-shrink-0">🔄</div>
+              <div className="text-3xl shrink-0">🔄</div>
               <div>
                 <p className="font-bold mb-1">Regular Updates</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-foreground/70">
                   Continuously improved policies
                 </p>
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="text-3xl flex-shrink-0">🤝</div>
+              <div className="text-3xl shrink-0">🤝</div>
               <div>
                 <p className="font-bold mb-1">Community Input</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-foreground/70">
                   Feedback-driven approach
                 </p>
               </div>
@@ -147,12 +147,12 @@ export default function Policies() {
           {policies.map((policy, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-xl transition-all border border-gray-200 dark:border-gray-700 overflow-hidden"
+              className="bg-slate-800 rounded-xl shadow-md hover:shadow-xl transition-all border border-gray-700 overflow-hidden"
             >
               <div className="bg-gradient-to-r from-indigo-500 to-blue-500 p-6">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-1">
+                    <h3 className="text-2xl font-bold text-foreground mb-1">
                       {policy.title}
                     </h3>
                     <p className="text-indigo-100">{policy.description}</p>
@@ -161,14 +161,14 @@ export default function Policies() {
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-foreground/80 mb-4">
                   Last updated: {policy.lastUpdated}
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {policy.topics.map((topic, i) => (
                     <span
                       key={i}
-                      className="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-semibold"
+                      className="inline-block px-3 py-1 bg-indigo-900 text-indigo-300 rounded-full text-xs font-semibold"
                     >
                       {topic}
                     </span>
@@ -187,7 +187,7 @@ export default function Policies() {
       <section className="mb-20">
         <h2 className="text-4xl font-bold mb-12">Core Policy Principles</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-green-500 shadow-md">
+          <div className="bg-slate-800 rounded-xl p-8 border-l-4 border-green-500 shadow-md">
             <div className="text-4xl mb-4">🔒</div>
             <h3 className="text-2xl font-bold mb-3">User Protection</h3>
             <p className="text-foreground/80">
@@ -195,7 +195,7 @@ export default function Policies() {
               industry-standard security practices and transparent policies.
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-blue-500 shadow-md">
+          <div className="bg-slate-800 rounded-xl p-8 border-l-4 border-blue-500 shadow-md">
             <div className="text-4xl mb-4">🔬</div>
             <h3 className="text-2xl font-bold mb-3">Research Integrity</h3>
             <p className="text-foreground/80">
@@ -203,7 +203,7 @@ export default function Policies() {
               integrity across all content and operations.
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-purple-500 shadow-md">
+          <div className="bg-slate-800 rounded-xl p-8 border-l-4 border-purple-500 shadow-md">
             <div className="text-4xl mb-4">📖</div>
             <h3 className="text-2xl font-bold mb-3">Open Access</h3>
             <p className="text-foreground/80">
@@ -211,7 +211,7 @@ export default function Policies() {
               promoting open access principles globally.
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border-l-4 border-orange-500 shadow-md">
+          <div className="bg-slate-800 rounded-xl p-8 border-l-4 border-orange-500 shadow-md">
             <div className="text-4xl mb-4">⚖️</div>
             <h3 className="text-2xl font-bold mb-3">Fairness & Equity</h3>
             <p className="text-foreground/80">
@@ -225,45 +225,43 @@ export default function Policies() {
       {/* Quick Links */}
       <section>
         <h2 className="text-4xl font-bold mb-12">Quick Access</h2>
-        <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-2xl p-12">
+        <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl p-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <a
               href="#"
-              className="bg-white dark:bg-slate-800 rounded-lg p-6 hover:shadow-lg transition-all border border-gray-200 dark:border-gray-700"
+              className="bg-slate-800 rounded-lg p-6 hover:shadow-lg transition-all border border-gray-700"
             >
               <div className="text-3xl mb-3">📄</div>
               <p className="font-bold mb-2">Full Policy Documents</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-300">
                 Access complete policy files
               </p>
             </a>
             <a
               href="#"
-              className="bg-white dark:bg-slate-800 rounded-lg p-6 hover:shadow-lg transition-all border border-gray-200 dark:border-gray-700"
+              className="bg-slate-800 rounded-lg p-6 hover:shadow-lg transition-all border border-gray-700"
             >
               <div className="text-3xl mb-3">❓</div>
               <p className="font-bold mb-2">FAQ</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Common questions answered
-              </p>
+              <p className="text-sm text-gray-300">Common questions answered</p>
             </a>
             <a
               href="#"
-              className="bg-white dark:bg-slate-800 rounded-lg p-6 hover:shadow-lg transition-all border border-gray-200 dark:border-gray-700"
+              className="bg-slate-800 rounded-lg p-6 hover:shadow-lg transition-all border border-gray-700"
             >
               <div className="text-3xl mb-3">💬</div>
               <p className="font-bold mb-2">Contact Us</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-300">
                 Questions about our policies?
               </p>
             </a>
             <a
               href="#"
-              className="bg-white dark:bg-slate-800 rounded-lg p-6 hover:shadow-lg transition-all border border-gray-200 dark:border-gray-700"
+              className="bg-slate-800 rounded-lg p-6 hover:shadow-lg transition-all border border-gray-700"
             >
               <div className="text-3xl mb-3">🔔</div>
               <p className="font-bold mb-2">Policy Updates</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-300">
                 Subscribe to change notifications
               </p>
             </a>

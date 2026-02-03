@@ -16,37 +16,37 @@ export default function Contact() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
         {/* Contact Info Cards */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-8 shadow-md border-t-4 border-emerald-500">
+        <div className="bg-slate-800 rounded-xl p-8 shadow-md border-t-4 border-emerald-500">
           <div className="text-5xl mb-4">📧</div>
           <h3 className="text-xl font-bold mb-2">Email</h3>
           <p className="text-foreground/80 mb-4">For general inquiries</p>
           <a
             href="mailto:info@episteme.org"
-            className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
+            className="text-emerald-400 font-semibold hover:underline"
           >
             info@episteme.org
           </a>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-8 shadow-md border-t-4 border-teal-500">
+        <div className="bg-slate-800 rounded-xl p-8 shadow-md border-t-4 border-teal-500">
           <div className="text-5xl mb-4">💼</div>
           <h3 className="text-xl font-bold mb-2">Partnerships</h3>
           <p className="text-foreground/80 mb-4">Business inquiries</p>
           <a
             href="mailto:partnerships@episteme.org"
-            className="text-teal-600 dark:text-teal-400 font-semibold hover:underline"
+            className="text-teal-400 font-semibold hover:underline"
           >
             partnerships@episteme.org
           </a>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-8 shadow-md border-t-4 border-cyan-500">
+        <div className="bg-slate-800 rounded-xl p-8 shadow-md border-t-4 border-cyan-500">
           <div className="text-5xl mb-4">📞</div>
           <h3 className="text-xl font-bold mb-2">Support</h3>
           <p className="text-foreground/80 mb-4">Technical support</p>
           <a
             href="mailto:support@episteme.org"
-            className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline"
+            className="text-cyan-400 font-semibold hover:underline"
           >
             support@episteme.org
           </a>
@@ -55,7 +55,7 @@ export default function Contact() {
 
       {/* Contact Form Section */}
       <section className="mb-20">
-        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl p-12">
+        <div className="bg-linear-to-br gradient-card rounded-2xl p-12">
           <h2 className="text-4xl font-bold mb-4">Send us a Message</h2>
           <p className="text-foreground/80 mb-8">
             Fill out the form below and we'll get back to you as soon as
@@ -120,7 +120,7 @@ export default function Contact() {
       <section className="mb-20">
         <h2 className="text-4xl font-bold mb-12">Frequently Asked Questions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700">
+          <div className="bg-slate-800 rounded-xl p-8 border border-gray-700">
             <h3 className="text-xl font-bold mb-3">
               How can I report an issue?
             </h3>
@@ -130,7 +130,7 @@ export default function Contact() {
               promptly.
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700">
+          <div className="bg-slate-800 rounded-xl p-8 border border-gray-700">
             <h3 className="text-xl font-bold mb-3">
               How long do responses take?
             </h3>
@@ -139,7 +139,7 @@ export default function Contact() {
               Urgent support requests may be prioritized.
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700">
+          <div className="bg-slate-800 rounded-xl p-8 border border-gray-700">
             <h3 className="text-xl font-bold mb-3">
               Do you offer partnerships?
             </h3>
@@ -148,7 +148,7 @@ export default function Contact() {
               partnerships@episteme.org to discuss opportunities.
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700">
+          <div className="bg-slate-800 rounded-xl p-8 border border-gray-700">
             <h3 className="text-xl font-bold mb-3">Can I schedule a call?</h3>
             <p className="text-foreground/80">
               Absolutely! Mention your availability in the contact form and
@@ -159,7 +159,7 @@ export default function Contact() {
       </section>
 
       {/* Office Locations */}
-      <section className="bg-white dark:bg-slate-800 rounded-2xl p-12 border border-gray-200 dark:border-gray-700">
+      <section className="bg-slate-800 rounded-2xl p-12 border border-gray-700">
         <h2 className="text-4xl font-bold mb-12">Our Locations</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center">

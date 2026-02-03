@@ -31,10 +31,10 @@ export default function Mission() {
               promoting inclusion in knowledge creation and sharing.
             </p>
           </div>
-          <div className="bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-8 h-80 flex items-center justify-center">
+          <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-xl p-8 h-80 flex items-center justify-center">
             <div className="text-center">
               <div className="text-6xl mb-4">🎯</div>
-              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+              <p className="text-2xl font-bold text-purple-400">
                 Open Science Forward
               </p>
             </div>
@@ -50,9 +50,9 @@ export default function Mission() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-purple-200 dark:border-purple-700 hover:shadow-lg transition-shadow">
+          <div className="bg-slate-800 rounded-xl p-8 border border-purple-700 hover:shadow-lg transition-shadow">
             <div className="text-4xl mb-4">📚</div>
-            <h3 className="text-xl font-bold mb-3 text-purple-600 dark:text-purple-400">
+            <h3 className="text-xl font-bold mb-3 text-purple-400">
               Open Knowledge Sharing
             </h3>
             <p className="text-foreground/80 leading-relaxed">
@@ -62,9 +62,9 @@ export default function Mission() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-pink-200 dark:border-pink-700 hover:shadow-lg transition-shadow">
+          <div className="bg-slate-800 rounded-xl p-8 border border-pink-700 hover:shadow-lg transition-shadow">
             <div className="text-4xl mb-4">⚡</div>
-            <h3 className="text-xl font-bold mb-3 text-pink-600 dark:text-pink-400">
+            <h3 className="text-xl font-bold mb-3 text-pink-400">
               Accelerated Progress
             </h3>
             <p className="text-foreground/80 leading-relaxed">
@@ -74,9 +74,9 @@ export default function Mission() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-orange-200 dark:border-orange-700 hover:shadow-lg transition-shadow">
+          <div className="bg-slate-800 rounded-xl p-8 border border-orange-700 hover:shadow-lg transition-shadow">
             <div className="text-4xl mb-4">🌍</div>
-            <h3 className="text-xl font-bold mb-3 text-orange-600 dark:text-orange-400">
+            <h3 className="text-xl font-bold mb-3 text-orange-400">
               Diverse Perspectives
             </h3>
             <p className="text-foreground/80 leading-relaxed">
@@ -85,9 +85,9 @@ export default function Mission() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-red-200 dark:border-red-700 hover:shadow-lg transition-shadow">
+          <div className="bg-slate-800 rounded-xl p-8 border border-red-700 hover:shadow-lg transition-shadow">
             <div className="text-4xl mb-4">🤝</div>
-            <h3 className="text-xl font-bold mb-3 text-red-600 dark:text-red-400">
+            <h3 className="text-xl font-bold mb-3 text-red-400">
               Equitable Access
             </h3>
             <p className="text-foreground/80 leading-relaxed">
@@ -99,7 +99,7 @@ export default function Mission() {
       </section>
 
       {/* Commitment Section */}
-      <section className="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-2xl p-12">
+      <section className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl p-12">
         <h2 className="text-4xl font-bold mb-8">Our Commitment</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex gap-4">

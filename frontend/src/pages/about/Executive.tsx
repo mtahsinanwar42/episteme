@@ -74,14 +74,14 @@ export default function Executive() {
           {teamMembers.map((member, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-gray-700"
+              className="bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all border border-gray-700"
             >
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-center">
                 <div className="text-6xl mb-2">{member.icon}</div>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-1">{member.name}</h3>
-                <p className="text-purple-600 dark:text-purple-400 font-semibold mb-3">
+                <p className="text-purple-400 font-semibold mb-3">
                   {member.role}
                 </p>
                 <p className="text-foreground/80 text-sm mb-4 leading-relaxed">
@@ -91,7 +91,7 @@ export default function Executive() {
                   {member.expertise.map((skill, i) => (
                     <span
                       key={i}
-                      className="inline-block px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-xs font-semibold"
+                      className="inline-block px-3 py-1 bg-purple-900 text-purple-300 rounded-full text-xs font-semibold"
                     >
                       {skill}
                     </span>
@@ -107,34 +107,34 @@ export default function Executive() {
       <section className="mb-20">
         <h2 className="text-4xl font-bold mb-12">Leadership Principles</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-8">
+          <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-xl p-8">
             <div className="text-4xl mb-4">🎯</div>
             <h3 className="text-2xl font-bold mb-3">Vision-Driven</h3>
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-foreground/80">
               We are guided by a clear vision of open science and remain
               committed to long-term impact over short-term gains.
             </p>
           </div>
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-8">
+          <div className="bg-gradient-to-br from-blue-900/20 to-cyan-900/20 rounded-xl p-8">
             <div className="text-4xl mb-4">🤝</div>
             <h3 className="text-2xl font-bold mb-3">Collaborative</h3>
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-foreground/80">
               We listen, learn, and work together with our community to build
               solutions that serve everyone.
             </p>
           </div>
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-8">
+          <div className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 rounded-xl p-8">
             <div className="text-4xl mb-4">💡</div>
             <h3 className="text-2xl font-bold mb-3">Innovative</h3>
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-foreground/80">
               We embrace new ideas, challenge the status quo, and continuously
               improve our approaches.
             </p>
           </div>
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl p-8">
+          <div className="bg-gradient-to-br from-orange-900/20 to-red-900/20 rounded-xl p-8">
             <div className="text-4xl mb-4">✨</div>
             <h3 className="text-2xl font-bold mb-3">Accountable</h3>
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-foreground/80">
               We take responsibility for our decisions and are transparent about
               our progress and challenges.
             </p>
@@ -145,7 +145,7 @@ export default function Executive() {
       {/* Organizational Structure */}
       <section>
         <h2 className="text-4xl font-bold mb-12">Organizational Structure</h2>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-12 border border-gray-200 dark:border-gray-700">
+        <div className="bg-slate-800 rounded-2xl p-12 border border-gray-700">
           <div className="mb-8">
             <div className="text-center mb-8">
               <div className="text-5xl mb-2">👑</div>
@@ -155,23 +155,21 @@ export default function Executive() {
               <div className="text-center">
                 <div className="text-3xl mb-2">🔬</div>
                 <p className="font-bold mb-4">Research & Quality</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-400">
                   CRO, Standards & Policies
                 </p>
               </div>
               <div className="text-center">
                 <div className="text-3xl mb-2">💻</div>
                 <p className="font-bold mb-4">Technology & Innovation</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-400">
                   CTO, Engineering & Product
                 </p>
               </div>
               <div className="text-center">
                 <div className="text-3xl mb-2">📊</div>
                 <p className="font-bold mb-4">Operations & Growth</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  CFO, Strategy & Finance
-                </p>
+                <p className="text-sm text-gray-400">CFO, Strategy & Finance</p>
               </div>
             </div>
           </div>
