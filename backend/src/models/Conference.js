@@ -69,17 +69,6 @@ export default (sequelize, DataTypes) => {
       freezeTableName: true,
       createdAt: "createdAt",
       updatedAt: "updatedAt",
-      validate: {
-        datesOrder() {
-          if (this.startAt && this.endAt && this.startAt > this.endAt) {
-            throw new Error("startAt must be <= endAt");
-          }
-
-          if (this.submissionPeriodStartAt && this.submissionPeriodEndAt && this.submissionPeriodStartAt > this.submissionPeriodEndAt) {
-            throw new Error("submissionPeriodStartAt must be <= submissionPeriodEndAt");
-          }
-        },
-      },
       hooks: {
         beforeCreate(conf) {
           const now = new Date();

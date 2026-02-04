@@ -25,9 +25,6 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.BIGINT,
         allowNull: false,
         field: "size",
-        validate: {
-          min: 0,
-        },
       },
       sha256: {
         type: DataTypes.TEXT,

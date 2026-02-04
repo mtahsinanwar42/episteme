@@ -27,9 +27,6 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.CHAR(3),
         allowNull: false,
         field: "currency",
-        validate: {
-          len: [3, 3],
-        },
       },
       provider: {
         type: DataTypes.TEXT,

@@ -21,3 +21,23 @@ export const slugify = (str) => {
     .replace(/\s+/g, "_")
     .replace(/[^a-z0-9_.-]/g, "");
 }
+
+export const isValidEmail = (str) => {
+  if (str === null || str === undefined || str === "") {
+    return;
+  }
+
+  const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+
+  return regex.test(value);
+}
+
+export const isValidPhone = (str) => {
+  if (str === null || str === undefined || str === "") {
+    return;
+  }
+
+  const regex = /^\+?[0-9][0-9\-\s]{6,20}$/;
+
+  return regex.test(str);
+}

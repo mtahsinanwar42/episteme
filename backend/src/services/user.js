@@ -1,7 +1,7 @@
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import { serializeUser } from "../utils/serializers.js";
-import { isEmpty, isNotEmpty } from "../utils/string.js";
+import { isEmpty, isNotEmpty, isValidEmail, isValidPhone } from "../utils/string.js";
 
 export function createUserService({ User, fileService, emailPublisher }) {
   if (!User) {
@@ -51,6 +51,14 @@ export function createUserService({ User, fileService, emailPublisher }) {
 
     if (!Object.values(USER_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid user status");
+    }
+
+    if (!isValidEmail(email)) {
+      throw new ErrorResponse(400, "Invalid Email!");
+    }
+
+    if (isNotEmpty(phone) && !isValidPhone(phone)) {
+      throw new ErrorResponse(400, "Invalid phone number format. Use digits, spaces or dashes, optionally starting with +.");
     }
 
     const normalizedRoles = normalizeRoles(roles);
@@ -120,6 +128,10 @@ export function createUserService({ User, fileService, emailPublisher }) {
 
     if (isNotEmpty(phone)) {
       updates.phone = phone;
+
+      if (!isValidPhone(phone)) {
+        throw new ErrorResponse(400, "Invalid phone number format. Use digits, spaces or dashes, optionally starting with +.");
+      }
     }
 
     if (isNotEmpty(linkedinUrl)) {
