@@ -24,6 +24,7 @@ import activityRoutes from "./routes/activity.js";
 import announcementRoutes from "./routes/announcement.js";
 import submissionRoutes from "./routes/contentSubmission.js";
 import reviewAssignmentRoutes from "./routes/contentReviewAssignment.js";
+import contactSupportRoutes from "./routes/support.js";
 import { createRefDataService } from "./services/referenceData.js";
 import { createSchedulerService } from "./services/scheduler.js";
 import { createKafkaTopics, startKafkaProducer, stopKafkaProducer } from "./config/kafka.js";
@@ -77,7 +78,7 @@ app.get("/health", async (req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/files', fileRoutes);
 app.use('/api/v1/reference-data', refDataRoutes);
-
+app.use('/api/v1/contact-support', contactSupportRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/conferences', conferenceRoutes);
 app.use('/api/v1/trainings', trainingRoutes);
