@@ -1,5 +1,6 @@
 import { useAnnouncements } from "@/hooks/useAnnouncements";
 import { Link } from "react-router-dom";
+import { formatDate } from "@/utils/dateFormatter";
 
 export default function HeroSection() {
   const { data: response, isLoading } = useAnnouncements({
@@ -74,12 +75,7 @@ export default function HeroSection() {
                 <span>→</span>
               </Link>
               <span className="text-white/70 text-sm">
-                Posted on{" "}
-                {new Date(announcement?.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+                Posted on {formatDate(announcement?.createdAt)}
               </span>
             </div>
           </div>

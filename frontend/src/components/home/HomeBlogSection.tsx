@@ -3,6 +3,7 @@ import type { Blog } from "@/models/blog";
 import { config } from "@/config/config";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
 import { Link } from "react-router-dom";
+import { formatDate } from "@/utils/dateFormatter";
 
 export default function HomeBlogSection() {
   const { data: response, isLoading } = useBlogs({
@@ -127,11 +128,7 @@ function BlogCard({ blog }: BlogCardProps) {
 
           {/* Meta */}
           <div className="text-sm text-foreground/80 mb-4">
-            {new Date(blog.createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            {formatDate(blog.createdAt)}
           </div>
         </div>
 

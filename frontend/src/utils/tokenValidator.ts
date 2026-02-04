@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { formatDateTime } from "./dateFormatter";
 
 interface DecodedToken {
   exp?: number;
@@ -121,7 +122,7 @@ export const getTokenExpirationInfo = (
   }
 
   const isExpired = isTokenExpired(token);
-  const expiresAt = new Date(expirationTime).toLocaleString();
+  const expiresAt = formatDateTime(new Date(expirationTime).toISOString());
   const timeRemaining = getTimeUntilExpiration(token);
 
   let expiresIn = "";

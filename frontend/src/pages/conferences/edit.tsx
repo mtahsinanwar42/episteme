@@ -22,13 +22,7 @@ import PageSubTitle from "@/components/common/PageSubTitle";
 import { fileService } from "@/services/fileService";
 import { FileTypeEnum } from "@/models/file";
 import { FileText, Upload, Loader2 } from "lucide-react";
-
-const formatDateForInput = (value?: string | null) => {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().split("T")[0];
-};
+import { formatDateForInput } from "@/utils/dateFormatter";
 
 export default function EditConference() {
   const navigate = useNavigate();

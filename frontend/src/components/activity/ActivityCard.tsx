@@ -6,6 +6,7 @@ import { UserRole } from "@/models/user";
 import type { RootState } from "@/stores/store";
 import { Edit } from "lucide-react";
 import { getBlogActivityResourceStatusBadge } from "../common/ResourceStatusBadge";
+import { formatDateTime } from "@/utils/dateFormatter";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -18,7 +19,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
     (state: RootState) => state?.auth?.user?.roles,
   );
   const isAdmin = currentRoles?.includes(UserRole.ADMIN);
-  const createdDate = new Date(activity.createdAt).toLocaleString();
+  const createdDate = formatDateTime(activity.createdAt);
 
   const handleEdit = () => {
     navigate(`/activities/edit/${activity.id}`);

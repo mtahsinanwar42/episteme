@@ -13,6 +13,7 @@ import { getConferenceStatusLabel } from "@/components/common/ConferenceStatusBa
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { fileService } from "@/services/fileService";
 import { config } from "@/config/config";
+import { formatDateShort } from "@/utils/dateFormatter";
 
 export default function ConferenceDetails() {
   const { conferenceId } = useParams();
@@ -38,14 +39,10 @@ export default function ConferenceDetails() {
     }
 
     return {
-      startAt: new Date(conference.startAt).toLocaleDateString(),
-      endAt: new Date(conference.endAt).toLocaleDateString(),
-      submissionStartAt: new Date(
-        conference.submissionPeriodStartAt,
-      ).toLocaleDateString(),
-      submissionEndAt: new Date(
-        conference.submissionPeriodEndAt,
-      ).toLocaleDateString(),
+      startAt: formatDateShort(conference.startAt),
+      endAt: formatDateShort(conference.endAt),
+      submissionStartAt: formatDateShort(conference.submissionPeriodStartAt),
+      submissionEndAt: formatDateShort(conference.submissionPeriodEndAt),
     };
   }, [conference]);
 

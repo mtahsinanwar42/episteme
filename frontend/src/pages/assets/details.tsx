@@ -10,6 +10,7 @@ import {
 import { fileService } from "@/services/fileService";
 import { useFileById } from "@/hooks/useFiles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { formatDateTime } from "@/utils/dateFormatter";
 
 export default function AssetDetails() {
   const { fileId } = useParams();
@@ -115,7 +116,7 @@ export default function AssetDetails() {
                   <p className="text-sm text-muted-foreground">Created At</p>
 
                   <p className="font-medium max-w-96 overflow-clip">
-                    {new Date(file.createdAt).toLocaleString()}
+                    {formatDateTime(file.createdAt)}
                   </p>
                 </div>
               </div>

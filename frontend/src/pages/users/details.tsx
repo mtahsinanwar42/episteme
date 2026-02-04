@@ -18,6 +18,7 @@ import {
   User,
   Notebook,
 } from "lucide-react";
+import { formatDateTime } from "@/utils/dateFormatter";
 import {
   Select,
   SelectContent,
@@ -423,7 +424,7 @@ export default function UserDetails() {
                   <div className="w-full">
                     <p className="text-sm ">Created At</p>
                     <p className="font-medium">
-                      {new Date(user.createdAt).toLocaleString()}
+                      {formatDateTime(user.createdAt)}
                     </p>
                   </div>
                 </div>
