@@ -31,7 +31,12 @@ export default function Conferences() {
     paginate: true,
   });
 
-  const conferences = response?.data || [];
+  const conferences = currentRoles?.includes(UserRole.ADMIN)
+    ? response?.data
+    : response?.data.filter(
+        (conference) => conference.status === 1 || conference.status === 2,
+      ) || [];
+
   const total = response?.total || 0;
   const currentPage = page;
   const currentLimit = response?.pagination?.next?.limit || pageSize;
@@ -72,14 +77,14 @@ export default function Conferences() {
       )}
       {error && <div className="text-red-600">{(error as Error).message}</div>}
 
-      {!isLoading && !error && conferences.length === 0 && (
+      {!isLoading && !error && conferences?.length === 0 && (
         <div className="text-slate-600">No conferences found.</div>
       )}
 
-      {!isLoading && !error && conferences.length > 0 && (
+      {!isLoading && !error && conferences && conferences?.length > 0 && (
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {conferences.map((conference) => (
+            {conferences?.map((conference) => (
               <ConferenceCard key={conference.id} conference={conference} />
             ))}
           </div>

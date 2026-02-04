@@ -41,6 +41,7 @@ export interface GetActivitiesParams {
   select?: string;
   search?: string;
   paginate?: boolean;
+  status?: number;
 }
 
 export interface CreateActivityRequest {

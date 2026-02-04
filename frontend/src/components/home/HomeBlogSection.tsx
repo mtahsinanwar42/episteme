@@ -9,6 +9,7 @@ export default function HomeBlogSection() {
   const { data: response, isLoading } = useBlogs({
     limit: 3,
     sort: "-createdAt",
+    status: 1,
   });
 
   const blogs = response?.data || [];

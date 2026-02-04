@@ -9,6 +9,7 @@ export default function HomeActivitySection() {
   const { data: response, isLoading } = useActivities({
     limit: 3,
     sort: "-createdAt",
+    status: 1,
   });
 
   const activities = response?.data || [];
