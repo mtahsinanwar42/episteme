@@ -306,7 +306,13 @@ export default function EditAnnouncement() {
 
             <Button
               type="submit"
-              disabled={updateAnnouncementMutation.isPending}
+              disabled={
+                updateAnnouncementMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
             >
               {updateAnnouncementMutation.isPending ? "Updating..." : "Update"}
             </Button>

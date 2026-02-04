@@ -259,7 +259,13 @@ export default function NewAnnouncement() {
 
             <Button
               type="submit"
-              disabled={createAnnouncementMutation.isPending}
+              disabled={
+                createAnnouncementMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
             >
               {createAnnouncementMutation.isPending ? "Creating..." : "Create"}
             </Button>

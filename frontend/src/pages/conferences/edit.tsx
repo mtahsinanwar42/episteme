@@ -395,7 +395,21 @@ export default function EditConference() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={updateConferenceMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                updateConferenceMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.slug.trim() ||
+                !formData.startAt ||
+                !formData.endAt ||
+                !formData.submissionPeriodStartAt ||
+                !formData.submissionPeriodEndAt ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {updateConferenceMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>

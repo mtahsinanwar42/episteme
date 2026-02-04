@@ -345,7 +345,21 @@ export default function NewConference() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={createConferenceMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                createConferenceMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.slug.trim() ||
+                !formData.startAt ||
+                !formData.endAt ||
+                !formData.submissionPeriodStartAt ||
+                !formData.submissionPeriodEndAt ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {createConferenceMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>

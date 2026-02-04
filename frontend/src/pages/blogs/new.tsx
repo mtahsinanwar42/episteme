@@ -249,7 +249,16 @@ export default function NewBlog() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={createBlogMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                createBlogMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {createBlogMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>

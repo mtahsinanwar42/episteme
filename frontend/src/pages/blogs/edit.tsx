@@ -288,7 +288,16 @@ export default function EditBlog() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={updateBlogMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                updateBlogMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {updateBlogMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>

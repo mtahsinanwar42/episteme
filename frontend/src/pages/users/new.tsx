@@ -427,7 +427,17 @@ export default function NewUser() {
               <Button
                 type="submit"
                 size="sm"
-                disabled={createUserMutation.isPending}
+                disabled={
+                  createUserMutation.isPending ||
+                  !formData.firstName.trim() ||
+                  !formData.lastName.trim() ||
+                  !formData.email.trim() ||
+                  !formData.password.trim() ||
+                  !formData.phone.trim() ||
+                  !formData.institution.trim() ||
+                  !formData.occupation.trim() ||
+                  !formData.country.trim()
+                }
               >
                 {createUserMutation.isPending ? "Creating..." : "Create"}
               </Button>

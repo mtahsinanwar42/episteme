@@ -255,7 +255,16 @@ export default function NewTraining() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={createTrainingMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                createTrainingMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {createTrainingMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
