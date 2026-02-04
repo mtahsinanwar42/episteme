@@ -182,9 +182,11 @@ export default function Users() {
                 <Eye className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
               </Link>
 
-              <div onClick={() => handleOpenStatusModal(row?.original)}>
-                <RefreshCw className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
-              </div>
+              {row?.original?.status === UserStatus.DELETED ? null : (
+                <div onClick={() => handleOpenStatusModal(row?.original)}>
+                  <RefreshCw className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
+                </div>
+              )}
             </div>
           );
         },

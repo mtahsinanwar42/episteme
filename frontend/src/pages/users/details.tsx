@@ -183,14 +183,14 @@ export default function UserDetails() {
 
   const getStatusBadge = (status: number) => {
     switch (status) {
-      case 0:
-        return <Badge variant="destructive">{UserStatus[status]}</Badge>;
-      case 1:
-        return <Badge variant="default">{UserStatus[status]}</Badge>;
-      case 2:
-        return <Badge variant="secondary">{UserStatus[status]}</Badge>;
-      case 9:
+      case UserStatus.INACTIVE:
         return <Badge variant="disabled">{UserStatus[status]}</Badge>;
+      case UserStatus.ACTIVE:
+        return <Badge variant="default">{UserStatus[status]}</Badge>;
+      case UserStatus.SUSPENDED:
+        return <Badge variant="secondary">{UserStatus[status]}</Badge>;
+      case UserStatus.DELETED:
+        return <Badge variant="destructive">{UserStatus[status]}</Badge>;
       default:
         return <Badge variant="default">{UserStatus[status]}</Badge>;
     }
@@ -317,19 +317,23 @@ export default function UserDetails() {
             <div className="p-4 gradient-card shadow-sm flex justify-between items-center">
               <h3 className="font-semibold">Information</h3>
 
-              {isEdit ? (
-                <X
-                  onClick={() => {
-                    setFormData(user);
-                    setIsEdit(false);
-                  }}
-                  className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
-                />
-              ) : (
-                <Edit
-                  onClick={() => setIsEdit(true)}
-                  className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
-                />
+              {user.status !== UserStatus.DELETED && (
+                <>
+                  {isEdit ? (
+                    <X
+                      onClick={() => {
+                        setFormData(user);
+                        setIsEdit(false);
+                      }}
+                      className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
+                    />
+                  ) : (
+                    <Edit
+                      onClick={() => setIsEdit(true)}
+                      className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
+                    />
+                  )}
+                </>
               )}
             </div>
 
