@@ -91,20 +91,29 @@ export function formatDateForInput(
 ): string {
   if (!dateString) return "";
 
-  // Remove 'Z' suffix if present - backend stores times in local timezone
-  const cleanedDateString = dateString.trim().replace(/Z$/, "");
-  const date = new Date(cleanedDateString);
+  // Simply extract the date part (YYYY-MM-DD) without timezone conversion
+  // Input format: 2026-02-10T00:00:00.000Z
+  // Output format: 2026-02-10
+  const datePart = dateString.trim().split("T")[0];
 
-  // Check if date is valid
-  if (isNaN(date.getTime())) {
-    console.error("Invalid date string:", dateString);
-    return "";
-  }
+  return datePart;
+}
 
-  // Get local date components
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+/**
+ * Converts a date input value (YYYY-MM-DD) to ISO string for backend
+ * @param dateInputValue - Date string from input field (YYYY-MM-DD)
+ * @returns ISO date string adjusted for backend timezone expectations
+ */
+export function formatDateFromInput(dateInputValue: string): string {
+  if (!dateInputValue) return "";
 
-  return `${year}-${month}-${day}`;
+  // Create date at midnight UTC
+  const date = new Date(`${dateInputValue}T00:00:00.000Z`);
+
+  // Add 6 hours to compensate for GMT+6 timezone offset
+  // When backend receives this UTC time, it will convert back to GMT+6
+  // resulting in the correct date at midnight local time
+  date.setHours(date.getHours() + 6);
+
+  return date.toISOString();
 }

@@ -19,6 +19,7 @@ import PageSubTitle from "@/components/common/PageSubTitle";
 import { fileService } from "@/services/fileService";
 import { FileTypeEnum } from "@/models/file";
 import { FileText, Upload } from "lucide-react";
+import { formatDateFromInput } from "@/utils/dateFormatter";
 
 export default function NewConference() {
   const navigate = useNavigate();
@@ -72,10 +73,14 @@ export default function NewConference() {
       {
         title: formData.title,
         slug: formData.slug,
-        startAt: formData.startAt,
-        endAt: formData.endAt,
-        submissionPeriodStartAt: formData.submissionPeriodStartAt,
-        submissionPeriodEndAt: formData.submissionPeriodEndAt,
+        startAt: formatDateFromInput(formData.startAt),
+        endAt: formatDateFromInput(formData.endAt),
+        submissionPeriodStartAt: formatDateFromInput(
+          formData.submissionPeriodStartAt,
+        ),
+        submissionPeriodEndAt: formatDateFromInput(
+          formData.submissionPeriodEndAt,
+        ),
         metadataFilePath: formData.metadataFilePath,
         status: formData.status,
       },
