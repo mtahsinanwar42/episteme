@@ -73,42 +73,23 @@ export default function Users() {
   const columns: ColumnDef<User>[] = useMemo(
     () => [
       {
-        id: "serial",
-        header: "SL",
-        cell: ({ row }) => <span className="text-sm">{row.index + 1}</span>,
-      },
-      {
-        id: "id",
-        header: "ID",
-        cell: ({ row }) => <span className="text-sm">{row.original.id}</span>,
-      },
-      {
         accessorKey: "firstName",
-        header: ({ column }) => {
-          return (
-            <div
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="flex items-center gap-4 justify-center w-full"
-            >
-              First Name
-              <ArrowUpDown className="size-4 text-muted-foreground" />
-            </div>
-          );
-        },
-        cell: ({ row }) => {
-          const firstName = row.getValue("firstName") as string;
-          return <span className="font-medium">{firstName}</span>;
-        },
-        sortingFn: (rowA, rowB, columnId) => {
-          const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
-          const b = String(rowB.getValue(columnId) ?? "").toLowerCase();
-          return a.localeCompare(b);
-        },
+        header: "First Name",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.getValue("firstName")}</span>
+        ),
+        enableSorting: false,
       },
       {
         accessorKey: "lastName",
+        header: "Last Name",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.getValue("lastName")}</span>
+        ),
+        enableSorting: false,
+      },
+      {
+        accessorKey: "email",
         header: ({ column }) => {
           return (
             <div
@@ -117,23 +98,19 @@ export default function Users() {
               }
               className="flex items-center gap-4 justify-center w-full"
             >
-              Last Name
+              Email
               <ArrowUpDown className="size-4 text-muted-foreground" />
             </div>
           );
         },
+        cell: ({ row }) => (
+          <span className="text-sm">{row.getValue("email")}</span>
+        ),
         sortingFn: (rowA, rowB, columnId) => {
           const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
           const b = String(rowB.getValue(columnId) ?? "").toLowerCase();
           return a.localeCompare(b);
         },
-      },
-      {
-        accessorKey: "email",
-        header: "Email",
-        cell: ({ row }) => (
-          <span className="text-sm">{row.getValue("email")}</span>
-        ),
       },
       {
         accessorKey: "phone",
@@ -141,6 +118,15 @@ export default function Users() {
         cell: ({ row }) => (
           <span className="text-sm">{row.getValue("phone")}</span>
         ),
+        enableSorting: false,
+      },
+      {
+        accessorKey: "institution",
+        header: "Institution",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.getValue("institution")}</span>
+        ),
+        enableSorting: false,
       },
       {
         accessorKey: "roles",
@@ -157,6 +143,7 @@ export default function Users() {
             </div>
           );
         },
+        enableSorting: false,
       },
       {
         accessorKey: "status",
@@ -195,12 +182,15 @@ export default function Users() {
                 <Eye className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
               </Link>
 
-              <div onClick={() => handleOpenStatusModal(row?.original)}>
-                <RefreshCw className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
-              </div>
+              {row?.original?.status === UserStatus.DELETED ? null : (
+                <div onClick={() => handleOpenStatusModal(row?.original)}>
+                  <RefreshCw className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
+                </div>
+              )}
             </div>
           );
         },
+        enableSorting: false,
       },
     ],
     [handleOpenStatusModal, getStatusBadge],

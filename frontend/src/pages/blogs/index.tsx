@@ -29,6 +29,7 @@ export default function Blogs() {
     limit: pageSize,
     sort: "-createdAt",
     paginate: true,
+    status: currentRoles?.includes(UserRole.ADMIN) ? undefined : 1,
   });
 
   const blogs = response?.data || [];

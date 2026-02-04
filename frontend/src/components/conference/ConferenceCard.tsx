@@ -6,6 +6,7 @@ import { UserRole } from "@/models/user";
 import type { Conference } from "@/models/conference";
 import { ConferenceStatus } from "@/models/conference";
 import { Edit } from "lucide-react";
+import { formatDateTime, formatDateShort } from "@/utils/dateFormatter";
 import {
   Select,
   SelectContent,
@@ -40,23 +41,23 @@ export function ConferenceCard({ conference }: ConferenceCardProps) {
   }, [conference.status]);
 
   const createdAt = useMemo(
-    () => new Date(conference.createdAt).toLocaleString(),
+    () => formatDateTime(conference.createdAt),
     [conference.createdAt],
   );
   const startAt = useMemo(
-    () => new Date(conference.startAt).toLocaleDateString(),
+    () => formatDateShort(conference.startAt),
     [conference.startAt],
   );
   const endAt = useMemo(
-    () => new Date(conference.endAt).toLocaleDateString(),
+    () => formatDateShort(conference.endAt),
     [conference.endAt],
   );
   const submissionStartAt = useMemo(
-    () => new Date(conference.submissionPeriodStartAt).toLocaleDateString(),
+    () => formatDateShort(conference.submissionPeriodStartAt),
     [conference.submissionPeriodStartAt],
   );
   const submissionEndAt = useMemo(
-    () => new Date(conference.submissionPeriodEndAt).toLocaleDateString(),
+    () => formatDateShort(conference.submissionPeriodEndAt),
     [conference.submissionPeriodEndAt],
   );
 

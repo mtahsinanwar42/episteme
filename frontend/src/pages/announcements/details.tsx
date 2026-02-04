@@ -8,6 +8,7 @@ import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
 import { getAnnouncementTrainingResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
+import { formatDateTime } from "@/utils/dateFormatter";
 
 export default function AnnouncementDetails() {
   const { announcementId } = useParams();
@@ -108,12 +109,10 @@ export default function AnnouncementDetails() {
                 )}
               </Badge>
               <Badge variant="outline">
-                Created:{" "}
-                {new Date(announcement?.createdAt || "").toLocaleString()}
+                Created: {formatDateTime(announcement?.createdAt)}
               </Badge>
               <Badge variant="outline">
-                Updated:{" "}
-                {new Date(announcement?.updatedAt || "").toLocaleString()}
+                Updated: {formatDateTime(announcement?.updatedAt)}
               </Badge>
             </div>
           </div>

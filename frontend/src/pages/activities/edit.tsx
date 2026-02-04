@@ -191,7 +191,6 @@ export default function EditActivity() {
               onChange={handleInputChange}
               placeholder="e.g., Episteme Conference 2"
               disabled={updateActivityMutation.isPending}
-              required
             />
           </div>
 
@@ -295,7 +294,16 @@ export default function EditActivity() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={updateActivityMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                updateActivityMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {updateActivityMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>

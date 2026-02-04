@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateUserMutation } from "@/hooks/useUsers";
+import { useCountries, useCreateUserMutation } from "@/hooks/useUsers";
 import { UserStatus } from "@/models/user";
 import { FileTypeEnum } from "@/models/file";
 import { fileService } from "@/services/fileService";
@@ -21,6 +21,8 @@ import PageTitle from "@/components/common/PageTitle";
 export default function NewUser() {
   const navigate = useNavigate();
   const createUserMutation = useCreateUserMutation();
+
+  const { data: countriesData } = useCountries();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -51,7 +53,7 @@ export default function NewUser() {
     setSelectedRoles((prev) => {
       if (prev.includes(role)) {
         // Don't allow deselecting if it's the only role
-        if (prev.length === 1) return prev;
+        // if (prev.length === 1) return prev;
         return prev.filter((r) => r !== role);
       }
       return [...prev, role];
@@ -188,7 +190,6 @@ export default function NewUser() {
                   placeholder="John"
                   value={formData.firstName}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -203,7 +204,6 @@ export default function NewUser() {
                   placeholder="Doe"
                   value={formData.lastName}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -218,7 +218,6 @@ export default function NewUser() {
                   placeholder="user@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -233,7 +232,6 @@ export default function NewUser() {
                   placeholder="Enter a secure password"
                   value={formData.password}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -248,7 +246,6 @@ export default function NewUser() {
                   placeholder="+8801712345678"
                   value={formData.phone}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -256,15 +253,25 @@ export default function NewUser() {
                 <label htmlFor="country" className="text-sm font-medium ">
                   Country *
                 </label>
-                <Input
-                  id="country"
-                  name="country"
-                  type="text"
-                  placeholder="Bangladesh"
+
+                <Select
                   value={formData.country}
-                  onChange={handleChange}
-                  required
-                />
+                  onValueChange={(value) => {
+                    setFormData((prev) => ({ ...prev, country: value }));
+                  }}
+                  disabled={createUserMutation.isPending}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countriesData?.data.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex flex-col space-y-2">
@@ -278,7 +285,6 @@ export default function NewUser() {
                   placeholder="University Name"
                   value={formData.institution}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -293,7 +299,6 @@ export default function NewUser() {
                   placeholder="Student"
                   value={formData.occupation}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -383,7 +388,7 @@ export default function NewUser() {
             </div>
 
             <div className="flex flex-col space-y-3">
-              <label className="text-sm font-medium ">Select Roles *</label>
+              <label className="text-sm font-medium ">Select Roles</label>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Checkbox
@@ -435,7 +440,17 @@ export default function NewUser() {
               <Button
                 type="submit"
                 size="sm"
-                disabled={createUserMutation.isPending}
+                disabled={
+                  createUserMutation.isPending ||
+                  !formData.firstName.trim() ||
+                  !formData.lastName.trim() ||
+                  !formData.email.trim() ||
+                  !formData.password.trim() ||
+                  !formData.phone.trim() ||
+                  !formData.institution.trim() ||
+                  !formData.occupation.trim() ||
+                  !formData.country.trim()
+                }
               >
                 {createUserMutation.isPending ? "Creating..." : "Create"}
               </Button>

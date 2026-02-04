@@ -8,6 +8,7 @@ import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
 import { getBlogActivityResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
+import { formatDateTime } from "@/utils/dateFormatter";
 
 export default function ActivityDetails() {
   const { activityId } = useParams();
@@ -103,10 +104,10 @@ export default function ActivityDetails() {
                 {getBlogActivityResourceStatusEnum(activity?.status)}
               </Badge>
               <Badge variant="outline">
-                Created: {new Date(activity?.createdAt || "").toLocaleString()}
+                Created: {formatDateTime(activity?.createdAt)}
               </Badge>
               <Badge variant="outline">
-                Updated: {new Date(activity?.updatedAt || "").toLocaleString()}
+                Updated: {formatDateTime(activity?.updatedAt)}
               </Badge>
             </div>
           </div>

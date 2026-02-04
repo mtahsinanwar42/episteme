@@ -1,15 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Mail,
-  Phone,
-  User as UserIcon,
-  Image,
-  DownloadCloud,
-} from "lucide-react";
+import { Mail, Phone, User as UserIcon, DownloadCloud } from "lucide-react";
 import { fileService } from "@/services/fileService";
 import { useFileById } from "@/hooks/useFiles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { formatDateTime } from "@/utils/dateFormatter";
 
 export default function AssetDetails() {
   const { fileId } = useParams();
@@ -115,16 +110,14 @@ export default function AssetDetails() {
                   <p className="text-sm text-muted-foreground">Created At</p>
 
                   <p className="font-medium max-w-96 overflow-clip">
-                    {new Date(file.createdAt).toLocaleString()}
+                    {formatDateTime(file.createdAt)}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <Image className="w-5 h-5 text-accent mt-0.5" />
+                <div className="w-5"></div>
                 <div className="group">
-                  <p className="text-sm text-muted-foreground mb-2">Image</p>
-
                   <div
                     onClick={() => handleDownload()}
                     className="cursor-pointer w-24 h-24 rounded-md border border-dashed border-accent grid place-content-center "

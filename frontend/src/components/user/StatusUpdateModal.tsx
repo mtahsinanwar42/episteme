@@ -78,6 +78,9 @@ export function StatusUpdateModal({
               <p className="text-sm text-foreground mb-2">
                 Name: {selectedUser?.firstName} {selectedUser?.lastName}
               </p>
+              <p className="text-sm text-foreground mb-2">
+                Email: {selectedUser?.email}
+              </p>
               <p className="text-sm text-foreground/80 mb-4">
                 Current status:{" "}
                 {selectedUser && UserStatus[selectedUser.status]}
@@ -86,7 +89,7 @@ export function StatusUpdateModal({
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Select new status
+                Select new status *
               </label>
               <Select
                 value={selectedStatus.toString()}

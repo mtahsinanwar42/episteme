@@ -10,15 +10,10 @@ import type { File } from "@/models/file";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
+import { formatDateTime } from "@/utils/dateFormatter";
 
 export default function Assets() {
   const columns: ColumnDef<File>[] = [
-    {
-      id: "serial",
-      header: "SL",
-      cell: ({ row }) => <span className="text-sm">{row.index + 1}</span>,
-    },
-
     {
       accessorKey: "name",
       header: "Name",
@@ -69,7 +64,7 @@ export default function Assets() {
       cell: ({ row }) => {
         return (
           <div className="text-sm text-center">
-            {new Date(row.getValue("createdAt") as string).toLocaleString()}
+            {formatDateTime(row.getValue("createdAt") as string)}
           </div>
         );
       },

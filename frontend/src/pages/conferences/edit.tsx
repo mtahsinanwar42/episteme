@@ -22,13 +22,7 @@ import PageSubTitle from "@/components/common/PageSubTitle";
 import { fileService } from "@/services/fileService";
 import { FileTypeEnum } from "@/models/file";
 import { FileText, Upload, Loader2 } from "lucide-react";
-
-const formatDateForInput = (value?: string | null) => {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().split("T")[0];
-};
+import { formatDateForInput, formatDateFromInput } from "@/utils/dateFormatter";
 
 export default function EditConference() {
   const navigate = useNavigate();
@@ -105,10 +99,14 @@ export default function EditConference() {
       {
         title: formData.title,
         slug: formData.slug,
-        startAt: formData.startAt,
-        endAt: formData.endAt,
-        submissionPeriodStartAt: formData.submissionPeriodStartAt,
-        submissionPeriodEndAt: formData.submissionPeriodEndAt,
+        startAt: formatDateFromInput(formData.startAt),
+        endAt: formatDateFromInput(formData.endAt),
+        submissionPeriodStartAt: formatDateFromInput(
+          formData.submissionPeriodStartAt,
+        ),
+        submissionPeriodEndAt: formatDateFromInput(
+          formData.submissionPeriodEndAt,
+        ),
         metadataFilePath: formData.metadataFilePath,
         status: Number(formData.status),
       },
@@ -230,7 +228,6 @@ export default function EditConference() {
               onChange={handleInputChange}
               placeholder="e.g., Episteme Conference 2027"
               disabled={updateConferenceMutation.isPending}
-              required
             />
           </div>
 
@@ -245,7 +242,6 @@ export default function EditConference() {
               onChange={handleInputChange}
               placeholder="e.g., episteme-2027"
               disabled={updateConferenceMutation.isPending}
-              required
             />
           </div>
 
@@ -260,7 +256,6 @@ export default function EditConference() {
                 value={formData.startAt}
                 onChange={handleInputChange}
                 disabled={updateConferenceMutation.isPending}
-                required
               />
             </div>
             <div>
@@ -273,7 +268,6 @@ export default function EditConference() {
                 value={formData.endAt}
                 onChange={handleInputChange}
                 disabled={updateConferenceMutation.isPending}
-                required
               />
             </div>
             <div>
@@ -286,7 +280,6 @@ export default function EditConference() {
                 value={formData.submissionPeriodStartAt}
                 onChange={handleInputChange}
                 disabled={updateConferenceMutation.isPending}
-                required
               />
             </div>
             <div>
@@ -299,7 +292,6 @@ export default function EditConference() {
                 value={formData.submissionPeriodEndAt}
                 onChange={handleInputChange}
                 disabled={updateConferenceMutation.isPending}
-                required
               />
             </div>
           </div>
@@ -403,7 +395,21 @@ export default function EditConference() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={updateConferenceMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                updateConferenceMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.slug.trim() ||
+                !formData.startAt ||
+                !formData.endAt ||
+                !formData.submissionPeriodStartAt ||
+                !formData.submissionPeriodEndAt ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {updateConferenceMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>

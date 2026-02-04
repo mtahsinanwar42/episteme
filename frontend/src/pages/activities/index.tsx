@@ -17,9 +17,8 @@ export default function Activities() {
     (state: RootState) => state?.auth?.user?.roles,
   );
 
-  console.log(currentRoles);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(9); // 3 cards x 3 rows by default
+  const [pageSize, setPageSize] = useState(9);
 
   const {
     data: response,
@@ -30,6 +29,7 @@ export default function Activities() {
     limit: pageSize,
     sort: "-createdAt",
     paginate: true,
+    status: currentRoles?.includes(UserRole.ADMIN) ? undefined : 1,
   });
 
   const activities = response?.data || [];

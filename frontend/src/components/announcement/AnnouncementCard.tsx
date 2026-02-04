@@ -6,7 +6,7 @@ import { UserRole } from "@/models/user";
 import type { RootState } from "@/stores/store";
 import { Edit } from "lucide-react";
 import { getAnnouncementTrainingResourceStatusBadge } from "@/components/common/ResourceStatusBadge";
-
+import { formatDateTime } from "@/utils/dateFormatter";
 interface AnnouncementCardProps {
   announcement: Announcement;
   showImage?: boolean;
@@ -18,7 +18,7 @@ export function AnnouncementCard({ announcement }: AnnouncementCardProps) {
     (state: RootState) => state?.auth?.user?.roles,
   );
   const isAdmin = currentRoles?.includes(UserRole.ADMIN);
-  const createdDate = new Date(announcement.createdAt).toLocaleString();
+  const createdDate = formatDateTime(announcement.createdAt);
 
   const handleEdit = () => {
     navigate(`/announcements/edit/${announcement.id}`);

@@ -185,7 +185,6 @@ export default function EditBlog() {
               onChange={handleInputChange}
               placeholder="e.g., Introduction to Research Methods"
               disabled={updateBlogMutation.isPending}
-              required
             />
           </div>
 
@@ -289,7 +288,16 @@ export default function EditBlog() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={updateBlogMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                updateBlogMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {updateBlogMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>

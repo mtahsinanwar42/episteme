@@ -162,7 +162,6 @@ export default function NewActivity() {
               onChange={handleInputChange}
               placeholder="e.g., Episteme Conference 2"
               disabled={createActivityMutation.isPending}
-              required
             />
           </div>
 
@@ -253,7 +252,16 @@ export default function NewActivity() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={createActivityMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                createActivityMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {createActivityMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>

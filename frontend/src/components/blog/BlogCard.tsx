@@ -6,6 +6,7 @@ import { UserRole } from "@/models/user";
 import type { RootState } from "@/stores/store";
 import { Edit } from "lucide-react";
 import { getBlogActivityResourceStatusBadge } from "@/components/common/ResourceStatusBadge";
+import { formatDateTime } from "@/utils/dateFormatter";
 
 interface BlogCardProps {
   blog: Blog;
@@ -18,7 +19,7 @@ export function BlogCard({ blog }: BlogCardProps) {
     (state: RootState) => state?.auth?.user?.roles,
   );
   const isAdmin = currentRoles?.includes(UserRole.ADMIN);
-  const createdDate = new Date(blog.createdAt).toLocaleString();
+  const createdDate = formatDateTime(blog.createdAt);
 
   const handleEdit = () => {
     navigate(`/blogs/edit/${blog.id}`);

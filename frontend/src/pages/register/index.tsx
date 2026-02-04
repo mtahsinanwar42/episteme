@@ -3,15 +3,28 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { Input } from "@/components/ui/input";
+import {
+  getPasswordStrength,
+  PasswordInput,
+} from "@/components/common/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
-// import { fileService } from "@/services/fileService";
-// import { FileTypeEnum } from "@/models/file";
+import { useCountries } from "@/hooks/useUsers";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Register() {
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
+
+  const { data: countriesData } = useCountries();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -33,11 +46,15 @@ export default function Register() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleCountryChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, country: value }));
+  };
+
   const handleRoleToggle = (role: string) => {
     setSelectedRoles((prev) => {
       if (prev.includes(role)) {
         // Don't allow deselecting if it's the only role
-        if (prev.length === 1) return prev;
+        // if (prev.length === 1) return prev;
         return prev.filter((r) => r !== role);
       }
       return [...prev, role];
@@ -105,7 +122,6 @@ export default function Register() {
                   placeholder="John"
                   value={formData.firstName}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -120,7 +136,6 @@ export default function Register() {
                   placeholder="Doe"
                   value={formData.lastName}
                   onChange={handleChange}
-                  required
                 />
               </div>
             </div>
@@ -136,24 +151,14 @@ export default function Register() {
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleChange}
-                required
               />
             </div>
 
-            <div className="flex flex-col space-y-2">
-              <label htmlFor="password" className="text-sm font-medium ">
-                Password *
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter a secure password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <PasswordInput
+              value={formData.password}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col space-y-2">
@@ -174,15 +179,22 @@ export default function Register() {
                 <label htmlFor="country" className="text-sm font-medium ">
                   Country *
                 </label>
-                <Input
-                  id="country"
-                  name="country"
-                  type="text"
-                  placeholder="Bangladesh"
+                <Select
                   value={formData.country}
-                  onChange={handleChange}
-                  required
-                />
+                  onValueChange={handleCountryChange}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countriesData?.data.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -198,7 +210,6 @@ export default function Register() {
                   placeholder="University Name"
                   value={formData.institution}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -213,7 +224,6 @@ export default function Register() {
                   placeholder="Student"
                   value={formData.occupation}
                   onChange={handleChange}
-                  required
                 />
               </div>
             </div>
@@ -233,7 +243,7 @@ export default function Register() {
             </div>
 
             <div className="flex flex-col space-y-3">
-              <label className="text-sm font-medium ">Select Roles *</label>
+              <label className="text-sm font-medium ">Select Roles</label>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Checkbox
@@ -286,7 +296,9 @@ export default function Register() {
                 background:
                   "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
               }}
-              disabled={isLoading}
+              disabled={
+                isLoading || getPasswordStrength(formData.password).score < 4
+              }
             >
               {isLoading ? "Creating Account..." : "Create"}
             </Button>

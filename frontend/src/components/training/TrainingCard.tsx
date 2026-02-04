@@ -6,7 +6,7 @@ import { UserRole } from "@/models/user";
 import type { RootState } from "@/stores/store";
 import { Edit } from "lucide-react";
 import { getAnnouncementTrainingResourceStatusBadge } from "../common/ResourceStatusBadge";
-
+import { formatDateTime } from "@/utils/dateFormatter";
 interface TrainingCardProps {
   training: Training;
   showImage?: boolean;
@@ -18,7 +18,7 @@ export function TrainingCard({ training }: TrainingCardProps) {
     (state: RootState) => state?.auth?.user?.roles,
   );
   const isAdmin = currentRoles?.includes(UserRole.ADMIN);
-  const createdDate = new Date(training.createdAt).toLocaleString();
+  const createdDate = formatDateTime(training.createdAt);
 
   const handleEdit = () => {
     navigate(`/trainings/edit/${training.id}`);

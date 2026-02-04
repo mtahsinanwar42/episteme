@@ -1,5 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useUserById, useUserDetailsMutation } from "@/hooks/useUsers";
+import {
+  useCountries,
+  useUserById,
+  useUserDetailsMutation,
+} from "@/hooks/useUsers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +22,7 @@ import {
   User,
   Notebook,
 } from "lucide-react";
+import { formatDateTime } from "@/utils/dateFormatter";
 import {
   Select,
   SelectContent,
@@ -37,6 +42,9 @@ import PageTitle from "@/components/common/PageTitle";
 export default function UserDetails() {
   const { userId } = useParams();
   const navigate = useNavigate();
+
+  const { data: countriesData } = useCountries();
+
   const updateUserMutation = useUserDetailsMutation();
   const { data, isLoading, isError, error } = useUserById(userId);
 
@@ -175,14 +183,14 @@ export default function UserDetails() {
 
   const getStatusBadge = (status: number) => {
     switch (status) {
-      case 0:
-        return <Badge variant="destructive">{UserStatus[status]}</Badge>;
-      case 1:
-        return <Badge variant="default">{UserStatus[status]}</Badge>;
-      case 2:
-        return <Badge variant="secondary">{UserStatus[status]}</Badge>;
-      case 9:
+      case UserStatus.INACTIVE:
         return <Badge variant="disabled">{UserStatus[status]}</Badge>;
+      case UserStatus.ACTIVE:
+        return <Badge variant="default">{UserStatus[status]}</Badge>;
+      case UserStatus.SUSPENDED:
+        return <Badge variant="secondary">{UserStatus[status]}</Badge>;
+      case UserStatus.DELETED:
+        return <Badge variant="destructive">{UserStatus[status]}</Badge>;
       default:
         return <Badge variant="default">{UserStatus[status]}</Badge>;
     }
@@ -309,19 +317,23 @@ export default function UserDetails() {
             <div className="p-4 gradient-card shadow-sm flex justify-between items-center">
               <h3 className="font-semibold">Information</h3>
 
-              {isEdit ? (
-                <X
-                  onClick={() => {
-                    setFormData(user);
-                    setIsEdit(false);
-                  }}
-                  className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
-                />
-              ) : (
-                <Edit
-                  onClick={() => setIsEdit(true)}
-                  className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
-                />
+              {user.status !== UserStatus.DELETED && (
+                <>
+                  {isEdit ? (
+                    <X
+                      onClick={() => {
+                        setFormData(user);
+                        setIsEdit(false);
+                      }}
+                      className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
+                    />
+                  ) : (
+                    <Edit
+                      onClick={() => setIsEdit(true)}
+                      className="size-4 text-foreground hover:text-foreground/80 cursor-pointer"
+                    />
+                  )}
+                </>
               )}
             </div>
 
@@ -335,6 +347,27 @@ export default function UserDetails() {
                     <p className="font-medium">{user.email}</p>
                   </div>
                 </div>
+
+                {/* {isEdit && (
+                  <div className="flex gap-3">
+                    <div>
+                      <User className="w-5 h-5 text-accent mt-0.5" />
+                    </div>
+
+                    <div className="w-full">
+                      <PasswordInput
+                        value={formData?.password}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            password: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                )} */}
+
                 <div className="flex items-start gap-3">
                   <Phone className="w-5 h-5 text-accent mt-0.5" />
                   <div className="w-full">
@@ -404,13 +437,24 @@ export default function UserDetails() {
                   <div className="w-full">
                     <p className="text-sm ">Country</p>
                     {isEdit ? (
-                      <Input
-                        type="text"
+                      <Select
                         value={formData.country}
-                        onChange={(e) =>
-                          setFormData({ ...formData, country: e.target.value })
-                        }
-                      />
+                        onValueChange={(value) => {
+                          setFormData({ ...formData, country: value });
+                        }}
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countriesData?.data.map((country) => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     ) : (
                       <p className="font-medium">
                         {user.country || "Not provided"}
@@ -423,7 +467,7 @@ export default function UserDetails() {
                   <div className="w-full">
                     <p className="text-sm ">Created At</p>
                     <p className="font-medium">
-                      {new Date(user.createdAt).toLocaleString()}
+                      {formatDateTime(user.createdAt)}
                     </p>
                   </div>
                 </div>

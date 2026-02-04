@@ -3,11 +3,13 @@ import type { Activity } from "@/models/activity";
 import { config } from "@/config/config";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
 import { Link } from "react-router-dom";
+import { formatDate } from "@/utils/dateFormatter";
 
 export default function HomeActivitySection() {
   const { data: response, isLoading } = useActivities({
     limit: 3,
     sort: "-createdAt",
+    status: 1,
   });
 
   const activities = response?.data || [];
@@ -122,13 +124,7 @@ function ActivityCard({ activity }: ActivityCardProps) {
           <div className="space-y-2 mb-4">
             <div className="flex items-center gap-2 text-sm text-foreground/90">
               <span>📅</span>
-              <span>
-                {new Date(activity.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
+              <span>{formatDate(activity.createdAt)}</span>
             </div>
           </div>
         </div>

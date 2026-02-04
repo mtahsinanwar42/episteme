@@ -31,7 +31,11 @@ export default function Trainings() {
     paginate: true,
   });
 
-  const trainings = response?.data || [];
+  const trainings = currentRoles?.includes(UserRole.ADMIN)
+    ? response?.data
+    : response?.data.filter(
+        (training) => training.status === 1 || training.status === 2,
+      ) || [];
   const total = response?.total || 0;
 
   const currentPage = page;
@@ -78,7 +82,7 @@ export default function Trainings() {
       {!isLoading && !error && (
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trainings.map((training) => (
+            {trainings?.map((training) => (
               <div
                 key={training.id}
                 onClick={() => handleTrainingClick(training.id)}

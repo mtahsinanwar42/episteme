@@ -41,6 +41,7 @@ export interface GetBlogsParams {
   select?: string;
   search?: string;
   paginate?: boolean;
+  status?: number;
 }
 
 export interface CreateBlogRequest {

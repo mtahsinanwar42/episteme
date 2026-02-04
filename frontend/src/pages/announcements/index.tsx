@@ -31,7 +31,12 @@ export default function Announcements() {
     paginate: true,
   });
 
-  const announcements = response?.data || [];
+  const announcements = currentRoles?.includes(UserRole.ADMIN)
+    ? response?.data
+    : response?.data.filter(
+        (announcement) =>
+          announcement.status === 1 || announcement.status === 2,
+      ) || [];
   const total = response?.total || 0;
 
   const currentPage = page;
@@ -82,7 +87,7 @@ export default function Announcements() {
       {!isLoading && !error && (
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {announcements.map((announcement) => (
+            {announcements?.map((announcement) => (
               <div
                 key={announcement.id}
                 onClick={() => handleAnnouncementClick(announcement.id)}

@@ -192,7 +192,6 @@ export default function EditTraining() {
               onChange={handleInputChange}
               placeholder="e.g., Professional Development Workshop"
               disabled={updateTrainingMutation.isPending}
-              required
             />
           </div>
 
@@ -299,7 +298,16 @@ export default function EditTraining() {
               Cancel
             </Button>
 
-            <Button type="submit" disabled={updateTrainingMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={
+                updateTrainingMutation.isPending ||
+                !formData.title.trim() ||
+                !formData.metadataFilePath ||
+                formData.status === undefined ||
+                formData.status === null
+              }
+            >
               {updateTrainingMutation.isPending ? "Updating..." : "Update"}
             </Button>
           </div>
