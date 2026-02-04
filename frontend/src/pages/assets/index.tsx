@@ -15,12 +15,6 @@ import { formatDateTime } from "@/utils/dateFormatter";
 export default function Assets() {
   const columns: ColumnDef<File>[] = [
     {
-      id: "serial",
-      header: "SL",
-      cell: ({ row }) => <span className="text-sm">{row.index + 1}</span>,
-    },
-
-    {
       accessorKey: "name",
       header: "Name",
       cell: ({ row }) => {

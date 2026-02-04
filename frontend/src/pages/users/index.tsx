@@ -73,16 +73,6 @@ export default function Users() {
   const columns: ColumnDef<User>[] = useMemo(
     () => [
       {
-        id: "serial",
-        header: "SL",
-        cell: ({ row }) => <span className="text-sm">{row.index + 1}</span>,
-      },
-      {
-        id: "id",
-        header: "ID",
-        cell: ({ row }) => <span className="text-sm">{row.original.id}</span>,
-      },
-      {
         accessorKey: "firstName",
         header: ({ column }) => {
           return (
