@@ -52,4 +52,10 @@ export const userService = {
   ): Promise<{ success: boolean; data: any }> => {
     return api.post<{ success: boolean; data: any }>("/users", postData, true);
   },
+  getCountries: async (): Promise<{ success: boolean; data: string[] }> => {
+    return api.get<{ success: boolean; data: string[] }>(
+      "/reference-data/countries",
+      false,
+    );
+  },
 };

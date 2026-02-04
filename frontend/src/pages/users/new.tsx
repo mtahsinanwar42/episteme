@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateUserMutation } from "@/hooks/useUsers";
+import { useCountries, useCreateUserMutation } from "@/hooks/useUsers";
 import { UserStatus } from "@/models/user";
 import { FileTypeEnum } from "@/models/file";
 import { fileService } from "@/services/fileService";
@@ -21,6 +21,8 @@ import PageTitle from "@/components/common/PageTitle";
 export default function NewUser() {
   const navigate = useNavigate();
   const createUserMutation = useCreateUserMutation();
+
+  const { data: countriesData } = useCountries();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -251,14 +253,25 @@ export default function NewUser() {
                 <label htmlFor="country" className="text-sm font-medium ">
                   Country *
                 </label>
-                <Input
-                  id="country"
-                  name="country"
-                  type="text"
-                  placeholder="Bangladesh"
+
+                <Select
                   value={formData.country}
-                  onChange={handleChange}
-                />
+                  onValueChange={(value) => {
+                    setFormData((prev) => ({ ...prev, country: value }));
+                  }}
+                  disabled={createUserMutation.isPending}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countriesData?.data.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex flex-col space-y-2">

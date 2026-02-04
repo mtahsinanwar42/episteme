@@ -1,5 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useUserById, useUserDetailsMutation } from "@/hooks/useUsers";
+import {
+  useCountries,
+  useUserById,
+  useUserDetailsMutation,
+} from "@/hooks/useUsers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +42,9 @@ import PageTitle from "@/components/common/PageTitle";
 export default function UserDetails() {
   const { userId } = useParams();
   const navigate = useNavigate();
+
+  const { data: countriesData } = useCountries();
+
   const updateUserMutation = useUserDetailsMutation();
   const { data, isLoading, isError, error } = useUserById(userId);
 
@@ -405,13 +412,24 @@ export default function UserDetails() {
                   <div className="w-full">
                     <p className="text-sm ">Country</p>
                     {isEdit ? (
-                      <Input
-                        type="text"
+                      <Select
                         value={formData.country}
-                        onChange={(e) =>
-                          setFormData({ ...formData, country: e.target.value })
-                        }
-                      />
+                        onValueChange={(value) => {
+                          setFormData({ ...formData, country: value });
+                        }}
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countriesData?.data.map((country) => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     ) : (
                       <p className="font-medium">
                         {user.country || "Not provided"}

@@ -6,12 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
-// import { fileService } from "@/services/fileService";
-// import { FileTypeEnum } from "@/models/file";
+import { useCountries } from "@/hooks/useUsers";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Register() {
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
+
+  const { data: countriesData } = useCountries();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,6 +40,10 @@ export default function Register() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCountryChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, country: value }));
   };
 
   const handleRoleToggle = (role: string) => {
@@ -170,14 +183,22 @@ export default function Register() {
                 <label htmlFor="country" className="text-sm font-medium ">
                   Country *
                 </label>
-                <Input
-                  id="country"
-                  name="country"
-                  type="text"
-                  placeholder="Bangladesh"
+                <Select
                   value={formData.country}
-                  onChange={handleChange}
-                />
+                  onValueChange={handleCountryChange}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countriesData?.data.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

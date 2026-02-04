@@ -46,3 +46,10 @@ export function useCreateUserMutation() {
     },
   });
 }
+
+export function useCountries() {
+  return useQuery({
+    queryKey: ["countries"],
+    queryFn: () => userService.getCountries(),
+  });
+}
