@@ -3,6 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { Input } from "@/components/ui/input";
+import {
+  getPasswordStrength,
+  PasswordInput,
+} from "@/components/common/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
@@ -36,10 +40,12 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "password") setPasswordTouched(true);
   };
 
   const handleCountryChange = (value: string) => {
@@ -150,19 +156,11 @@ export default function Register() {
               />
             </div>
 
-            <div className="flex flex-col space-y-2">
-              <label htmlFor="password" className="text-sm font-medium ">
-                Password *
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter a secure password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
+            <PasswordInput
+              value={formData.password}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col space-y-2">
@@ -300,7 +298,9 @@ export default function Register() {
                 background:
                   "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
               }}
-              disabled={isLoading}
+              disabled={
+                isLoading || getPasswordStrength(formData.password).score < 4
+              }
             >
               {isLoading ? "Creating Account..." : "Create"}
             </Button>

@@ -343,6 +343,27 @@ export default function UserDetails() {
                     <p className="font-medium">{user.email}</p>
                   </div>
                 </div>
+
+                {/* {isEdit && (
+                  <div className="flex gap-3">
+                    <div>
+                      <User className="w-5 h-5 text-accent mt-0.5" />
+                    </div>
+
+                    <div className="w-full">
+                      <PasswordInput
+                        value={formData?.password}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            password: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                )} */}
+
                 <div className="flex items-start gap-3">
                   <Phone className="w-5 h-5 text-accent mt-0.5" />
                   <div className="w-full">
