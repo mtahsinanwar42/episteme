@@ -122,10 +122,8 @@ export default function AssetDetails() {
               </div>
 
               <div className="flex items-start gap-3">
-                <Image className="w-5 h-5 text-accent mt-0.5" />
+                <div className="w-5"></div>
                 <div className="group">
-                  <p className="text-sm text-muted-foreground mb-2">Image</p>
-
                   <div
                     onClick={() => handleDownload()}
                     className="cursor-pointer w-24 h-24 rounded-md border border-dashed border-accent grid place-content-center "
