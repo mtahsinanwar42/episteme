@@ -185,7 +185,6 @@ export default function EditBlog() {
               onChange={handleInputChange}
               placeholder="e.g., Introduction to Research Methods"
               disabled={updateBlogMutation.isPending}
-              required
             />
           </div>
 

@@ -164,7 +164,6 @@ export default function NewAnnouncement() {
               onChange={handleInputChange}
               placeholder="e.g., Important System Update"
               disabled={createAnnouncementMutation.isPending}
-              required
             />
           </div>
 

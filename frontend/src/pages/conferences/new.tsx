@@ -190,7 +190,6 @@ export default function NewConference() {
               onChange={handleInputChange}
               placeholder="e.g., Episteme Conference 2027"
               disabled={createConferenceMutation.isPending}
-              required
             />
           </div>
 
@@ -205,7 +204,6 @@ export default function NewConference() {
               onChange={handleInputChange}
               placeholder="e.g., episteme-2027"
               disabled={createConferenceMutation.isPending}
-              required
             />
           </div>
 
@@ -220,7 +218,6 @@ export default function NewConference() {
                 value={formData.startAt}
                 onChange={handleInputChange}
                 disabled={createConferenceMutation.isPending}
-                required
               />
             </div>
             <div>
@@ -233,7 +230,6 @@ export default function NewConference() {
                 value={formData.endAt}
                 onChange={handleInputChange}
                 disabled={createConferenceMutation.isPending}
-                required
               />
             </div>
             <div>
@@ -246,7 +242,6 @@ export default function NewConference() {
                 value={formData.submissionPeriodStartAt}
                 onChange={handleInputChange}
                 disabled={createConferenceMutation.isPending}
-                required
               />
             </div>
             <div>
@@ -259,7 +254,6 @@ export default function NewConference() {
                 value={formData.submissionPeriodEndAt}
                 onChange={handleInputChange}
                 disabled={createConferenceMutation.isPending}
-                required
               />
             </div>
           </div>

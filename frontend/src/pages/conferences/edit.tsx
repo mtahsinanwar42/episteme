@@ -228,7 +228,6 @@ export default function EditConference() {
               onChange={handleInputChange}
               placeholder="e.g., Episteme Conference 2027"
               disabled={updateConferenceMutation.isPending}
-              required
             />
           </div>
 
@@ -243,7 +242,6 @@ export default function EditConference() {
               onChange={handleInputChange}
               placeholder="e.g., episteme-2027"
               disabled={updateConferenceMutation.isPending}
-              required
             />
           </div>
 
@@ -258,7 +256,6 @@ export default function EditConference() {
                 value={formData.startAt}
                 onChange={handleInputChange}
                 disabled={updateConferenceMutation.isPending}
-                required
               />
             </div>
             <div>
@@ -271,7 +268,6 @@ export default function EditConference() {
                 value={formData.endAt}
                 onChange={handleInputChange}
                 disabled={updateConferenceMutation.isPending}
-                required
               />
             </div>
             <div>
@@ -284,7 +280,6 @@ export default function EditConference() {
                 value={formData.submissionPeriodStartAt}
                 onChange={handleInputChange}
                 disabled={updateConferenceMutation.isPending}
-                required
               />
             </div>
             <div>
@@ -297,7 +292,6 @@ export default function EditConference() {
                 value={formData.submissionPeriodEndAt}
                 onChange={handleInputChange}
                 disabled={updateConferenceMutation.isPending}
-                required
               />
             </div>
           </div>

@@ -162,7 +162,6 @@ export default function NewTraining() {
               onChange={handleInputChange}
               placeholder="e.g., Professional Development Workshop"
               disabled={createTrainingMutation.isPending}
-              required
             />
           </div>
 

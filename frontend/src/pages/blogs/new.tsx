@@ -159,7 +159,6 @@ export default function NewBlog() {
               onChange={handleInputChange}
               placeholder="e.g., Introduction to Research Methods"
               disabled={createBlogMutation.isPending}
-              required
             />
           </div>
 

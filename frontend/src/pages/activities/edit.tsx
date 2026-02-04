@@ -191,7 +191,6 @@ export default function EditActivity() {
               onChange={handleInputChange}
               placeholder="e.g., Episteme Conference 2"
               disabled={updateActivityMutation.isPending}
-              required
             />
           </div>
 

@@ -162,7 +162,6 @@ export default function NewActivity() {
               onChange={handleInputChange}
               placeholder="e.g., Episteme Conference 2"
               disabled={createActivityMutation.isPending}
-              required
             />
           </div>
 

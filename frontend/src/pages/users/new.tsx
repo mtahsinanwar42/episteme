@@ -51,7 +51,7 @@ export default function NewUser() {
     setSelectedRoles((prev) => {
       if (prev.includes(role)) {
         // Don't allow deselecting if it's the only role
-        if (prev.length === 1) return prev;
+        // if (prev.length === 1) return prev;
         return prev.filter((r) => r !== role);
       }
       return [...prev, role];
@@ -188,7 +188,6 @@ export default function NewUser() {
                   placeholder="John"
                   value={formData.firstName}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -203,7 +202,6 @@ export default function NewUser() {
                   placeholder="Doe"
                   value={formData.lastName}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -218,7 +216,6 @@ export default function NewUser() {
                   placeholder="user@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -233,7 +230,6 @@ export default function NewUser() {
                   placeholder="Enter a secure password"
                   value={formData.password}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -248,7 +244,6 @@ export default function NewUser() {
                   placeholder="+8801712345678"
                   value={formData.phone}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -263,7 +258,6 @@ export default function NewUser() {
                   placeholder="Bangladesh"
                   value={formData.country}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -278,7 +272,6 @@ export default function NewUser() {
                   placeholder="University Name"
                   value={formData.institution}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -293,7 +286,6 @@ export default function NewUser() {
                   placeholder="Student"
                   value={formData.occupation}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -383,7 +375,7 @@ export default function NewUser() {
             </div>
 
             <div className="flex flex-col space-y-3">
-              <label className="text-sm font-medium ">Select Roles *</label>
+              <label className="text-sm font-medium ">Select Roles</label>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Checkbox

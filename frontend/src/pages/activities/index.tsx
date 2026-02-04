@@ -17,7 +17,6 @@ export default function Activities() {
     (state: RootState) => state?.auth?.user?.roles,
   );
 
-  console.log(currentRoles);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(9); // 3 cards x 3 rows by default
 
