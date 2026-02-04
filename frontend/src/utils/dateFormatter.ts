@@ -1,4 +1,14 @@
 /**
+ * Get the browser's timezone offset in hours
+ * @returns Timezone offset in hours (e.g., 6 for GMT+6, -5 for GMT-5)
+ */
+function getTimezoneOffsetHours(): number {
+  // getTimezoneOffset() returns minutes, negative for positive offsets
+  // For GMT+6, it returns -360, so we divide by -60 to get 6
+  return -new Date().getTimezoneOffset() / 60;
+}
+
+/**
  * Formats a date string to the user's local timezone
  * @param dateString - ISO date string from the backend
  * @param options - Intl.DateTimeFormat options
@@ -52,7 +62,7 @@ export function formatDateTime(
     return "";
   }
 
-  // Add 12 hours to fix backend time storage issue
+  // Add 12 hours to fix backend time storage issue (backend stores times 12 hours behind)
   date.setHours(date.getHours() + 12);
 
   const defaultOptions: Intl.DateTimeFormatOptions = {
@@ -110,10 +120,11 @@ export function formatDateFromInput(dateInputValue: string): string {
   // Create date at midnight UTC
   const date = new Date(`${dateInputValue}T00:00:00.000Z`);
 
-  // Add 6 hours to compensate for GMT+6 timezone offset
-  // When backend receives this UTC time, it will convert back to GMT+6
+  // Dynamically get timezone offset and add to compensate
+  // When backend receives this UTC time, it will convert back to local timezone
   // resulting in the correct date at midnight local time
-  date.setHours(date.getHours() + 6);
+  const timezoneOffset = getTimezoneOffsetHours();
+  date.setHours(date.getHours() + timezoneOffset);
 
   return date.toISOString();
 }
