@@ -74,31 +74,22 @@ export default function Users() {
     () => [
       {
         accessorKey: "firstName",
-        header: ({ column }) => {
-          return (
-            <div
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="flex items-center gap-4 justify-center w-full"
-            >
-              First Name
-              <ArrowUpDown className="size-4 text-muted-foreground" />
-            </div>
-          );
-        },
-        cell: ({ row }) => {
-          const firstName = row.getValue("firstName") as string;
-          return <span className="font-medium">{firstName}</span>;
-        },
-        sortingFn: (rowA, rowB, columnId) => {
-          const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
-          const b = String(rowB.getValue(columnId) ?? "").toLowerCase();
-          return a.localeCompare(b);
-        },
+        header: "First Name",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.getValue("firstName")}</span>
+        ),
+        enableSorting: false,
       },
       {
         accessorKey: "lastName",
+        header: "Last Name",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.getValue("lastName")}</span>
+        ),
+        enableSorting: false,
+      },
+      {
+        accessorKey: "email",
         header: ({ column }) => {
           return (
             <div
@@ -107,23 +98,19 @@ export default function Users() {
               }
               className="flex items-center gap-4 justify-center w-full"
             >
-              Last Name
+              Email
               <ArrowUpDown className="size-4 text-muted-foreground" />
             </div>
           );
         },
+        cell: ({ row }) => (
+          <span className="text-sm">{row.getValue("email")}</span>
+        ),
         sortingFn: (rowA, rowB, columnId) => {
           const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
           const b = String(rowB.getValue(columnId) ?? "").toLowerCase();
           return a.localeCompare(b);
         },
-      },
-      {
-        accessorKey: "email",
-        header: "Email",
-        cell: ({ row }) => (
-          <span className="text-sm">{row.getValue("email")}</span>
-        ),
       },
       {
         accessorKey: "phone",
@@ -131,6 +118,15 @@ export default function Users() {
         cell: ({ row }) => (
           <span className="text-sm">{row.getValue("phone")}</span>
         ),
+        enableSorting: false,
+      },
+      {
+        accessorKey: "institution",
+        header: "Institution",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.getValue("institution")}</span>
+        ),
+        enableSorting: false,
       },
       {
         accessorKey: "roles",
@@ -147,6 +143,7 @@ export default function Users() {
             </div>
           );
         },
+        enableSorting: false,
       },
       {
         accessorKey: "status",
@@ -191,6 +188,7 @@ export default function Users() {
             </div>
           );
         },
+        enableSorting: false,
       },
     ],
     [handleOpenStatusModal, getStatusBadge],
