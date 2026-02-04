@@ -1,12 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Mail,
-  Phone,
-  User as UserIcon,
-  Image,
-  DownloadCloud,
-} from "lucide-react";
+import { Mail, Phone, User as UserIcon, DownloadCloud } from "lucide-react";
 import { fileService } from "@/services/fileService";
 import { useFileById } from "@/hooks/useFiles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
