@@ -37,7 +37,7 @@ import EditBlog from "@/pages/blogs/edit";
 import ConferenceDetails from "@/pages/conferences/details";
 import NewConference from "@/pages/conferences/new";
 import EditConference from "@/pages/conferences/edit";
-import Unauthorized from "@/pages/misc/Unauthorized";
+import Unauthorized from "@/pages/misc/unauthorized";
 import NotFound from "@/pages/misc/notFound";
 
 export default function RouteConfig() {
