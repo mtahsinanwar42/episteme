@@ -43,9 +43,6 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "version_no",
-        validate: {
-          min: 1,
-        },
       },
     },
     {

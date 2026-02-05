@@ -37,6 +37,8 @@ import EditBlog from "@/pages/blogs/edit";
 import ConferenceDetails from "@/pages/conferences/details";
 import NewConference from "@/pages/conferences/new";
 import EditConference from "@/pages/conferences/edit";
+import Unauthorized from "@/pages/misc/unauthorized";
+import NotFound from "@/pages/misc/notFound";
 
 export default function RouteConfig() {
   return (
@@ -101,23 +103,62 @@ export default function RouteConfig() {
 
       <Route path="/activities" element={<Activities />} />
       <Route path="/activities/:activityId" element={<ActivityDetails />} />
-      <Route path="/activities/new" element={<NewActivity />} />
-      <Route path="/activities/edit/:activityId" element={<EditActivity />} />
+      <Route
+        path="/activities/new"
+        element={
+          <ProtectedRoute>
+            <NewActivity />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/activities/edit/:activityId"
+        element={
+          <ProtectedRoute>
+            <EditActivity />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/trainings" element={<Trainings />} />
       <Route path="/trainings/:trainingId" element={<TrainingDetails />} />
-      <Route path="/trainings/new" element={<NewTraining />} />
-      <Route path="/trainings/edit/:trainingId" element={<EditTraining />} />
+      <Route
+        path="/trainings/new"
+        element={
+          <ProtectedRoute>
+            <NewTraining />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/trainings/edit/:trainingId"
+        element={
+          <ProtectedRoute>
+            <EditTraining />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/announcements" element={<Announcements />} />
       <Route
         path="/announcements/:announcementId"
         element={<AnnouncementDetails />}
       />
-      <Route path="/announcements/new" element={<NewAnnouncement />} />
+      <Route
+        path="/announcements/new"
+        element={
+          <ProtectedRoute>
+            <NewAnnouncement />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/announcements/edit/:announcementId"
-        element={<EditAnnouncement />}
+        element={
+          <ProtectedRoute>
+            <EditAnnouncement />
+          </ProtectedRoute>
+        }
       />
 
       <Route path="/conferences" element={<Conferences />} />
@@ -126,17 +167,42 @@ export default function RouteConfig() {
         element={<ConferenceDetails />}
       />
 
-      <Route path="/conferences/new" element={<NewConference />} />
+      <Route
+        path="/conferences/new"
+        element={
+          <ProtectedRoute>
+            <NewConference />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/conferences/edit/:conferenceId"
-        element={<EditConference />}
+        element={
+          <ProtectedRoute>
+            <EditConference />
+          </ProtectedRoute>
+        }
       />
 
       <Route path="/blogs" element={<Blogs />} />
       <Route path="/blogs/:blogId" element={<BlogDetails />} />
-      <Route path="/blogs/new" element={<NewBlog />} />
-      <Route path="/blogs/edit/:blogId" element={<EditBlog />} />
+      <Route
+        path="/blogs/new"
+        element={
+          <ProtectedRoute>
+            <NewBlog />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/blogs/edit/:blogId"
+        element={
+          <ProtectedRoute>
+            <EditBlog />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/about/mission" element={<Mission />} />
       <Route path="/about/ethics" element={<Ethics />} />
@@ -146,7 +212,10 @@ export default function RouteConfig() {
       <Route path="/about/career" element={<Career />} />
       <Route path="/about/contact" element={<Contact />} />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/404-not-found" element={<NotFound />} />
+
+      <Route path="*" element={<Navigate to="/404-not-found" replace />} />
     </Routes>
   );
 }

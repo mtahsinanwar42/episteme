@@ -13,3 +13,5 @@ export const currentTimestamp = () => {
     String(d.getUTCMilliseconds()).padStart(3, "0")
   );
 };
+
+export const toDate = (v) => (v instanceof Date ? v : new Date(v));

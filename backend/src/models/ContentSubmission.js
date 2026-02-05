@@ -23,13 +23,6 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         field: "topics",
         defaultValue: [],
-        validate: {
-          noNulls(value) {
-            if (!Array.isArray(value) || value.some((v) => v == null)) {
-              throw new Error("topics must be a non-null array with no null elements");
-            }
-          },
-        },
       },
       doi: {
         type: DataTypes.TEXT,

@@ -5,6 +5,7 @@ import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS } from "../utils/constants
 import { serializeConference } from "../utils/serializers.js";
 import { isEmpty, isNotEmpty } from "../utils/string.js";
 import { sequelize } from "../config/db.js";
+import { toDate } from "../utils/dateTime.js";
 
 export function createConferenceService({ Conference, fileService }) {
   if (!Conference) {
@@ -60,6 +61,14 @@ export function createConferenceService({ Conference, fileService }) {
 
     if (!Object.values(CONFERENCE_STATUS).includes(status)) {
       throw new ErrorResponse(400, "Invalid conference status");
+    }
+
+    if (toDate(startAt) > toDate(endAt)) {
+      throw new ErrorResponse(400, "Start Date must be before than or same as End Date");
+    }
+
+    if (toDate(submissionPeriodStartAt) > toDate(submissionPeriodEndAt)) {
+      throw new ErrorResponse(400, "Submission Start Date must be before than or same as Submission End Date");
     }
 
     if (await Conference.findOne({ where: { slug } })) {

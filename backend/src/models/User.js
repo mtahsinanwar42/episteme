@@ -28,29 +28,12 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
         field: "phone_number",
-        validate: {
-          isValidPhone(value) {
-            if (value === null || value === undefined || value === "") return;
-
-            const regex = /^\+?[0-9][0-9\-\s]{6,20}$/;
-
-            if (!regex.test(value)) {
-              throw new Error("Invalid phone number format. Use digits, spaces or dashes, optionally starting with +.");
-            }
-          },
-        },
       },
       email: {
         type: DataTypes.TEXT,
         allowNull: false,
         unique: true,
         field: "email",
-        validate: {
-          is: {
-            args: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
-            msg: "Invalid email format",
-          },
-        },
       },
       passwordHash: {
         type: DataTypes.TEXT,
@@ -70,13 +53,6 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         field: "roles",
         defaultValue: ["USER"],
-        validate: {
-          isValidRoles(value) {
-            if (!Array.isArray(value) || value.some((r) => r == null)) {
-              throw new Error("Roles must be a non-null array of text values");
-            }
-          },
-        },
       },
       status: {
         type: DataTypes.INTEGER,
@@ -103,14 +79,6 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
         field: "linkedin_url",
-        validate: {
-          isUrlOrNull(value) {
-            if (value == null) return;
-            if (!/^https?:\/\/.+/i.test(value)) {
-              throw new Error("linkedinUrl must be a valid URL starting with http(s)://");
-            }
-          },
-        },
       },
       institution: {
         type: DataTypes.TEXT,

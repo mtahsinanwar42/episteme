@@ -47,7 +47,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       throw new ErrorResponse(400, "title, conferenceId, contentFilePath are required");
     }
 
-    if (!Array.isArray(topics) || topics.length === 0) {
+    if (!Array.isArray(topics) || topics.length === 0 || topics.some((t) => t == null)) {
       throw new ErrorResponse(400, "topics is required");
     }
 
