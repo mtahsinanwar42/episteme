@@ -7,6 +7,8 @@ import type { RootState } from "@/stores/store";
 import { Edit } from "lucide-react";
 import { getBlogActivityResourceStatusBadge } from "../common/ResourceStatusBadge";
 import { formatDateTime } from "@/utils/dateFormatter";
+import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { config } from "@/config/config";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -19,6 +21,16 @@ export function ActivityCard({ activity }: ActivityCardProps) {
     (state: RootState) => state?.auth?.user?.roles,
   );
   const isAdmin = currentRoles?.includes(UserRole.ADMIN);
+
+  const { data: metadata } = useMetadataFile({
+    filePath: activity.metadataFilePath || "",
+    resourceId: activity.id,
+  });
+
+  const imageUrl = metadata?.heroImagePath
+    ? `${new URL(config.baseUrl).origin}/${metadata.heroImagePath}`
+    : undefined;
+
   const createdDate = formatDateTime(activity.createdAt);
 
   const handleEdit = () => {
@@ -28,6 +40,9 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   return (
     <Card
       title={activity.title}
+      description={<div className="truncate">{metadata?.summary}</div>}
+      showImage
+      imageUrl={imageUrl}
       statusBadge={<>{getBlogActivityResourceStatusBadge(activity.status)}</>}
       metadata={<span className="text-slate-500 text-sm">{createdDate}</span>}
       actions={

@@ -85,8 +85,8 @@ export default function Announcements() {
       {error && <div className="text-red-600">{(error as Error).message}</div>}
 
       {!isLoading && !error && (
-        <div className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-full max-w-2/3 flex flex-col gap-12">
             {announcements?.map((announcement) => (
               <div
                 key={announcement.id}
