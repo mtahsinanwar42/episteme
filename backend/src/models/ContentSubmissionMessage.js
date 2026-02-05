@@ -32,9 +32,6 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
         field: "visibility_scope",
-        validate: {
-          isIn: [["USER_ADMIN", "ADMIN_REVIEWER"]],
-        },
       },
       message: {
         type: DataTypes.TEXT,
