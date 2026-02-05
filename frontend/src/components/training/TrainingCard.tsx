@@ -7,6 +7,8 @@ import type { RootState } from "@/stores/store";
 import { Edit } from "lucide-react";
 import { getAnnouncementTrainingResourceStatusBadge } from "../common/ResourceStatusBadge";
 import { formatDateTime } from "@/utils/dateFormatter";
+import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { config } from "@/config/config";
 interface TrainingCardProps {
   training: Training;
   showImage?: boolean;
@@ -18,6 +20,16 @@ export function TrainingCard({ training }: TrainingCardProps) {
     (state: RootState) => state?.auth?.user?.roles,
   );
   const isAdmin = currentRoles?.includes(UserRole.ADMIN);
+
+  const { data: metadata } = useMetadataFile({
+    filePath: training.metadataFilePath || "",
+    resourceId: training.id,
+  });
+
+  const imageUrl = metadata?.heroImagePath
+    ? `${new URL(config.baseUrl).origin}/${metadata.heroImagePath}`
+    : undefined;
+
   const createdDate = formatDateTime(training.createdAt);
 
   const handleEdit = () => {
@@ -27,6 +39,9 @@ export function TrainingCard({ training }: TrainingCardProps) {
   return (
     <Card
       title={training.title}
+      description={<div className="truncate">{metadata?.summary}</div>}
+      showImage
+      imageUrl={imageUrl}
       statusBadge={
         <>{getAnnouncementTrainingResourceStatusBadge(training.status)}</>
       }

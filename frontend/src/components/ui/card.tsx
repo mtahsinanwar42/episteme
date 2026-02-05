@@ -5,6 +5,7 @@ interface CardProps {
   imageAlt?: string;
   showImage?: boolean;
   title: string;
+  description?: ReactNode;
   statusBadge?: ReactNode;
   metadata?: ReactNode;
   actions?: ReactNode;
@@ -16,6 +17,7 @@ export function Card({
   imageAlt = "",
   showImage = true,
   title,
+  description,
   statusBadge,
   metadata,
   actions,
@@ -23,11 +25,11 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className="relative h-full rounded-lg border-b-2 border-border gradient-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="relative grid grid-cols-2 rounded-lg border-b-2 border-border gradient-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
       onClick={onClick}
     >
       {showImage && imageUrl && (
-        <div className="aspect-video w-full bg-slate-100">
+        <div className="w-full bg-slate-100 order-2 h-96">
           <img
             src={imageUrl}
             alt={imageAlt}
@@ -38,17 +40,19 @@ export function Card({
         </div>
       )}
 
-      <div className="h-full p-4 flex flex-col gap-2 justify-between">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-foreground pr-4">{title}</h3>
+      <div className="h-full p-4 flex flex-col justify-end gap-8">
+        <div className="flex flex-col gap-2">
+          <h2 className="font-semibold text-foreground pr-4">{title}</h2>
           {actions && (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="absolute top-4 right-4"
+              className="absolute top-4 left-4"
             >
               {actions}
             </div>
           )}
+
+          {description}
         </div>
 
         <div className="flex items-center gap-2">

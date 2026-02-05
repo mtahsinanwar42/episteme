@@ -20,6 +20,8 @@ import {
   getConferenceStatusLabel,
 } from "@/components/common/ConferenceStatusBadge";
 import { useUpdateConferenceStatusMutation } from "@/hooks/useConferences";
+import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { config } from "@/config/config";
 
 interface ConferenceCardProps {
   conference: Conference;
@@ -31,14 +33,20 @@ export function ConferenceCard({ conference }: ConferenceCardProps) {
     (state: RootState) => state?.auth?.user?.roles,
   );
   const isAdmin = currentRoles?.includes(UserRole.ADMIN);
+
   const updateStatusMutation = useUpdateConferenceStatusMutation(conference.id);
   const [selectedStatus, setSelectedStatus] = useState<number>(
     conference.status,
   );
 
-  useEffect(() => {
-    setSelectedStatus(conference.status);
-  }, [conference.status]);
+  const { data: metadata } = useMetadataFile({
+    filePath: conference.metadataFilePath || "",
+    resourceId: conference.id,
+  });
+
+  const imageUrl = metadata?.heroImagePath
+    ? `${new URL(config.baseUrl).origin}/${metadata.heroImagePath}`
+    : undefined;
 
   const createdAt = useMemo(
     () => formatDateTime(conference.createdAt),
@@ -66,54 +74,59 @@ export function ConferenceCard({ conference }: ConferenceCardProps) {
     updateStatusMutation.mutate({ status: selectedStatus });
   };
 
+  useEffect(() => {
+    setSelectedStatus(conference.status);
+  }, [conference.status]);
+
   return (
     <div
-      className="relative h-full rounded-lg border-b-2 border-border gradient-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="relative grid grid-cols-2 rounded-lg border-b-2 border-border gradient-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
       onClick={() => navigate(`/conferences/${conference.id}`)}
     >
-      <div className="h-full p-4 flex flex-col justify-between gap-3">
-        <div>
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-foreground pr-4">
-              {conference.title}
-            </h3>
-
+      <div className="h-full p-4 flex flex-col justify-end gap-4">
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-2">
             {isAdmin && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="absolute top-4 right-4"
-              >
+              <div onClick={(e) => e.stopPropagation()} className="">
                 <Edit
                   className="w-4 h-4"
                   onClick={() => navigate(`/conferences/edit/${conference.id}`)}
                 />
               </div>
             )}
+
+            <h2 className="font-semibold text-foreground pr-4">
+              {conference.title}
+            </h2>
+
+            <div className="truncate">{metadata?.summary}</div>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            {getConferenceStatusBadge(conference.status)}
-            <span className="text-xs text-muted-foreground">
-              Created: {createdAt}
-            </span>
-          </div>
+          <div>
+            <div className="grid grid-cols-1 gap-2 text-sm text-foreground/80">
+              <div className="flex flex-wrap gap-2">
+                <span className="font-medium">Start Date:</span>
+                <span>{startAt}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="font-medium">End Date:</span>
+                <span>{endAt}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="font-medium">Submission Start:</span>
+                <span>{submissionStartAt}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="font-medium">Submission End:</span>
+                <span>{submissionEndAt}</span>
+              </div>
+            </div>
 
-          <div className="grid grid-cols-1 gap-2 text-sm text-foreground/80">
-            <div className="flex flex-wrap gap-2">
-              <span className="font-medium">Start Date:</span>
-              <span>{startAt}</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="font-medium">End Date:</span>
-              <span>{endAt}</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="font-medium">Submission Start:</span>
-              <span>{submissionStartAt}</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="font-medium">Submission End:</span>
-              <span>{submissionEndAt}</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              {getConferenceStatusBadge(conference.status)}
+              <span className="text-xs text-muted-foreground">
+                Created: {createdAt}
+              </span>
             </div>
           </div>
         </div>
@@ -165,6 +178,16 @@ export function ConferenceCard({ conference }: ConferenceCardProps) {
             </div>
           </div>
         )}
+      </div>
+
+      <div className="w-full bg-slate-100 order-2 h-96">
+        <img
+          src={imageUrl}
+          alt={conference.title}
+          className="h-full w-full object-cover"
+          crossOrigin="anonymous"
+          loading="lazy"
+        />
       </div>
     </div>
   );
