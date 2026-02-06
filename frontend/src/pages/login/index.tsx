@@ -90,7 +90,6 @@ function Login() {
               </label>
               <Input
                 id="email"
-                type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -126,7 +125,7 @@ function Login() {
                 background:
                   "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
               }}
-              disabled={isLoading}
+              disabled={isLoading || !email.trim() || !password.trim()}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>

@@ -12,7 +12,6 @@ import {
   FileText,
   Calendar,
   User as UserIcon,
-  Shield,
   Edit,
   X,
   User,
@@ -30,7 +29,6 @@ import PageTitle from "@/components/common/PageTitle";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import { FileUploadField } from "@/components/common/FileUploadField";
 import { useSuccessToast } from "@/hooks/useSuccessToast";
-import { Checkbox } from "@/components/ui/checkbox";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { useDispatch, useSelector } from "react-redux";
 import { authService } from "@/services/authService";
@@ -77,27 +75,8 @@ export default function MyProfile() {
     isLinkedinValid &&
     (formData.institution || "").trim() !== "" &&
     (formData.occupation || "").trim() !== "" &&
-    (formData.country || "").trim() !== "" &&
-    (formData.roles || []).length > 0;
+    (formData.country || "").trim() !== "";
 
-  const handleRoleToggle = (role: string) => {
-    setFormData((prev) => {
-      const currentRoles = prev.roles || [];
-      if (currentRoles.includes(role)) {
-        return {
-          ...prev,
-          roles: currentRoles.filter((r: string) => r !== role),
-        };
-      }
-      if (role === "ADMIN") {
-        return { ...prev, roles: ["ADMIN"] };
-      }
-      return {
-        ...prev,
-        roles: [...currentRoles.filter((r: string) => r !== "ADMIN"), role],
-      };
-    });
-  };
 
   const handleFileSelect = async (file: File | null, type: FileTypeEnum) => {
     if (!file) return;
@@ -546,49 +525,6 @@ export default function MyProfile() {
                     </div>
                   )}
 
-                  {isEdit && (
-                    <div className="flex gap-3">
-                      <div>
-                        <Shield className="w-5 h-5 text-accent mt-0.5" />
-                      </div>
-
-                      <div className="w-full">
-                        <p className="text-sm font-medium">Select Roles *</p>
-                        <div className="space-y-3 mt-2">
-                          <div className="flex items-center space-x-3">
-                            <Checkbox
-                              id="role-user"
-                              checked={(formData.roles || []).includes("USER")}
-                              onCheckedChange={() => handleRoleToggle("USER")}
-                            />
-                            <label
-                              htmlFor="role-user"
-                              className="text-sm cursor-pointer"
-                            >
-                              User
-                            </label>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <Checkbox
-                              id="role-reviewer"
-                              checked={(formData.roles || []).includes(
-                                "REVIEWER",
-                              )}
-                              onCheckedChange={() =>
-                                handleRoleToggle("REVIEWER")
-                              }
-                            />
-                            <label
-                              htmlFor="role-reviewer"
-                              className="text-sm cursor-pointer"
-                            >
-                              Reviewer
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {user?.statusUpdateNotes && (
                     <div className="flex items-start gap-3">

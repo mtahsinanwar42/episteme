@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 
 interface DataTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[];
@@ -63,8 +64,8 @@ export function DataTable<TData, TValue = unknown>({
 
   if (isLoading) {
     return (
-      <div className="p-8 text-center" style={{ color: "var(--color-text)" }}>
-        Loading...
+      <div className="relative min-h-[200px]">
+        <LoadingOverlay visible />
       </div>
     );
   }

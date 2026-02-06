@@ -3,7 +3,11 @@ import { DataTable } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Eye } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/stores/store";
+import { UserRole } from "@/models/user";
+import { Button } from "@/components/ui/button";
 
 import { useFiles } from "@/hooks/useFiles";
 import type { File } from "@/models/file";
@@ -13,6 +17,10 @@ import PageSubTitle from "@/components/common/PageSubTitle";
 import { formatDateTime } from "@/utils/dateFormatter";
 
 export default function Assets() {
+  const navigate = useNavigate();
+  const currentRoles = useSelector(
+    (state: RootState) => state?.auth?.user?.roles,
+  );
   const columns: ColumnDef<File>[] = [
     {
       accessorKey: "name",
@@ -124,6 +132,16 @@ export default function Assets() {
       <div className="mb-6">
         <PageTitle title="Assets" />
         <PageSubTitle text="View and manage all assets" />
+        {currentRoles?.includes(UserRole.ADMIN) && (
+          <div className="flex justify-end">
+            <Button
+              onClick={() => navigate("/assets/new")}
+              className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              Add New Asset
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-4">
@@ -134,7 +152,7 @@ export default function Assets() {
           error={error ? (error as Error).message : null}
           pageSize={pageSize}
           enableSearch
-          searchPlaceholder="Search assets"
+          searchPlaceholder="Search Assets"
         />
 
         {!isLoading && !error && total > 0 && (

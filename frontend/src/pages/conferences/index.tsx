@@ -34,13 +34,10 @@ export default function Conferences() {
     limit: pageSize,
     sort: "-createdAt",
     paginate: true,
+    statusIn: currentRoles?.includes(UserRole.ADMIN) ? undefined : "1,2",
   });
 
-  const conferences = currentRoles?.includes(UserRole.ADMIN)
-    ? response?.data
-    : response?.data.filter(
-        (conference) => conference.status === 1 || conference.status === 2,
-      ) || [];
+  const conferences = response?.data || [];
 
   const total = response?.total || 0;
   const currentPage = page;
