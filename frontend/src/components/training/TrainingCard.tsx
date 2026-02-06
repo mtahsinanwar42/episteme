@@ -1,0 +1,54 @@
+import { Card } from "@/components/ui/card";
+import { type Training } from "@/models/training";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { UserRole } from "@/models/user";
+import type { RootState } from "@/stores/store";
+import { Edit } from "lucide-react";
+import { getAnnouncementTrainingResourceStatusBadge } from "../common/ResourceStatusBadge";
+import { formatDateTime } from "@/utils/dateFormatter";
+import { useMetadataFile } from "@/hooks/useMetadataFiles";
+import { config } from "@/config/config";
+interface TrainingCardProps {
+  training: Training;
+  showImage?: boolean;
+}
+
+export function TrainingCard({ training }: TrainingCardProps) {
+  const navigate = useNavigate();
+  const currentRoles = useSelector(
+    (state: RootState) => state?.auth?.user?.roles,
+  );
+  const isAdmin = currentRoles?.includes(UserRole.ADMIN);
+
+  const { data: metadata } = useMetadataFile({
+    filePath: training.metadataFilePath || "",
+    resourceId: training.id,
+  });
+
+  const imageUrl = metadata?.heroImagePath
+    ? `${new URL(config.baseUrl).origin}/${metadata.heroImagePath}`
+    : undefined;
+
+  const createdDate = formatDateTime(training.createdAt);
+
+  const handleEdit = () => {
+    navigate(`/trainings/edit/${training.id}`);
+  };
+
+  return (
+    <Card
+      title={training.title}
+      description={<div className="truncate">{metadata?.summary}</div>}
+      showImage
+      imageUrl={imageUrl}
+      statusBadge={
+        <>{getAnnouncementTrainingResourceStatusBadge(training.status)}</>
+      }
+      metadata={<span className="text-slate-500 text-sm">{createdDate}</span>}
+      actions={
+        isAdmin ? <Edit className="w-4 h-4" onClick={handleEdit} /> : undefined
+      }
+    />
+  );
+}

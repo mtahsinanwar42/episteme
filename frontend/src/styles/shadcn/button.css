@@ -1,0 +1,20 @@
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: var(--text-base);
+  font-weight: 500;
+  background-color: var(--color-accent);
+  color: var(--accent-foreground);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: var(--color-foreground);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto var(--color-foreground);
+}

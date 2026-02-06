@@ -1,0 +1,155 @@
+import { Breadcrumb } from '@/components/common/Breadcrumb';
+import { UserRound } from 'lucide-react';
+
+export default function Executive() {
+  const teamMembers = [
+    {
+      name: 'Dr. Sarah Chen',
+      role: 'Chief Executive Officer',
+      bio: 'Visionary leader with 15+ years in open science and academic publishing',
+      image: '/assets/images/about_leadership_tahsin.jpg',
+      expertise: ['Strategy', 'Innovation', 'Leadership'],
+    },
+    {
+      name: 'Prof. Michael Johnson',
+      role: 'Chief Research Officer',
+      bio: 'Pioneering researcher focused on open access and research integrity',
+      expertise: ['Research', 'Quality', 'Standards'],
+    },
+    {
+      name: 'Dr. Elena Rodriguez',
+      role: 'Chief Technology Officer',
+      bio: 'Tech innovator leading our platform development and infrastructure',
+      expertise: ['Technology', 'Architecture', 'Security'],
+    },
+    {
+      name: 'James Wilson',
+      role: 'Chief Financial Officer',
+      bio: 'Finance expert ensuring sustainable growth and responsible stewardship',
+      expertise: ['Finance', 'Operations', 'Planning'],
+    },
+    {
+      name: 'Dr. Amelia Okafor',
+      role: 'Chief Diversity & Inclusion Officer',
+      bio: 'Advocate for equitable access and inclusive research communities',
+      expertise: ['Diversity', 'Inclusion', 'Community'],
+    },
+    {
+      name: 'David Kim',
+      role: 'Chief Strategy Officer',
+      bio: 'Strategic thinker driving partnerships and market expansion',
+      expertise: ['Strategy', 'Partnerships', 'Growth'],
+    },
+  ];
+
+  return (
+    <div className="min-h-screen">
+      <Breadcrumb items={[{ label: 'Executive Leadership' }]} />
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-slate-700 via-purple-600 to-slate-700 py-20 px-4 rounded-lg mb-16 overflow-hidden">
+        <div className="absolute inset-0 opacity-20"></div>
+        <div className="relative z-10 max-w-4xl">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            Executive Leadership
+          </h1>
+          <p className="text-xl text-white/90 max-w-2xl">
+            Meet the visionary leaders driving open science forward with
+            innovation and purpose.
+          </p>
+        </div>
+      </div>
+
+      {/* Leadership Overview */}
+      <section className="mb-20">
+        <h2 className="text-4xl font-bold mb-8">Our Leadership Team</h2>
+        <p className="text-lg text-foreground/80 max-w-3xl mb-12">
+          Our executive team brings together diverse expertise in research,
+          technology, finance, and strategy. With decades of combined experience
+          in academic publishing and open science, we're committed to
+          transforming how knowledge is shared globally.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {teamMembers.map((member, idx) => (
+            <div
+              key={idx}
+              className="bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all border border-gray-700"
+            >
+              <div className="bg-gradient-to-b from-purple-900/30 to-slate-800 p-6 flex justify-center">
+                {member.image ? (
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-52 h-52 rounded-full object-cover object-[center_30%]"
+                  />
+                ) : (
+                  <div className="w-52 h-52 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center">
+                    <UserRound className="w-24 h-24 text-slate-400" />
+                  </div>
+                )}
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-1">{member.name}</h3>
+                <p className="text-purple-400 font-semibold mb-3">
+                  {member.role}
+                </p>
+                <p className="text-foreground/80 text-sm mb-4 leading-relaxed">
+                  {member.bio}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {member.expertise.map((skill, i) => (
+                    <span
+                      key={i}
+                      className="inline-block px-3 py-1 bg-purple-900 text-purple-300 rounded-full text-xs font-semibold"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Core Values */}
+      <section>
+        <h2 className="text-4xl font-bold mb-12">Leadership Principles</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-xl p-8">
+            <div className="text-4xl mb-4">🎯</div>
+            <h3 className="text-2xl font-bold mb-3">Vision-Driven</h3>
+            <p className="text-foreground/80">
+              We are guided by a clear vision of open science and remain
+              committed to long-term impact over short-term gains.
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-blue-900/20 to-cyan-900/20 rounded-xl p-8">
+            <div className="text-4xl mb-4">🤝</div>
+            <h3 className="text-2xl font-bold mb-3">Collaborative</h3>
+            <p className="text-foreground/80">
+              We listen, learn, and work together with our community to build
+              solutions that serve everyone.
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 rounded-xl p-8">
+            <div className="text-4xl mb-4">💡</div>
+            <h3 className="text-2xl font-bold mb-3">Innovative</h3>
+            <p className="text-foreground/80">
+              We embrace new ideas, challenge the status quo, and continuously
+              improve our approaches.
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-orange-900/20 to-red-900/20 rounded-xl p-8">
+            <div className="text-4xl mb-4">✨</div>
+            <h3 className="text-2xl font-bold mb-3">Accountable</h3>
+            <p className="text-foreground/80">
+              We take responsibility for our decisions and are transparent about
+              our progress and challenges.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

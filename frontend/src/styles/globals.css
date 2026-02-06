@@ -1,0 +1,137 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@/styles/shadcn/button.css";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  color-scheme: light dark;
+  color: #ffffffde;
+}
+
+@theme {
+  --color-background: #eeeeee;
+  --color-foreground: #222222;
+  --color-accent: #646cff;
+  --color-accent-foreground: #ffffff;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #222222;
+  --color-border: #e2e8f0;
+
+  --popover: oklch(2% 0 0);
+  --popover-foreground: oklch(100% 0 0);
+  --primary: oklch(100% 0 0);
+  --primary-foreground: oklch(8% 0.02 290);
+  --secondary-foreground: oklch(100% 0 0);
+  --shadow-small: 0 0 4px 4px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 0 8px 8px rgba(0, 0, 0, 0.05);
+  --shadow-large: 0 0 16px 16px rgba(0, 0, 0, 0.05);
+
+  --title-gradient: #735fe9, #ce47eb, #f47b74;
+  --card-gradient: #1d293d, #0f172d;
+}
+
+@layer base {
+  html[data-theme="dark"] {
+    --color-background: #000000ee;
+    --color-foreground: #ffffff;
+    --color-accent: #5a58c1;
+    --color-accent-foreground: #e5ecf1;
+
+    --color-card: #000000;
+    --color-card-foreground: #ffffff;
+    --color-border: #314158;
+
+    --popover: oklch(2% 0 0);
+    --popover-foreground: oklch(100% 0 0);
+    --primary: oklch(100% 0 0);
+    --primary-foreground: oklch(8% 0.02 290);
+    --secondary-foreground: oklch(100% 0 0);
+
+    --destructive: oklch(60.4% 0.191 22.216);
+    --border: #080c0f;
+    --input: oklch(32% 0.01 240);
+    --ring: oklch(20% 0.01 240);
+    --chart-1: #735fe9;
+    --chart-2: #ce47eb;
+    --chart-3: #f47b74;
+    --chart-4: #006aaf;
+  }
+
+  html[data-theme="emerald"] {
+    --color-background: #aef5bf;
+    --color-foreground: #caa800;
+    --color-accent: #00ffaa;
+  }
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--color-foreground);
+  background: var(--color-background);
+  font-size: var(--text-base);
+  font-family: "Trebuchet MS", Arial, sans-serif;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.2);
+  opacity: 0.8;
+}
+
+html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.9;
+}
+
+h1 {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
+h2 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+h5 {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+h6 {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+@layer utilities {
+  .gradient-title {
+    @apply bg-linear-to-r bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, var(--title-gradient));
+  }
+
+  .gradient-card {
+    @apply bg-linear-to-br;
+    background-image: linear-gradient(135deg, var(--card-gradient));
+  }
+}
