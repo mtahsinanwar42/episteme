@@ -19,4 +19,14 @@ export const authService = {
   getLoggedInUserDetails: async (): Promise<UserDetailsResponse> => {
     return api.get<UserDetailsResponse>("/auth/me", true);
   },
+
+  updatePassword: async ({
+    currentPassword,
+    newPassword,
+  }: {
+    currentPassword: string;
+    newPassword: string;
+  }) => {
+    return api.put("/auth/me/password", { currentPassword, newPassword }, true);
+  },
 };

@@ -39,12 +39,22 @@ import NewConference from "@/pages/conferences/new";
 import EditConference from "@/pages/conferences/edit";
 import Unauthorized from "@/pages/misc/unauthorized";
 import NotFound from "@/pages/misc/notFound";
+import UpdatePassword from "@/pages/auth/updatePassword";
 
 export default function RouteConfig() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route
+        path="/update-password"
+        element={
+          <ProtectedRoute>
+            <UpdatePassword />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/me" element={<Home />} />
 
       <Route path="/auth/callback" element={<AuthCallback />} />
 

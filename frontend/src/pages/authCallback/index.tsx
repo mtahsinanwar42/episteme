@@ -11,7 +11,7 @@ function AuthCallback() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        navigate("/dashboard");
+        navigate("/");
       } else {
         navigate("/login");
       }
