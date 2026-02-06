@@ -4,6 +4,7 @@ import type {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  UserDetails,
   UserDetailsResponse,
 } from "@/models/auth";
 
@@ -18,6 +19,16 @@ export const authService = {
 
   getLoggedInUserDetails: async (): Promise<UserDetailsResponse> => {
     return api.get<UserDetailsResponse>("/auth/me", true);
+  },
+
+  updateLoggedInUserDetails: async (
+    postData: any,
+  ): Promise<{ success: boolean; data: UserDetails }> => {
+    return api.put<{ success: boolean; data: UserDetails }>(
+      "/auth/me/details",
+      postData,
+      true,
+    );
   },
 
   updatePassword: async ({
