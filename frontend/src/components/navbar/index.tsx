@@ -18,6 +18,7 @@ import {
 import { User, LogOut, Menu } from "lucide-react";
 import { UserRole } from "@/models/user";
 import { config } from "@/config/config";
+import { aboutPageFlags } from "@/config/featureFlags";
 
 const avatarColors = [
   {
@@ -92,38 +93,21 @@ const getAvatarColor = (name?: string) => {
   return avatarColors[index];
 };
 
+const allAboutChildren: (NavItemConfig & { flagKey: string })[] = [
+  { label: 'Mission & Vision', href: '/about/mission', flagKey: 'mission' },
+  { label: 'Ethics', href: '/about/ethics', flagKey: 'ethics' },
+  { label: 'Sustainability', href: '/about/sustainability', flagKey: 'sustainability' },
+  { label: 'Executive Committee', href: '/about/executive', flagKey: 'executive' },
+  { label: 'Policies', href: '/about/policies', flagKey: 'policies' },
+  { label: 'Career', href: '/about/career', flagKey: 'career' },
+  { label: 'Contact', href: '/about/contact', flagKey: 'contact' },
+];
+
 const aboutNavItem: NavItemConfig = {
   label: "About",
-  children: [
-    {
-      label: "Mission & Vision",
-      href: "/about/mission",
-    },
-    {
-      label: "Ethics",
-      href: "/about/ethics",
-    },
-    {
-      label: "Sustainability",
-      href: "/about/sustainability",
-    },
-    {
-      label: "Executive Committee",
-      href: "/about/executive",
-    },
-    {
-      label: "Policies",
-      href: "/about/policies",
-    },
-    {
-      label: "Career",
-      href: "/about/career",
-    },
-    {
-      label: "Contact",
-      href: "/about/contact",
-    },
-  ],
+  children: allAboutChildren
+    .filter((item) => aboutPageFlags[item.flagKey] !== false)
+    .map(({ flagKey: _, ...rest }) => rest),
 };
 
 const publicNavItems: NavItemConfig[] = [

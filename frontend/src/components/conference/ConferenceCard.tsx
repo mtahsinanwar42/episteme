@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/store";
 import { UserRole } from "@/models/user";
 import type { Conference } from "@/models/conference";
+import { ConferenceStatus } from "@/models/conference";
 import { Edit, RefreshCw } from "lucide-react";
 import { formatDateTime } from "@/utils/dateFormatter";
 import { getConferenceStatusBadge } from "@/components/common/ConferenceStatusBadge";
@@ -50,7 +51,7 @@ export function ConferenceCard({
       metadata={<span className="text-slate-500 text-sm">{createdAt}</span>}
       onClick={() => navigate(`/conferences/${conference.id}`)}
       actions={
-        isAdmin ? (
+        isAdmin && conference.status !== ConferenceStatus.DELETED ? (
           <div className="flex items-center gap-3">
             <RefreshCw
               className="w-4 h-4 text-foreground hover:text-foreground/80 cursor-pointer"

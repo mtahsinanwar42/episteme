@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { type RootState } from "@/stores/store";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -13,10 +14,10 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (loading) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center"
+        className="relative min-h-screen"
         style={{ backgroundColor: "var(--color-background)" }}
       >
-        <p style={{ color: "var(--color-text)" }}>Loading...</p>
+        <LoadingOverlay visible />
       </div>
     );
   }
