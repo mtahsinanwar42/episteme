@@ -119,7 +119,7 @@ export default function Register() {
 
   useEffect(() => {
     if (user) {
-      navigate("/home");
+      navigate("/");
     }
   }, [user, navigate]);
 

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function NotFound() {
   return (
     <div className="h-full flex flex-col items-center justify-center">
-      <div className="w-96 mb-8">
+      <div className="w-96 h-96 mb-8">
         <img
           src="/assets/images/error_image.png"
           alt="Not Found"

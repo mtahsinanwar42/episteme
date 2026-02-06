@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { Input } from "@/components/ui/input";
@@ -10,19 +10,14 @@ import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import Cookies from "js-cookie";
 
 function Login() {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const token = useSelector((state: RootState) => state.auth.token);
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [user, navigate]);
 
   const handleEmailPasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +41,7 @@ function Login() {
         if (userDetailsResponse.success && userDetailsResponse.data) {
           dispatch(setUser(userDetailsResponse.data));
           dispatch(setLoading(false));
-          navigate("/home");
+          navigate("/");
         }
       }
     } catch (error) {
@@ -58,6 +53,18 @@ function Login() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (location.state && location.state.fromLogout) {
+      dispatch(setUser(null));
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
 
   return (
     <div className="h-full flex items-center justify-center">

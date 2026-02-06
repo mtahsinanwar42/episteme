@@ -1,9 +1,5 @@
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  useCountries,
-  useUserById,
-  useUserDetailsMutation,
-} from "@/hooks/useUsers";
+import { useNavigate, Link } from "react-router-dom";
+import { useCountries, useUserDetailsMutation } from "@/hooks/useUsers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,13 +19,6 @@ import {
   Notebook,
 } from "lucide-react";
 import { formatDateTime } from "@/utils/dateFormatter";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { UserStatus } from "@/models/user";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
@@ -43,19 +32,20 @@ import { FileUploadField } from "@/components/common/FileUploadField";
 import { useSuccessToast } from "@/hooks/useSuccessToast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useDispatch, useSelector } from "react-redux";
+import { authService } from "@/services/authService";
+import { setUser } from "@/stores/authSlice";
 
-export default function UserDetails() {
-  const { userId } = useParams();
+export default function MyProfile() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const userData = useSelector((state: any) => state.auth.user);
   const { data: countriesData } = useCountries();
 
   const updateUserMutation = useUserDetailsMutation();
-  const { data, isLoading, isError, error } = useUserById(userId);
   const { showSuccessToast } = useSuccessToast();
 
   const [isEdit, setIsEdit] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<number>(1);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [uploadedPhotoFile, setUploadedPhotoFile] = useState<{
@@ -69,7 +59,7 @@ export default function UserDetails() {
     storageKey: string;
   } | null>(null);
   const [formData, setFormData] = useState<Record<string, any>>(() => {
-    return data?.data ? { ...data.data } : {};
+    return userData ? { ...userData } : {};
   });
 
   const PHONE_REGEX = /^\+?[0-9][0-9\-\s]{6,20}$/;
@@ -178,69 +168,38 @@ export default function UserDetails() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!isEditFormValid) return;
 
-    updateUserMutation.mutate(
-      {
-        userId: userId as string,
-        postData: { ...formData },
-      },
-      {
-        onSuccess: () => {
-          setIsEdit(false);
-          showSuccessToast("User updated successfully.");
-          console.log("User info updated successfully");
-        },
-        onError: (error) => {
-          console.error("Error updating user info:", error);
-        },
-      },
-    );
+    try {
+      let response = await authService.updateLoggedInUserDetails(formData);
+      if (response.success && response.data) {
+        dispatch(setUser(response.data));
+        setIsEdit(false);
+        showSuccessToast("User updated successfully.");
+      }
+    } catch (error) {
+      console.error("Error updating user info:", error);
+    }
   };
 
   useEffect(() => {
-    if (data?.data) {
-      setFormData({ ...data.data });
-      setSelectedStatus(data.data.status);
-      if (data.data.photoFilePath) {
-        const storageKey = data.data.photoFilePath;
+    if (userData) {
+      setFormData({ ...userData });
+      if (userData.photoFilePath) {
+        const storageKey = userData.photoFilePath;
         const name = storageKey.split("/").pop() || storageKey;
         setUploadedPhotoFile({ name, size: 0, storageKey });
       }
-      if (data.data.cvFilePath) {
-        const storageKey = data.data.cvFilePath;
+      if (userData.cvFilePath) {
+        const storageKey = userData.cvFilePath;
         const name = storageKey.split("/").pop() || storageKey;
         setUploadedCvFile({ name, size: 0, storageKey });
       }
     }
-  }, [data?.data]);
+  }, [userData]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="">Loading user details...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center max-w-md">
-          <div className="bg-destructive/10 text-destructive rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-2">Error Loading User</h3>
-            <p className="text-sm">{error.message}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data?.data) {
+  if (!userData) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -253,7 +212,7 @@ export default function UserDetails() {
     );
   }
 
-  const user = data.data;
+  const user = userData;
 
   const getStatusBadge = (status: number) => {
     switch (status) {
@@ -272,12 +231,10 @@ export default function UserDetails() {
 
   return (
     <div>
-      <Breadcrumb
-        items={[{ label: "Users", href: "/users" }, { label: `${user.email}` }]}
-      />
+      <Breadcrumb items={[{ label: "My Profile" }]} />
 
       <div className="mb-6">
-        <PageTitle title="User Details" />
+        <PageTitle title="My Profile" />
       </div>
 
       <div className="relative">
@@ -336,7 +293,7 @@ export default function UserDetails() {
                   </h2>
                 )}
                 <div className="flex flex-wrap gap-2">
-                  {user.roles.map((role) => (
+                  {user.roles.map((role: string) => (
                     <Badge key={role} variant="outline" className="gap-1">
                       {role}
                     </Badge>
@@ -390,6 +347,16 @@ export default function UserDetails() {
                   Download CV
                 </Button>
               )}
+
+              <Link to="/profile/update-password" className="w-full">
+                <Button
+                  size="sm"
+                  className="w-full justify-start focus:outline-none! focus:ring-0!"
+                >
+                  <FileText className="w-4 h-4" />
+                  Update Password
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -515,7 +482,6 @@ export default function UserDetails() {
                           }}
                           options={countriesData?.data || []}
                           placeholder="Select a country"
-                          disabled={isLoading}
                         />
                       ) : (
                         <p className="font-medium">
@@ -587,51 +553,6 @@ export default function UserDetails() {
                       </div>
 
                       <div className="w-full">
-                        <p className="text-sm ">Status *</p>
-                        <div className="w-full">
-                          <Select
-                            value={selectedStatus.toString()}
-                            onValueChange={(value) => {
-                              setSelectedStatus(Number(value));
-                              setFormData((prev) => {
-                                return { ...prev, status: Number(value) };
-                              });
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem
-                                value={UserStatus.INACTIVE.toString()}
-                              >
-                                Inactive
-                              </SelectItem>
-                              <SelectItem value={UserStatus.ACTIVE.toString()}>
-                                Active
-                              </SelectItem>
-                              <SelectItem
-                                value={UserStatus.SUSPENDED.toString()}
-                              >
-                                Suspended
-                              </SelectItem>
-                              <SelectItem value={UserStatus.DELETED.toString()}>
-                                Deleted
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {isEdit && (
-                    <div className="flex gap-3">
-                      <div>
-                        <Shield className="w-5 h-5 text-accent mt-0.5" />
-                      </div>
-
-                      <div className="w-full">
                         <p className="text-sm font-medium">Select Roles *</p>
                         <div className="space-y-3 mt-2">
                           <div className="flex items-center space-x-3">
@@ -662,19 +583,6 @@ export default function UserDetails() {
                               className="text-sm cursor-pointer"
                             >
                               Reviewer
-                            </label>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <Checkbox
-                              id="role-admin"
-                              checked={(formData.roles || []).includes("ADMIN")}
-                              onCheckedChange={() => handleRoleToggle("ADMIN")}
-                            />
-                            <label
-                              htmlFor="role-admin"
-                              className="text-sm cursor-pointer"
-                            >
-                              Admin
                             </label>
                           </div>
                         </div>

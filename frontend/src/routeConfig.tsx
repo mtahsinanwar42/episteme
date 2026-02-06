@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "@/pages/login";
-import AuthCallback from "@/pages/authCallback";
 import ProtectedRoute from "@/components/common/protectedRoute";
 import Users from "@/pages/users";
 import Home from "@/pages/home";
@@ -39,16 +38,33 @@ import NewConference from "@/pages/conferences/new";
 import EditConference from "@/pages/conferences/edit";
 import Unauthorized from "@/pages/misc/unauthorized";
 import NotFound from "@/pages/misc/notFound";
+import UpdatePassword from "@/pages/me/updatePassword";
+import MyProfile from "@/pages/me/myProfile";
 
 export default function RouteConfig() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-
-      <Route path="/auth/callback" element={<AuthCallback />} />
-
       <Route path="/" element={<Home />} />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <MyProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/profile/update-password"
+        element={
+          <ProtectedRoute>
+            <UpdatePassword />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/users"

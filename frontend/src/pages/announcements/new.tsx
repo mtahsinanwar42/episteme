@@ -1,27 +1,26 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { AnnouncementStatus } from '@/models/announcement';
-import { useCreateAnnouncementMutation } from '@/hooks/useAnnouncements';
-import { Breadcrumb } from '@/components/common/Breadcrumb';
-import PageTitle from '@/components/common/PageTitle';
-import PageSubTitle from '@/components/common/PageSubTitle';
-import { LoadingOverlay } from '@/components/common/LoadingOverlay';
-import { fileService } from '@/services/fileService';
-import { FileTypeEnum } from '@/models/file';
-import { FileText } from 'lucide-react';
-import { FileUploadField } from '@/components/common/FileUploadField';
-import { useSuccessToast } from '@/hooks/useSuccessToast';
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { AnnouncementStatus } from "@/models/announcement";
+import { useCreateAnnouncementMutation } from "@/hooks/useAnnouncements";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageTitle from "@/components/common/PageTitle";
+import PageSubTitle from "@/components/common/PageSubTitle";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
+import { fileService } from "@/services/fileService";
+import { FileTypeEnum } from "@/models/file";
+import { FileUploadField } from "@/components/common/FileUploadField";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
 
 export default function NewAnnouncement() {
   const navigate = useNavigate();
@@ -37,8 +36,8 @@ export default function NewAnnouncement() {
   } | null>(null);
 
   const [formData, setFormData] = useState({
-    title: '',
-    metadataFilePath: '',
+    title: "",
+    metadataFilePath: "",
     status: AnnouncementStatus.UPCOMING,
   });
 
@@ -46,12 +45,12 @@ export default function NewAnnouncement() {
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      setError('Title is required');
+      setError("Title is required");
       return;
     }
 
     if (!formData.metadataFilePath) {
-      setError('Metadata file is required');
+      setError("Metadata file is required");
       return;
     }
 
@@ -65,14 +64,14 @@ export default function NewAnnouncement() {
       },
       {
         onSuccess: () => {
-          showSuccessToast('Announcement created successfully.');
-          navigate('/announcements');
+          showSuccessToast("Announcement created successfully.");
+          navigate("/announcements");
         },
         onError: (err: any) => {
           setError(
             err instanceof Error
               ? err.message
-              : 'Failed to create announcement',
+              : "Failed to create announcement",
           );
         },
       },
@@ -98,8 +97,8 @@ export default function NewAnnouncement() {
     if (!file) return;
 
     // Validate file type (JSON only)
-    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-      setError('Please upload a JSON file');
+    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
+      setError("Please upload a JSON file");
       return;
     }
 
@@ -109,7 +108,7 @@ export default function NewAnnouncement() {
 
     try {
       const formDataToUpload = new FormData();
-      formDataToUpload.append('file', file);
+      formDataToUpload.append("file", file);
 
       const fileUploadResponse = await fileService.uploadFile(
         FileTypeEnum.ASSETS,
@@ -130,18 +129,18 @@ export default function NewAnnouncement() {
           storageKey: fileUploadResponse.data.file.storageKey,
         });
       } else {
-        setError('Failed to upload file');
+        setError("Failed to upload file");
         setMetadataFile(null);
         setUploadedMetadataFile(null);
       }
     } catch (error) {
-      console.error('Metadata file upload error:', error);
-      setError('Failed to upload metadata file');
+      console.error("Metadata file upload error:", error);
+      setError("Failed to upload metadata file");
       setMetadataFile(null);
       setUploadedMetadataFile(null);
       setFormData((prev) => ({
         ...prev,
-        metadataFilePath: '',
+        metadataFilePath: "",
       }));
     } finally {
       setUploading(false);
@@ -152,8 +151,8 @@ export default function NewAnnouncement() {
     <div>
       <Breadcrumb
         items={[
-          { label: 'Announcements', href: '/announcements' },
-          { label: 'New Announcement' },
+          { label: "Announcements", href: "/announcements" },
+          { label: "New Announcement" },
         ]}
       />
 
@@ -231,7 +230,7 @@ export default function NewAnnouncement() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/announcements')}
+              onClick={() => navigate("/announcements")}
               disabled={createAnnouncementMutation.isPending}
             >
               Cancel
@@ -247,7 +246,7 @@ export default function NewAnnouncement() {
                 formData.status === null
               }
             >
-              {createAnnouncementMutation.isPending ? 'Creating...' : 'Create'}
+              {createAnnouncementMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
         </form>
