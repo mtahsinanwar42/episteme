@@ -1,28 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { ConferenceStatus } from '@/models/conference';
-import { useCreateConferenceMutation } from '@/hooks/useConferences';
-import { Breadcrumb } from '@/components/common/Breadcrumb';
-import PageTitle from '@/components/common/PageTitle';
-import PageSubTitle from '@/components/common/PageSubTitle';
-import { LoadingOverlay } from '@/components/common/LoadingOverlay';
-import { fileService } from '@/services/fileService';
-import { FileTypeEnum } from '@/models/file';
-import { FileText } from 'lucide-react';
-import { FileUploadField } from '@/components/common/FileUploadField';
-import { useSuccessToast } from '@/hooks/useSuccessToast';
-import { formatDateFromInput } from '@/utils/dateFormatter';
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { ConferenceStatus } from "@/models/conference";
+import { useCreateConferenceMutation } from "@/hooks/useConferences";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageTitle from "@/components/common/PageTitle";
+import PageSubTitle from "@/components/common/PageSubTitle";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
+import { fileService } from "@/services/fileService";
+import { FileTypeEnum } from "@/models/file";
+import { FileUploadField } from "@/components/common/FileUploadField";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
+import { formatDateFromInput } from "@/utils/dateFormatter";
 
 export default function NewConference() {
   const navigate = useNavigate();
@@ -38,13 +37,13 @@ export default function NewConference() {
   } | null>(null);
 
   const [formData, setFormData] = useState({
-    title: '',
-    slug: '',
-    startAt: '',
-    endAt: '',
-    submissionPeriodStartAt: '',
-    submissionPeriodEndAt: '',
-    metadataFilePath: '',
+    title: "",
+    slug: "",
+    startAt: "",
+    endAt: "",
+    submissionPeriodStartAt: "",
+    submissionPeriodEndAt: "",
+    metadataFilePath: "",
     status: ConferenceStatus.ACTIVE,
   });
 
@@ -52,12 +51,12 @@ export default function NewConference() {
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      setError('Title is required');
+      setError("Title is required");
       return;
     }
 
     if (!formData.slug.trim()) {
-      setError('Slug is required');
+      setError("Slug is required");
       return;
     }
 
@@ -67,12 +66,12 @@ export default function NewConference() {
       !formData.submissionPeriodStartAt ||
       !formData.submissionPeriodEndAt
     ) {
-      setError('All date fields are required');
+      setError("All date fields are required");
       return;
     }
 
     if (!formData.metadataFilePath) {
-      setError('Metadata file is required');
+      setError("Metadata file is required");
       return;
     }
 
@@ -95,12 +94,12 @@ export default function NewConference() {
       },
       {
         onSuccess: () => {
-          showSuccessToast('Conference created successfully.');
-          navigate('/conferences');
+          showSuccessToast("Conference created successfully.");
+          navigate("/conferences");
         },
         onError: (err: any) => {
           setError(
-            err instanceof Error ? err.message : 'Failed to create conference',
+            err instanceof Error ? err.message : "Failed to create conference",
           );
         },
       },
@@ -125,8 +124,8 @@ export default function NewConference() {
   const handleMetadataFileChange = async (file: File | null) => {
     if (!file) return;
 
-    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-      setError('Please upload a JSON file');
+    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
+      setError("Please upload a JSON file");
       return;
     }
 
@@ -136,7 +135,7 @@ export default function NewConference() {
 
     try {
       const formDataToUpload = new FormData();
-      formDataToUpload.append('file', file);
+      formDataToUpload.append("file", file);
 
       const fileUploadResponse = await fileService.uploadFile(
         FileTypeEnum.ASSETS,
@@ -157,18 +156,18 @@ export default function NewConference() {
           storageKey: fileUploadResponse.data.file.storageKey,
         });
       } else {
-        setError('Failed to upload file');
+        setError("Failed to upload file");
         setMetadataFile(null);
         setUploadedMetadataFile(null);
       }
     } catch (uploadError) {
-      console.error('Metadata file upload error:', uploadError);
-      setError('Failed to upload metadata file');
+      console.error("Metadata file upload error:", uploadError);
+      setError("Failed to upload metadata file");
       setMetadataFile(null);
       setUploadedMetadataFile(null);
       setFormData((prev) => ({
         ...prev,
-        metadataFilePath: '',
+        metadataFilePath: "",
       }));
     } finally {
       setUploading(false);
@@ -179,8 +178,8 @@ export default function NewConference() {
     <div>
       <Breadcrumb
         items={[
-          { label: 'Conferences', href: '/conferences' },
-          { label: 'New Conference' },
+          { label: "Conferences", href: "/conferences" },
+          { label: "New Conference" },
         ]}
       />
 
@@ -320,7 +319,7 @@ export default function NewConference() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/conferences')}
+              onClick={() => navigate("/conferences")}
               disabled={createConferenceMutation.isPending}
             >
               Cancel
@@ -341,7 +340,7 @@ export default function NewConference() {
                 formData.status === null
               }
             >
-              {createConferenceMutation.isPending ? 'Creating...' : 'Create'}
+              {createConferenceMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
         </form>
