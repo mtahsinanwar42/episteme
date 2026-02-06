@@ -18,12 +18,6 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
-
   const handleEmailPasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -58,6 +52,12 @@ function Login() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="h-full flex items-center justify-center">

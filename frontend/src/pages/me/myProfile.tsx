@@ -361,7 +361,7 @@ export default function MyProfile() {
                 </Button>
               )}
 
-              <Link to="/update-password" className="w-full">
+              <Link to="/profile/update-password" className="w-full">
                 <Button
                   size="sm"
                   className="w-full justify-start focus:outline-none! focus:ring-0!"
