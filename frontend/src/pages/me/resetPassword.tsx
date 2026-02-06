@@ -10,6 +10,7 @@ import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import { Input } from "@/components/ui/input";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
 
 export default function ResetPassword() {
   const { resetToken } = useParams();
@@ -19,7 +20,7 @@ export default function ResetPassword() {
   const passwordStrength = getPasswordStrength(password);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const { showSuccessToast } = useSuccessToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +37,8 @@ export default function ResetPassword() {
     try {
       const response = await authService.resetPassword(resetToken!, password);
       if (response.success) {
-        setSuccess(true);
-        setTimeout(() => navigate("/login"), 1200);
+        showSuccessToast("Password reset successful!");
+        navigate("/login");
       } else {
         setError("Failed to reset password. Try again.");
       }
@@ -51,7 +52,7 @@ export default function ResetPassword() {
   return (
     <div className="h-full flex flex-col">
       <PageTitle title="Reset Password" />
-      <PageSubTitle text="Enter your new password below" />
+      <PageSubTitle text="Enter your new password" />
 
       <div className="h-full flex items-center justify-center">
         <div className="relative max-w-md w-full">
@@ -99,11 +100,6 @@ export default function ResetPassword() {
                   {error}
                 </div>
               )}
-              {success && (
-                <div className="p-3 rounded-md text-sm border border-green-500/30 bg-green-500/10 text-green-800">
-                  Password reset successful! Redirecting to login...
-                </div>
-              )}
               <Button
                 type="submit"
                 className="w-full text-foreground! shadow-lg enabled:hover:brightness-105"
@@ -112,11 +108,19 @@ export default function ResetPassword() {
                     "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
                 }}
                 disabled={
-                  !password.trim() || !confirmPassword.trim() || isLoading
+                  !password.trim() ||
+                  passwordStrength.score < 4 ||
+                  password !== confirmPassword ||
+                  isLoading
                 }
               >
-                {isLoading ? "Resetting..." : "Reset Password"}
+                Reset Password
               </Button>
+              {isLoading && (
+                <div className="flex justify-center">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+                </div>
+              )}
             </form>
           </div>
         </div>

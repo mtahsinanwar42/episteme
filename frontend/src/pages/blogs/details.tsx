@@ -94,7 +94,7 @@ export default function BlogDetails() {
               className="h-56 w-4/5 object-contain rounded-md mx-auto mt-6"
             />
           ) : (
-            <div className="w-full h-56 flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 animate-pulse rounded-md mx-auto mt-6">
+            <div className={`w-full h-56 flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 rounded-md mx-auto mt-6${metadataLoading ? ' animate-pulse' : ''}`}>
               <div className="text-center">
                 <ImageIcon className="w-12 h-12 text-slate-600 mx-auto mb-2" />
               </div>

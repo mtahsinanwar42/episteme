@@ -6,12 +6,18 @@ import { authService } from "@/services/authService";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const { showSuccessToast } = useSuccessToast();
+
+  const EMAIL_REGEX =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+  const isEmailValid = EMAIL_REGEX.test(email);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,8 +25,9 @@ export default function ForgotPassword() {
     setIsLoading(true);
     try {
       const response = await authService.forgotPassword(email);
-      if (response.success && response.data?.resetToken) {
-        navigate(`/reset-password/${response.data.resetToken}`);
+      if (response.success) {
+        showSuccessToast("A Password Reset URL has been sent to your email.");
+        navigate("/login");
       } else {
         setError("Failed to send reset email. Please try again.");
       }
@@ -49,13 +56,18 @@ export default function ForgotPassword() {
                 <Input
                   id="email"
                   name="email"
-                  type="email"
-                  placeholder="Enter your email"
+                  type="text"
+                  placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
                   autoComplete="email"
                 />
+                {email && !isEmailValid && (
+                  <p className="text-red-400 text-xs">
+                    Please enter a valid email address.
+                  </p>
+                )}
               </div>
               {error && (
                 <div className="p-3 rounded-md text-sm border border-red-500/30 bg-red-500/10 text-red-800">
@@ -69,10 +81,15 @@ export default function ForgotPassword() {
                   background:
                     "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
                 }}
-                disabled={!email.trim() || isLoading}
+                disabled={!isEmailValid || isLoading}
               >
-                {isLoading ? "Sending..." : "Send Reset Link"}
+                Send Reset Link
               </Button>
+              {isLoading && (
+                <div className="flex justify-center">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+                </div>
+              )}
             </form>
           </div>
         </div>

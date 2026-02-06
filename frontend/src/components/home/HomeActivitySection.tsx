@@ -94,47 +94,50 @@ function ActivityCard({ activity }: ActivityCardProps) {
     : null;
 
   return (
-    <article className="bg-slate-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-700 group">
-      <div className="relative h-48 overflow-hidden bg-slate-900">
+    <article className="grid grid-cols-[55%_45%] gradient-card rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border-b-2 border-border">
+      {/* Content */}
+      <div className="p-4 flex flex-col justify-between">
+        <div className="flex flex-col gap-2">
+          <div className="inline-flex">
+            <span className="gradient-card text-foreground px-3 py-1 rounded-full text-xs font-semibold border border-border">
+              Activity
+            </span>
+          </div>
+          <h3 className="font-semibold text-foreground line-clamp-2">
+            {activity.title}
+          </h3>
+          {metadata?.summary && (
+            <p className="text-sm text-foreground/60 line-clamp-2">
+              {metadata.summary}
+            </p>
+          )}
+          <span className="text-sm text-foreground/50">
+            {formatDate(activity.createdAt)}
+          </span>
+        </div>
+
+        <Link
+          to={`/activities/${activity.id}`}
+          className="text-foreground/80 font-semibold hover:underline inline-flex items-center gap-1 mt-3"
+        >
+          Read More
+          <span>→</span>
+        </Link>
+      </div>
+
+      {/* Image */}
+      <div className="h-full flex items-center justify-center">
         {!isLoading && imageUrl ? (
           <img
             src={imageUrl}
             alt={activity.title}
             crossOrigin="anonymous"
-            className="w-full h-full object-cover"
+            className="h-44 w-4/5 object-cover rounded-md"
+            loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl">
-            🎯
-          </div>
+          <div className="h-44 w-4/5 gradient-card rounded-md" />
         )}
-        <div className="absolute top-4 left-4">
-          <span className="gradient-card text-foreground px-3 py-1 rounded-full text-xs font-semibold">
-            Activity
-          </span>
-        </div>
-      </div>
-
-      <div className="h-56 p-6 flex flex-col justify-between">
-        <div>
-          <h3 className="text-xl font-bold mb-3 line-clamp-2 transition-colors">
-            {activity.title}
-          </h3>
-
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center gap-2 text-sm text-foreground/90">
-              <span>📅</span>
-              <span>{formatDate(activity.createdAt)}</span>
-            </div>
-          </div>
-        </div>
-
-        <Link
-          to={`/activities/${activity.id}`}
-          className="block w-full text-center  bg-slate-700 hover:bg-slate-600 text-foreground px-4 py-2 rounded-lg font-semibold transition-colors"
-        >
-          View Details
-        </Link>
       </div>
     </article>
   );

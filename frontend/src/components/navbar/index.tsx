@@ -287,7 +287,7 @@ export default function Navbar() {
                       src={`${new URL(config.baseUrl).origin}/${user.photoFilePath}`}
                       alt="Profile"
                       crossOrigin="anonymous"
-                      className="w-12 h-12 rounded-full border-2 border-indigo-600"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-indigo-600"
                     />
                   ) : (
                     <div
