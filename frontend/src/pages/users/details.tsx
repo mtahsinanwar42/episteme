@@ -109,10 +109,7 @@ export default function UserDetails() {
     });
   };
 
-  const handleFileSelect = async (
-    file: File | null,
-    type: FileTypeEnum,
-  ) => {
+  const handleFileSelect = async (file: File | null, type: FileTypeEnum) => {
     if (!file) return;
     if (type === FileTypeEnum.PROFILE_PHOTOS) {
       setPhotoFile(file);
@@ -387,7 +384,7 @@ export default function UserDetails() {
                 <Button
                   size="sm"
                   className="w-full justify-start focus:outline-none! focus:ring-0!"
-                  onClick={() => fileService.downloadFile(user.cvFilePath)}
+                  onClick={() => fileService.downloadFile(user.cvFilePath!)}
                 >
                   <FileText className="w-4 h-4" />
                   Download CV
@@ -432,299 +429,314 @@ export default function UserDetails() {
                     </div>
                   </div>
 
-                <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-accent mt-0.5" />
-                  <div className="w-full">
-                    <p className="text-sm ">Phone</p>
-
-                    {isEdit ? (
-                      <>
-                        <Input
-                          type="text"
-                          value={formData.phone}
-                          onChange={(e) =>
-                            setFormData({ ...formData, phone: e.target.value })
-                          }
-                        />
-                        {formData.phone && !isPhoneValid && (
-                          <p className="text-red-400 text-xs">
-                            Please enter a valid phone number.
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <p className="font-medium">
-                        {user.phone || "Not provided"}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Building2 className="w-5 h-5 text-accent mt-0.5" />
-                  <div className="w-full">
-                    <p className="text-sm ">Institution *</p>
-                    {isEdit ? (
-                      <Input
-                        type="text"
-                        value={formData.institution}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            institution: e.target.value,
-                          })
-                        }
-                      />
-                    ) : (
-                      <p className="font-medium">
-                        {user.institution || "Not provided"}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Briefcase className="w-5 h-5 text-accent mt-0.5" />
-                  <div className="w-full">
-                    <p className="text-sm ">Occupation *</p>
-                    {isEdit ? (
-                      <Input
-                        type="text"
-                        value={formData.occupation}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            occupation: e.target.value,
-                          })
-                        }
-                      />
-                    ) : (
-                      <p className="font-medium">
-                        {user.occupation || "Not provided"}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-accent mt-0.5" />
-                  <div className="w-full">
-                    <p className="text-sm ">Country *</p>
-                    {isEdit ? (
-                      <SearchableSelect
-                        value={formData.country}
-                        onValueChange={(value) => {
-                          setFormData({ ...formData, country: value });
-                        }}
-                        options={countriesData?.data || []}
-                        placeholder="Select a country"
-                        disabled={isLoading}
-                      />
-                    ) : (
-                      <p className="font-medium">
-                        {user.country || "Not provided"}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-accent mt-0.5" />
-                  <div className="w-full">
-                    <p className="text-sm ">Created At</p>
-                    <p className="font-medium">
-                      {formatDateTime(user.createdAt)}
-                    </p>
-                  </div>
-                </div>
-
-                {isEdit && (
-                  <div className="flex gap-3">
-                    <div>
-                      <User className="w-5 h-5 text-accent mt-0.5" />
-                    </div>
-
-                    <div className="w-full">
-                      <FileUploadField
-                        label="Profile picture"
-                        selectedFile={photoFile}
-                        onFileSelect={(file) =>
-                          handleFileSelect(file, FileTypeEnum.PROFILE_PHOTOS)
-                        }
-                        accept="image/*"
-                        disabled={updateUserMutation.isPending}
-                        helperText="Upload a profile photo (JPG, PNG)"
-                        uploadedFile={uploadedPhotoFile}
-                        maxNameLength={40}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {isEdit && (
-                  <div className="flex gap-3">
-                    <div>
-                      <FileText className="w-5 h-5 text-accent mt-0.5" />
-                    </div>
-
-                    <div className="w-full">
-                      <FileUploadField
-                        label="CV"
-                        selectedFile={cvFile}
-                        onFileSelect={(file) =>
-                          handleFileSelect(file, FileTypeEnum.CVS)
-                        }
-                        accept=".pdf,.doc,.docx"
-                        disabled={updateUserMutation.isPending}
-                        helperText="Upload a CV (PDF, DOC, DOCX)"
-                        uploadedFile={uploadedCvFile}
-                        maxNameLength={40}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {isEdit && (
-                  <div className="flex gap-3">
-                    <div>
-                      <Shield className="w-5 h-5 text-accent mt-0.5" />
-                    </div>
-
-                    <div className="w-full">
-                      <p className="text-sm ">Status *</p>
-                      <div className="w-full">
-                        <Select
-                          value={selectedStatus.toString()}
-                          onValueChange={(value) => {
-                            setSelectedStatus(Number(value));
-                            setFormData((prev) => {
-                              return { ...prev, status: Number(value) };
-                            });
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value={UserStatus.INACTIVE.toString()}>
-                              Inactive
-                            </SelectItem>
-                            <SelectItem value={UserStatus.ACTIVE.toString()}>
-                              Active
-                            </SelectItem>
-                            <SelectItem value={UserStatus.SUSPENDED.toString()}>
-                              Suspended
-                            </SelectItem>
-                            <SelectItem value={UserStatus.DELETED.toString()}>
-                              Deleted
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {isEdit && (
-                  <div className="flex gap-3">
-                    <div>
-                      <Shield className="w-5 h-5 text-accent mt-0.5" />
-                    </div>
-
-                    <div className="w-full">
-                      <p className="text-sm font-medium">Select Roles *</p>
-                      <div className="space-y-3 mt-2">
-                        <div className="flex items-center space-x-3">
-                          <Checkbox
-                            id="role-user"
-                            checked={(formData.roles || []).includes("USER")}
-                            onCheckedChange={() => handleRoleToggle("USER")}
-                          />
-                          <label
-                            htmlFor="role-user"
-                            className="text-sm cursor-pointer"
-                          >
-                            User
-                          </label>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <Checkbox
-                            id="role-reviewer"
-                            checked={(formData.roles || []).includes("REVIEWER")}
-                            onCheckedChange={() => handleRoleToggle("REVIEWER")}
-                          />
-                          <label
-                            htmlFor="role-reviewer"
-                            className="text-sm cursor-pointer"
-                          >
-                            Reviewer
-                          </label>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <Checkbox
-                            id="role-admin"
-                            checked={(formData.roles || []).includes("ADMIN")}
-                            onCheckedChange={() => handleRoleToggle("ADMIN")}
-                          />
-                          <label
-                            htmlFor="role-admin"
-                            className="text-sm cursor-pointer"
-                          >
-                            Admin
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {user?.statusUpdateNotes && (
                   <div className="flex items-start gap-3">
-                    <Notebook className="w-5 h-5 text-accent mt-0.5" />
+                    <Phone className="w-5 h-5 text-accent mt-0.5" />
                     <div className="w-full">
-                      <p className="text-sm ">Status Update Notes</p>
+                      <p className="text-sm ">Phone</p>
+
+                      {isEdit ? (
+                        <>
+                          <Input
+                            type="text"
+                            value={formData.phone}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                phone: e.target.value,
+                              })
+                            }
+                          />
+                          {formData.phone && !isPhoneValid && (
+                            <p className="text-red-400 text-xs">
+                              Please enter a valid phone number.
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="font-medium">
+                          {user.phone || "Not provided"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Building2 className="w-5 h-5 text-accent mt-0.5" />
+                    <div className="w-full">
+                      <p className="text-sm ">Institution *</p>
                       {isEdit ? (
                         <Input
                           type="text"
-                          value={formData.statusUpdateNotes}
+                          value={formData.institution}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              statusUpdateNotes: e.target.value,
+                              institution: e.target.value,
                             })
                           }
                         />
                       ) : (
-                        <p className="font-medium">{user.statusUpdateNotes}</p>
+                        <p className="font-medium">
+                          {user.institution || "Not provided"}
+                        </p>
                       )}
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
+                  <div className="flex items-start gap-3">
+                    <Briefcase className="w-5 h-5 text-accent mt-0.5" />
+                    <div className="w-full">
+                      <p className="text-sm ">Occupation *</p>
+                      {isEdit ? (
+                        <Input
+                          type="text"
+                          value={formData.occupation}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              occupation: e.target.value,
+                            })
+                          }
+                        />
+                      ) : (
+                        <p className="font-medium">
+                          {user.occupation || "Not provided"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-accent mt-0.5" />
+                    <div className="w-full">
+                      <p className="text-sm ">Country *</p>
+                      {isEdit ? (
+                        <SearchableSelect
+                          value={formData.country}
+                          onValueChange={(value) => {
+                            setFormData({ ...formData, country: value });
+                          }}
+                          options={countriesData?.data || []}
+                          placeholder="Select a country"
+                          disabled={isLoading}
+                        />
+                      ) : (
+                        <p className="font-medium">
+                          {user.country || "Not provided"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Calendar className="w-5 h-5 text-accent mt-0.5" />
+                    <div className="w-full">
+                      <p className="text-sm ">Created At</p>
+                      <p className="font-medium">
+                        {formatDateTime(user.createdAt)}
+                      </p>
+                    </div>
+                  </div>
 
-            {isEdit && (
-              <div className="flex gap-4 justify-end mt-6 pr-6 pb-6">
-                <div>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setFormData(user);
-                      setIsEdit(false);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    onClick={() => handleSave()}
-                    disabled={!isEditFormValid || updateUserMutation.isPending}
-                  >
-                    Save
-                  </Button>
+                  {isEdit && (
+                    <div className="flex gap-3">
+                      <div>
+                        <User className="w-5 h-5 text-accent mt-0.5" />
+                      </div>
+
+                      <div className="w-full">
+                        <FileUploadField
+                          label="Profile picture"
+                          selectedFile={photoFile}
+                          onFileSelect={(file) =>
+                            handleFileSelect(file, FileTypeEnum.PROFILE_PHOTOS)
+                          }
+                          accept="image/*"
+                          disabled={updateUserMutation.isPending}
+                          helperText="Upload a profile photo (JPG, PNG)"
+                          uploadedFile={uploadedPhotoFile}
+                          maxNameLength={40}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {isEdit && (
+                    <div className="flex gap-3">
+                      <div>
+                        <FileText className="w-5 h-5 text-accent mt-0.5" />
+                      </div>
+
+                      <div className="w-full">
+                        <FileUploadField
+                          label="CV"
+                          selectedFile={cvFile}
+                          onFileSelect={(file) =>
+                            handleFileSelect(file, FileTypeEnum.CVS)
+                          }
+                          accept=".pdf,.doc,.docx"
+                          disabled={updateUserMutation.isPending}
+                          helperText="Upload a CV (PDF, DOC, DOCX)"
+                          uploadedFile={uploadedCvFile}
+                          maxNameLength={40}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {isEdit && (
+                    <div className="flex gap-3">
+                      <div>
+                        <Shield className="w-5 h-5 text-accent mt-0.5" />
+                      </div>
+
+                      <div className="w-full">
+                        <p className="text-sm ">Status *</p>
+                        <div className="w-full">
+                          <Select
+                            value={selectedStatus.toString()}
+                            onValueChange={(value) => {
+                              setSelectedStatus(Number(value));
+                              setFormData((prev) => {
+                                return { ...prev, status: Number(value) };
+                              });
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem
+                                value={UserStatus.INACTIVE.toString()}
+                              >
+                                Inactive
+                              </SelectItem>
+                              <SelectItem value={UserStatus.ACTIVE.toString()}>
+                                Active
+                              </SelectItem>
+                              <SelectItem
+                                value={UserStatus.SUSPENDED.toString()}
+                              >
+                                Suspended
+                              </SelectItem>
+                              <SelectItem value={UserStatus.DELETED.toString()}>
+                                Deleted
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isEdit && (
+                    <div className="flex gap-3">
+                      <div>
+                        <Shield className="w-5 h-5 text-accent mt-0.5" />
+                      </div>
+
+                      <div className="w-full">
+                        <p className="text-sm font-medium">Select Roles *</p>
+                        <div className="space-y-3 mt-2">
+                          <div className="flex items-center space-x-3">
+                            <Checkbox
+                              id="role-user"
+                              checked={(formData.roles || []).includes("USER")}
+                              onCheckedChange={() => handleRoleToggle("USER")}
+                            />
+                            <label
+                              htmlFor="role-user"
+                              className="text-sm cursor-pointer"
+                            >
+                              User
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <Checkbox
+                              id="role-reviewer"
+                              checked={(formData.roles || []).includes(
+                                "REVIEWER",
+                              )}
+                              onCheckedChange={() =>
+                                handleRoleToggle("REVIEWER")
+                              }
+                            />
+                            <label
+                              htmlFor="role-reviewer"
+                              className="text-sm cursor-pointer"
+                            >
+                              Reviewer
+                            </label>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <Checkbox
+                              id="role-admin"
+                              checked={(formData.roles || []).includes("ADMIN")}
+                              onCheckedChange={() => handleRoleToggle("ADMIN")}
+                            />
+                            <label
+                              htmlFor="role-admin"
+                              className="text-sm cursor-pointer"
+                            >
+                              Admin
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {user?.statusUpdateNotes && (
+                    <div className="flex items-start gap-3">
+                      <Notebook className="w-5 h-5 text-accent mt-0.5" />
+                      <div className="w-full">
+                        <p className="text-sm ">Status Update Notes</p>
+                        {isEdit ? (
+                          <Input
+                            type="text"
+                            value={formData.statusUpdateNotes}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                statusUpdateNotes: e.target.value,
+                              })
+                            }
+                          />
+                        ) : (
+                          <p className="font-medium">
+                            {user.statusUpdateNotes}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
+
+              {isEdit && (
+                <div className="flex gap-4 justify-end mt-6 pr-6 pb-6">
+                  <div>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setFormData(user);
+                        setIsEdit(false);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      onClick={() => handleSave()}
+                      disabled={
+                        !isEditFormValid || updateUserMutation.isPending
+                      }
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );
