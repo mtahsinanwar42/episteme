@@ -12,6 +12,8 @@ import { formatDateTime } from "@/utils/dateFormatter";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/store";
 import { UserRole } from "@/models/user";
+import { ActivityStatus } from "@/models/activity";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 
 export default function ActivityDetails() {
   const { activityId } = useParams();
@@ -31,11 +33,8 @@ export default function ActivityDetails() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading activity details...</p>
-        </div>
+      <div className="relative min-h-[400px]">
+        <LoadingOverlay visible />
       </div>
     );
   }
@@ -85,7 +84,7 @@ export default function ActivityDetails() {
 
       <div className="space-y-6">
         <div className="rounded-lg border border-border shadow-sm relative gradient-card">
-          {isAdmin && activity?.id && (
+          {isAdmin && activity?.id && activity?.status !== ActivityStatus.DELETED && (
             <Edit
               onClick={() => navigate(`/activities/edit/${activity.id}`)}
               className="absolute top-4 right-4 z-10 h-4 w-4 cursor-pointer text-foreground hover:text-foreground/80"

@@ -85,6 +85,7 @@ export interface GetConferencesParams {
   select?: string;
   search?: string;
   paginate?: boolean;
+  statusIn?: string;
 }
 
 export interface CreateConferenceRequest {

@@ -36,6 +36,7 @@ import EditBlog from "@/pages/blogs/edit";
 import ConferenceDetails from "@/pages/conferences/details";
 import NewConference from "@/pages/conferences/new";
 import EditConference from "@/pages/conferences/edit";
+import { aboutPageFlags } from "@/config/featureFlags";
 import Unauthorized from "@/pages/misc/unauthorized";
 import NotFound from "@/pages/misc/notFound";
 import UpdatePassword from "@/pages/me/updatePassword";
@@ -220,13 +221,13 @@ export default function RouteConfig() {
         }
       />
 
-      <Route path="/about/mission" element={<Mission />} />
-      <Route path="/about/ethics" element={<Ethics />} />
-      <Route path="/about/sustainability" element={<Sustainability />} />
-      <Route path="/about/executive" element={<Executive />} />
-      <Route path="/about/policies" element={<Policies />} />
-      <Route path="/about/career" element={<Career />} />
-      <Route path="/about/contact" element={<Contact />} />
+      {aboutPageFlags.mission && <Route path="/about/mission" element={<Mission />} />}
+      {aboutPageFlags.ethics && <Route path="/about/ethics" element={<Ethics />} />}
+      {aboutPageFlags.sustainability && <Route path="/about/sustainability" element={<Sustainability />} />}
+      {aboutPageFlags.executive && <Route path="/about/executive" element={<Executive />} />}
+      {aboutPageFlags.policies && <Route path="/about/policies" element={<Policies />} />}
+      {aboutPageFlags.career && <Route path="/about/career" element={<Career />} />}
+      {aboutPageFlags.contact && <Route path="/about/contact" element={<Contact />} />}
 
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/404-not-found" element={<NotFound />} />

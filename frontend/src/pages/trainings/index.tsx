@@ -29,7 +29,7 @@ export default function Trainings() {
     limit: pageSize,
     sort: "-createdAt",
     paginate: true,
-    status: currentRoles?.includes(UserRole.ADMIN) ? undefined : 1,
+    statusIn: currentRoles?.includes(UserRole.ADMIN) ? undefined : "1,2",
   });
 
   const trainings = response?.data || [];

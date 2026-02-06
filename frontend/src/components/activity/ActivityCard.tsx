@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { type Activity } from "@/models/activity";
+import { type Activity, ActivityStatus } from "@/models/activity";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { UserRole } from "@/models/user";
@@ -46,7 +46,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
       statusBadge={<>{getBlogActivityResourceStatusBadge(activity.status)}</>}
       metadata={<span className="text-slate-500 text-sm">{createdDate}</span>}
       actions={
-        isAdmin ? <Edit onClick={handleEdit} className="w-4 h-4" /> : undefined
+        isAdmin && activity.status !== ActivityStatus.DELETED ? <Edit onClick={handleEdit} className="w-4 h-4" /> : undefined
       }
     />
   );

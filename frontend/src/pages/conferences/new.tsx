@@ -70,6 +70,16 @@ export default function NewConference() {
       return;
     }
 
+    if (formData.endAt < formData.startAt) {
+      setError('End Date must be on or after Start Date');
+      return;
+    }
+
+    if (formData.submissionPeriodEndAt < formData.submissionPeriodStartAt) {
+      setError('Submission End Date must be on or after Submission Start Date');
+      return;
+    }
+
     if (!formData.metadataFilePath) {
       setError("Metadata file is required");
       return;
@@ -247,6 +257,9 @@ export default function NewConference() {
                 onChange={handleInputChange}
                 disabled={createConferenceMutation.isPending}
               />
+              {formData.startAt && formData.endAt && formData.endAt < formData.startAt && (
+                <p className="text-red-400 text-xs mt-1">End Date must be on or after Start Date</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-2 text-heading">
@@ -271,6 +284,9 @@ export default function NewConference() {
                 onChange={handleInputChange}
                 disabled={createConferenceMutation.isPending}
               />
+              {formData.submissionPeriodStartAt && formData.submissionPeriodEndAt && formData.submissionPeriodEndAt < formData.submissionPeriodStartAt && (
+                <p className="text-red-400 text-xs mt-1">Submission End Date must be on or after Submission Start Date</p>
+              )}
             </div>
           </div>
 
@@ -337,7 +353,9 @@ export default function NewConference() {
                 !formData.submissionPeriodEndAt ||
                 !formData.metadataFilePath ||
                 formData.status === undefined ||
-                formData.status === null
+                formData.status === null ||
+                (!!formData.startAt && !!formData.endAt && formData.endAt < formData.startAt) ||
+                (!!formData.submissionPeriodStartAt && !!formData.submissionPeriodEndAt && formData.submissionPeriodEndAt < formData.submissionPeriodStartAt)
               }
             >
               {createConferenceMutation.isPending ? "Creating..." : "Create"}

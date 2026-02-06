@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, User as UserIcon, DownloadCloud } from "lucide-react";
+import { FileText, Key, Calendar, User as UserIcon, DownloadCloud } from "lucide-react";
 import { fileService } from "@/services/fileService";
 import { useFileById } from "@/hooks/useFiles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { formatDateTime } from "@/utils/dateFormatter";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 
 export default function AssetDetails() {
   const { fileId } = useParams();
@@ -27,11 +28,8 @@ export default function AssetDetails() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading asset details...</p>
-        </div>
+      <div className="relative min-h-[400px]">
+        <LoadingOverlay visible />
       </div>
     );
   }
@@ -84,7 +82,7 @@ export default function AssetDetails() {
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-accent mt-0.5" />
+                <FileText className="w-5 h-5 text-accent mt-0.5" />
                 <div>
                   <p className="text-sm text-muted-foreground">Name</p>
 
@@ -94,7 +92,7 @@ export default function AssetDetails() {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-accent mt-0.5" />
+                <Key className="w-5 h-5 text-accent mt-0.5" />
                 <div>
                   <p className="text-sm text-muted-foreground">Storage Key</p>
 
@@ -105,7 +103,7 @@ export default function AssetDetails() {
               </div>
 
               <div className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-accent mt-0.5" />
+                <Calendar className="w-5 h-5 text-accent mt-0.5" />
                 <div>
                   <p className="text-sm text-muted-foreground">Created At</p>
 

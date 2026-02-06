@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { type Training } from "@/models/training";
+import { type Training, TrainingStatus } from "@/models/training";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { UserRole } from "@/models/user";
@@ -47,7 +47,7 @@ export function TrainingCard({ training }: TrainingCardProps) {
       }
       metadata={<span className="text-slate-500 text-sm">{createdDate}</span>}
       actions={
-        isAdmin ? <Edit className="w-4 h-4" onClick={handleEdit} /> : undefined
+        isAdmin && training.status !== TrainingStatus.DELETED ? <Edit className="w-4 h-4" onClick={handleEdit} /> : undefined
       }
     />
   );

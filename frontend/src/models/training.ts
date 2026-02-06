@@ -43,6 +43,7 @@ export interface GetTrainingsParams {
   search?: string;
   paginate?: boolean;
   status?: number;
+  statusIn?: string;
 }
 
 export interface CreateTrainingRequest {

@@ -10,6 +10,8 @@ import { authService } from "@/services/authService";
 import { useSuccessToast } from "@/hooks/useSuccessToast";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 
 export default function UpdatePassword() {
   const navigate = useNavigate();
@@ -61,13 +63,20 @@ export default function UpdatePassword() {
 
   return (
     <div className="h-full flex flex-col">
-      <div>
+      <Breadcrumb
+        items={[
+          { label: "My Profile", href: "/profile" },
+          { label: "Update Password" },
+        ]}
+      />
+      <div className="mb-6">
         <PageTitle title="Update Password" />
         <PageSubTitle text="Change your account password securely" />
       </div>
 
       <div className="h-full flex items-center justify-center">
         <div className="relative max-w-md w-full">
+          <LoadingOverlay visible={isLoading} />
           <div className="absolute -inset-px bg-linear-to-br from-indigo-300/35 via-sky-200/30 to-emerald-200/25 rounded-3xl blur opacity-70" />
           <div className="relative rounded-3xl border border-border bg-card backdrop-blur-md shadow-2xl p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
