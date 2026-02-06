@@ -41,12 +41,17 @@ import Unauthorized from "@/pages/misc/unauthorized";
 import NotFound from "@/pages/misc/notFound";
 import UpdatePassword from "@/pages/me/updatePassword";
 import MyProfile from "@/pages/me/myProfile";
+import ForgotPassword from "./pages/me/forgotPassword";
+import ResetPassword from "./pages/me/resetPassword";
 
 export default function RouteConfig() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
+
       <Route path="/" element={<Home />} />
 
       <Route
@@ -221,13 +226,27 @@ export default function RouteConfig() {
         }
       />
 
-      {aboutPageFlags.mission && <Route path="/about/mission" element={<Mission />} />}
-      {aboutPageFlags.ethics && <Route path="/about/ethics" element={<Ethics />} />}
-      {aboutPageFlags.sustainability && <Route path="/about/sustainability" element={<Sustainability />} />}
-      {aboutPageFlags.executive && <Route path="/about/executive" element={<Executive />} />}
-      {aboutPageFlags.policies && <Route path="/about/policies" element={<Policies />} />}
-      {aboutPageFlags.career && <Route path="/about/career" element={<Career />} />}
-      {aboutPageFlags.contact && <Route path="/about/contact" element={<Contact />} />}
+      {aboutPageFlags.mission && (
+        <Route path="/about/mission" element={<Mission />} />
+      )}
+      {aboutPageFlags.ethics && (
+        <Route path="/about/ethics" element={<Ethics />} />
+      )}
+      {aboutPageFlags.sustainability && (
+        <Route path="/about/sustainability" element={<Sustainability />} />
+      )}
+      {aboutPageFlags.executive && (
+        <Route path="/about/executive" element={<Executive />} />
+      )}
+      {aboutPageFlags.policies && (
+        <Route path="/about/policies" element={<Policies />} />
+      )}
+      {aboutPageFlags.career && (
+        <Route path="/about/career" element={<Career />} />
+      )}
+      {aboutPageFlags.contact && (
+        <Route path="/about/contact" element={<Contact />} />
+      )}
 
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/404-not-found" element={<NotFound />} />

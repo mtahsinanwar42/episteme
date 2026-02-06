@@ -80,7 +80,7 @@ function Login() {
             <p>Access your dashboard and manage your account</p>
           </div>
 
-          <form onSubmit={handleEmailPasswordLogin} className="space-y-5">
+          <form onSubmit={handleEmailPasswordLogin} className="space-y-4">
             <div className="flex flex-col space-y-2">
               <label
                 htmlFor="email"
@@ -110,6 +110,15 @@ function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+            </div>
+
+            <div className="text-right mb-4">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-indigo-400 hover:underline"
+              >
+                Forgot password?
+              </Link>
             </div>
 
             {error && (

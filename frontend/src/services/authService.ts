@@ -40,4 +40,25 @@ export const authService = {
   }) => {
     return api.put("/auth/me/password", { currentPassword, newPassword }, true);
   },
+
+  forgotPassword: async (
+    email: string,
+  ): Promise<{ success: boolean; data: { resetToken: string } }> => {
+    return api.post<{ success: boolean; data: { resetToken: string } }>(
+      "/auth/forgotPassword",
+      { email },
+      false,
+    );
+  },
+
+  resetPassword: async (
+    resetToken: string,
+    password: string,
+  ): Promise<{ success: boolean }> => {
+    return api.put<{ success: boolean }>(
+      `/auth/resetPassword/${resetToken}`,
+      { password },
+      false,
+    );
+  },
 };
