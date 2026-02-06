@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { Input } from "@/components/ui/input";
@@ -10,19 +10,14 @@ import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import Cookies from "js-cookie";
 
 function Login() {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const token = useSelector((state: RootState) => state.auth.token);
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [user, navigate]);
 
   const handleEmailPasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +41,7 @@ function Login() {
         if (userDetailsResponse.success && userDetailsResponse.data) {
           dispatch(setUser(userDetailsResponse.data));
           dispatch(setLoading(false));
-          navigate("/home");
+          navigate("/");
         }
       }
     } catch (error) {
@@ -58,6 +53,18 @@ function Login() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (location.state && location.state.fromLogout) {
+      dispatch(setUser(null));
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
 
   return (
     <div className="h-full flex items-center justify-center">
@@ -73,7 +80,7 @@ function Login() {
             <p>Access your dashboard and manage your account</p>
           </div>
 
-          <form onSubmit={handleEmailPasswordLogin} className="space-y-5">
+          <form onSubmit={handleEmailPasswordLogin} className="space-y-4">
             <div className="flex flex-col space-y-2">
               <label
                 htmlFor="email"
@@ -83,7 +90,6 @@ function Login() {
               </label>
               <Input
                 id="email"
-                type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -106,6 +112,15 @@ function Login() {
               />
             </div>
 
+            <div className="text-right mb-4">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-indigo-400 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
             {error && (
               <div className="p-3 rounded-md text-sm border border-red-500/30 bg-red-200/40 text-orange-700">
                 {error}
@@ -119,7 +134,7 @@ function Login() {
                 background:
                   "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
               }}
-              disabled={isLoading}
+              disabled={isLoading || !email.trim() || !password.trim()}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>

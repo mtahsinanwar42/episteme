@@ -98,48 +98,50 @@ function BlogCard({ blog }: BlogCardProps) {
     : null;
 
   return (
-    <article className="gradient-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-700 group">
+    <article className="grid grid-cols-[55%_45%] gradient-card rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border-b-2 border-border">
+      {/* Content */}
+      <div className="p-4 flex flex-col justify-between">
+        <div className="flex flex-col gap-2">
+          <div className="inline-flex">
+            <span className="gradient-card text-foreground px-3 py-1 rounded-full text-xs font-semibold border border-border">
+              Blog
+            </span>
+          </div>
+          <h3 className="font-semibold text-foreground line-clamp-2">
+            {blog.title}
+          </h3>
+          {metadata?.summary && (
+            <p className="text-sm text-foreground/60 line-clamp-2">
+              {metadata.summary}
+            </p>
+          )}
+          <span className="text-sm text-foreground/50">
+            {formatDate(blog.createdAt)}
+          </span>
+        </div>
+
+        <Link
+          to={`/blogs/${blog.id}`}
+          className="text-foreground/80 font-semibold hover:underline inline-flex items-center gap-1 mt-3"
+        >
+          Read More
+          <span>→</span>
+        </Link>
+      </div>
+
       {/* Image */}
-      <div className="relative h-48 overflow-hidden gradient-card">
+      <div className="h-full flex items-center justify-center">
         {!isLoading && imageUrl ? (
           <img
             src={imageUrl}
             alt={blog.title}
             crossOrigin="anonymous"
-            className="w-full h-full object-cover"
+            className="h-44 w-4/5 object-cover rounded-md"
+            loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl">
-            📝
-          </div>
+          <div className="h-44 w-4/5 gradient-card rounded-md" />
         )}
-        <div className="absolute top-4 left-4">
-          <span className="gradient-card text-foreground px-3 py-1 rounded-full text-xs font-semibold">
-            Blog
-          </span>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="h-48 p-6 flex flex-col justify-between">
-        <div>
-          <h3 className="text-xl font-bold mb-3 line-clamp-2 transition-colors">
-            {blog.title}
-          </h3>
-
-          {/* Meta */}
-          <div className="text-sm text-foreground/80 mb-4">
-            {formatDate(blog.createdAt)}
-          </div>
-        </div>
-
-        <Link
-          to={`/blogs/${blog.id}`}
-          className="text-foreground/80 font-semibold hover:underline inline-flex items-center gap-1"
-        >
-          Read More
-          <span>→</span>
-        </Link>
       </div>
     </article>
   );

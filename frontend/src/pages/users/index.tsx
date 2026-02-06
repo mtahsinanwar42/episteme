@@ -6,13 +6,21 @@ import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, Eye, RefreshCw } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { UserRole } from "@/models/user";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/stores/store";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import PageTitle from "@/components/common/PageTitle";
 import { StatusUpdateModal } from "@/components/user/StatusUpdateModal";
 
 export default function Users() {
+  const navigate = useNavigate();
+  const currentRoles = useSelector(
+    (state: RootState) => state?.auth?.user?.roles,
+  );
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [page, setPage] = useState(1);
@@ -202,6 +210,16 @@ export default function Users() {
       <div className="mb-6">
         <PageTitle title="Users" />
         <PageSubTitle text="View and manage all registered users" />
+        {currentRoles?.includes(UserRole.ADMIN) && (
+          <div className="flex justify-end">
+            <Button
+              onClick={() => navigate("/users/new")}
+              className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              Add New User
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-4">
@@ -212,7 +230,7 @@ export default function Users() {
           error={error ? (error as Error).message : null}
           pageSize={pageSize}
           enableSearch
-          searchPlaceholder="Search users"
+          searchPlaceholder="Search Users"
         />
 
         {!isLoading && !error && total > 0 && (

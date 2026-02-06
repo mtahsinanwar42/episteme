@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { type Announcement } from "@/models/announcement";
+import { type Announcement, AnnouncementStatus } from "@/models/announcement";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { UserRole } from "@/models/user";
@@ -47,7 +47,7 @@ export function AnnouncementCard({ announcement }: AnnouncementCardProps) {
       }
       metadata={<span className="text-slate-500 text-sm">{createdDate}</span>}
       actions={
-        isAdmin ? <Edit onClick={handleEdit} className="w-4 h-4" /> : undefined
+        isAdmin && announcement.status !== AnnouncementStatus.DELETED ? <Edit onClick={handleEdit} className="w-4 h-4" /> : undefined
       }
     />
   );

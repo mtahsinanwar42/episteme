@@ -12,6 +12,8 @@ import { formatDateTime } from "@/utils/dateFormatter";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/store";
 import { UserRole } from "@/models/user";
+import { BlogStatus } from "@/models/blog";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 
 export default function BlogDetails() {
   const { blogId } = useParams();
@@ -31,11 +33,8 @@ export default function BlogDetails() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading blog details...</p>
-        </div>
+      <div className="relative min-h-[400px]">
+        <LoadingOverlay visible />
       </div>
     );
   }
@@ -81,7 +80,7 @@ export default function BlogDetails() {
 
       <div className="space-y-6">
         <div className="rounded-lg border border-border shadow-sm relative gradient-card">
-          {isAdmin && blog?.id && (
+          {isAdmin && blog?.id && blog?.status !== BlogStatus.DELETED && (
             <Edit
               onClick={() => navigate(`/blogs/edit/${blog.id}`)}
               className="absolute top-4 right-4 z-10 h-4 w-4 cursor-pointer text-foreground hover:text-foreground/80"
@@ -95,7 +94,7 @@ export default function BlogDetails() {
               className="h-56 w-4/5 object-contain rounded-md mx-auto mt-6"
             />
           ) : (
-            <div className="w-full h-56 flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 animate-pulse rounded-md mx-auto mt-6">
+            <div className={`w-full h-56 flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 rounded-md mx-auto mt-6${metadataLoading ? ' animate-pulse' : ''}`}>
               <div className="text-center">
                 <ImageIcon className="w-12 h-12 text-slate-600 mx-auto mb-2" />
               </div>

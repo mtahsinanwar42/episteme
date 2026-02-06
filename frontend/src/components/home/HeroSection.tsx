@@ -45,7 +45,7 @@ export default function HeroSection() {
     return (
       <div className="relative h-[600px] rounded-2xl overflow-hidden mb-16 bg-slate-800 animate-pulse">
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-foreground text-2xl">Loading...</div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
         </div>
       </div>
     );
@@ -60,7 +60,7 @@ export default function HeroSection() {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1532153955177-f59af40d6472?w=1600&q=80')",
+            "url('/assets/images/hero_background.jpg')",
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-slate-900/70 to-black/80"></div>

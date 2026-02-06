@@ -104,7 +104,7 @@ export default function Register() {
       });
 
       if (response.success) {
-        showSuccessToast("Registration successful! Redirecting to login...");
+        showSuccessToast("Registration successful!");
         navigate("/login");
       }
     } catch (error) {
@@ -119,7 +119,7 @@ export default function Register() {
 
   useEffect(() => {
     if (user) {
-      navigate("/home");
+      navigate("/");
     }
   }, [user, navigate]);
 

@@ -124,7 +124,6 @@ export default function Contact() {
                   Email
                 </label>
                 <input
-                  type="email"
                   name="email"
                   value={form.email}
                   onChange={handleChange}
