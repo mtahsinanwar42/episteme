@@ -60,7 +60,7 @@ export default function HeroSection() {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1532153955177-f59af40d6472?w=1600&q=80')",
+            "url('/assets/images/hero_background.jpg')",
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-slate-900/70 to-black/80"></div>

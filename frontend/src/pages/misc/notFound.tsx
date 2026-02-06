@@ -7,7 +7,7 @@ export default function NotFound() {
         <img
           src="/assets/images/error_image.png"
           alt="Not Found"
-          className="object-cover"
+          className="w-full h-full object-cover"
         />
       </div>
 

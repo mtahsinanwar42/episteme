@@ -8,7 +8,7 @@ export default function Unauthorized() {
         <img
           src="/assets/images/unauthorized_access.png"
           alt="Unauthorized"
-          className="object-cover"
+          className="w-full h-full object-cover"
         />
       </div>
 
