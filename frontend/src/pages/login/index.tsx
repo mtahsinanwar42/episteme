@@ -46,7 +46,7 @@ function Login() {
         if (userDetailsResponse.success && userDetailsResponse.data) {
           dispatch(setUser(userDetailsResponse.data));
           dispatch(setLoading(false));
-          navigate("/home");
+          navigate("/");
         }
       }
     } catch (error) {
