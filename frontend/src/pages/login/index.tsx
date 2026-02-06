@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,9 @@ import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import Cookies from "js-cookie";
 
 function Login() {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const token = useSelector((state: RootState) => state.auth.token);
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -54,10 +55,16 @@ function Login() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (location.state && location.state.fromLogout) {
+      dispatch(setUser(null));
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (token) {
       navigate("/");
     }
-  }, [user, navigate]);
+  }, [token, navigate]);
 
   return (
     <div className="h-full flex items-center justify-center">
