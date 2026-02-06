@@ -1,9 +1,5 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
-import {
-  useCountries,
-  useUserById,
-  useUserDetailsMutation,
-} from "@/hooks/useUsers";
+import { useNavigate, Link } from "react-router-dom";
+import { useCountries, useUserDetailsMutation } from "@/hooks/useUsers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,13 +19,6 @@ import {
   Notebook,
 } from "lucide-react";
 import { formatDateTime } from "@/utils/dateFormatter";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { UserStatus } from "@/models/user";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
@@ -57,7 +46,6 @@ export default function MyProfile() {
   const { showSuccessToast } = useSuccessToast();
 
   const [isEdit, setIsEdit] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<number>(1);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [uploadedPhotoFile, setUploadedPhotoFile] = useState<{
@@ -198,7 +186,6 @@ export default function MyProfile() {
   useEffect(() => {
     if (userData) {
       setFormData({ ...userData });
-      setSelectedStatus(userData.status);
       if (userData.photoFilePath) {
         const storageKey = userData.photoFilePath;
         const name = storageKey.split("/").pop() || storageKey;
@@ -558,51 +545,6 @@ export default function MyProfile() {
                       </div>
                     </div>
                   )}
-
-                  {/* {isEdit && (
-                    <div className="flex gap-3">
-                      <div>
-                        <Shield className="w-5 h-5 text-accent mt-0.5" />
-                      </div>
-
-                      <div className="w-full">
-                        <p className="text-sm ">Status *</p>
-                        <div className="w-full">
-                          <Select
-                            value={selectedStatus.toString()}
-                            onValueChange={(value) => {
-                              setSelectedStatus(Number(value));
-                              setFormData((prev) => {
-                                return { ...prev, status: Number(value) };
-                              });
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem
-                                value={UserStatus.INACTIVE.toString()}
-                              >
-                                Inactive
-                              </SelectItem>
-                              <SelectItem value={UserStatus.ACTIVE.toString()}>
-                                Active
-                              </SelectItem>
-                              <SelectItem
-                                value={UserStatus.SUSPENDED.toString()}
-                              >
-                                Suspended
-                              </SelectItem>
-                              <SelectItem value={UserStatus.DELETED.toString()}>
-                                Deleted
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-                  )} */}
 
                   {isEdit && (
                     <div className="flex gap-3">

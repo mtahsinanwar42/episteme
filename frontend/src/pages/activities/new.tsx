@@ -1,27 +1,26 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { ActivityStatus } from '@/models/activity';
-import { useCreateActivityMutation } from '@/hooks/useActivities';
-import { Breadcrumb } from '@/components/common/Breadcrumb';
-import PageTitle from '@/components/common/PageTitle';
-import PageSubTitle from '@/components/common/PageSubTitle';
-import { LoadingOverlay } from '@/components/common/LoadingOverlay';
-import { fileService } from '@/services/fileService';
-import { FileTypeEnum } from '@/models/file';
-import { FileText } from 'lucide-react';
-import { FileUploadField } from '@/components/common/FileUploadField';
-import { useSuccessToast } from '@/hooks/useSuccessToast';
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { ActivityStatus } from "@/models/activity";
+import { useCreateActivityMutation } from "@/hooks/useActivities";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageTitle from "@/components/common/PageTitle";
+import PageSubTitle from "@/components/common/PageSubTitle";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
+import { fileService } from "@/services/fileService";
+import { FileTypeEnum } from "@/models/file";
+import { FileUploadField } from "@/components/common/FileUploadField";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
 
 export default function NewActivity() {
   const navigate = useNavigate();
@@ -37,8 +36,8 @@ export default function NewActivity() {
   } | null>(null);
 
   const [formData, setFormData] = useState({
-    title: '',
-    metadataFilePath: '',
+    title: "",
+    metadataFilePath: "",
     status: ActivityStatus.DRAFT,
   });
 
@@ -46,12 +45,12 @@ export default function NewActivity() {
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      setError('Title is required');
+      setError("Title is required");
       return;
     }
 
     if (!formData.metadataFilePath) {
-      setError('Metadata file is required');
+      setError("Metadata file is required");
       return;
     }
 
@@ -65,12 +64,12 @@ export default function NewActivity() {
       },
       {
         onSuccess: () => {
-          showSuccessToast('Activity created successfully.');
-          navigate('/activities');
+          showSuccessToast("Activity created successfully.");
+          navigate("/activities");
         },
         onError: (err: any) => {
           setError(
-            err instanceof Error ? err.message : 'Failed to create activity',
+            err instanceof Error ? err.message : "Failed to create activity",
           );
         },
       },
@@ -96,8 +95,8 @@ export default function NewActivity() {
     if (!file) return;
 
     // Validate file type (JSON only)
-    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-      setError('Please upload a JSON file');
+    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
+      setError("Please upload a JSON file");
       return;
     }
 
@@ -107,7 +106,7 @@ export default function NewActivity() {
 
     try {
       const formDataToUpload = new FormData();
-      formDataToUpload.append('file', file);
+      formDataToUpload.append("file", file);
 
       const fileUploadResponse = await fileService.uploadFile(
         FileTypeEnum.ASSETS,
@@ -128,18 +127,18 @@ export default function NewActivity() {
           storageKey: fileUploadResponse.data.file.storageKey,
         });
       } else {
-        setError('Failed to upload file');
+        setError("Failed to upload file");
         setMetadataFile(null);
         setUploadedMetadataFile(null);
       }
     } catch (error) {
-      console.error('Metadata file upload error:', error);
-      setError('Failed to upload metadata file');
+      console.error("Metadata file upload error:", error);
+      setError("Failed to upload metadata file");
       setMetadataFile(null);
       setUploadedMetadataFile(null);
       setFormData((prev) => ({
         ...prev,
-        metadataFilePath: '',
+        metadataFilePath: "",
       }));
     } finally {
       setUploading(false);
@@ -150,8 +149,8 @@ export default function NewActivity() {
     <div>
       <Breadcrumb
         items={[
-          { label: 'Activities', href: '/activities' },
-          { label: 'New Activity' },
+          { label: "Activities", href: "/activities" },
+          { label: "New Activity" },
         ]}
       />
 
@@ -226,7 +225,7 @@ export default function NewActivity() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/activities')}
+              onClick={() => navigate("/activities")}
               disabled={createActivityMutation.isPending}
             >
               Cancel
@@ -242,7 +241,7 @@ export default function NewActivity() {
                 formData.status === null
               }
             >
-              {createActivityMutation.isPending ? 'Creating...' : 'Create'}
+              {createActivityMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
         </form>

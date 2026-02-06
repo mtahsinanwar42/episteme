@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "@/pages/login";
-import AuthCallback from "@/pages/authCallback";
 import ProtectedRoute from "@/components/common/protectedRoute";
 import Users from "@/pages/users";
 import Home from "@/pages/home";

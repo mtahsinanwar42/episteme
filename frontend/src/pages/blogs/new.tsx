@@ -1,27 +1,26 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { BlogStatus } from '@/models/blog';
-import { useCreateBlogMutation } from '@/hooks/useBlogs';
-import { Breadcrumb } from '@/components/common/Breadcrumb';
-import PageTitle from '@/components/common/PageTitle';
-import PageSubTitle from '@/components/common/PageSubTitle';
-import { LoadingOverlay } from '@/components/common/LoadingOverlay';
-import { fileService } from '@/services/fileService';
-import { FileTypeEnum } from '@/models/file';
-import { FileText } from 'lucide-react';
-import { FileUploadField } from '@/components/common/FileUploadField';
-import { useSuccessToast } from '@/hooks/useSuccessToast';
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { BlogStatus } from "@/models/blog";
+import { useCreateBlogMutation } from "@/hooks/useBlogs";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import PageTitle from "@/components/common/PageTitle";
+import PageSubTitle from "@/components/common/PageSubTitle";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
+import { fileService } from "@/services/fileService";
+import { FileTypeEnum } from "@/models/file";
+import { FileUploadField } from "@/components/common/FileUploadField";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
 
 export default function NewBlog() {
   const navigate = useNavigate();
@@ -37,8 +36,8 @@ export default function NewBlog() {
   } | null>(null);
 
   const [formData, setFormData] = useState({
-    title: '',
-    metadataFilePath: '',
+    title: "",
+    metadataFilePath: "",
     status: BlogStatus.DRAFT,
   });
 
@@ -46,12 +45,12 @@ export default function NewBlog() {
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      setError('Title is required');
+      setError("Title is required");
       return;
     }
 
     if (!formData.metadataFilePath) {
-      setError('Metadata file is required');
+      setError("Metadata file is required");
       return;
     }
 
@@ -65,12 +64,12 @@ export default function NewBlog() {
       },
       {
         onSuccess: () => {
-          showSuccessToast('Blog created successfully.');
-          navigate('/blogs');
+          showSuccessToast("Blog created successfully.");
+          navigate("/blogs");
         },
         onError: (err: any) => {
           setError(
-            err instanceof Error ? err.message : 'Failed to create blog',
+            err instanceof Error ? err.message : "Failed to create blog",
           );
         },
       },
@@ -96,8 +95,8 @@ export default function NewBlog() {
     if (!file) return;
 
     // Validate file type (JSON only)
-    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-      setError('Please upload a JSON file');
+    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
+      setError("Please upload a JSON file");
       return;
     }
 
@@ -107,7 +106,7 @@ export default function NewBlog() {
 
     try {
       const formDataToUpload = new FormData();
-      formDataToUpload.append('file', file);
+      formDataToUpload.append("file", file);
 
       const fileUploadResponse = await fileService.uploadFile(
         FileTypeEnum.ASSETS,
@@ -128,18 +127,18 @@ export default function NewBlog() {
           storageKey: fileUploadResponse.data.file.storageKey,
         });
       } else {
-        setError('Failed to upload file');
+        setError("Failed to upload file");
         setMetadataFile(null);
         setUploadedMetadataFile(null);
       }
     } catch (error) {
-      console.error('Metadata file upload error:', error);
-      setError('Failed to upload metadata file');
+      console.error("Metadata file upload error:", error);
+      setError("Failed to upload metadata file");
       setMetadataFile(null);
       setUploadedMetadataFile(null);
       setFormData((prev) => ({
         ...prev,
-        metadataFilePath: '',
+        metadataFilePath: "",
       }));
     } finally {
       setUploading(false);
@@ -149,7 +148,7 @@ export default function NewBlog() {
   return (
     <div>
       <Breadcrumb
-        items={[{ label: 'Blogs', href: '/blogs' }, { label: 'New Blog' }]}
+        items={[{ label: "Blogs", href: "/blogs" }, { label: "New Blog" }]}
       />
 
       <div className="mb-8">
@@ -221,7 +220,7 @@ export default function NewBlog() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/blogs')}
+              onClick={() => navigate("/blogs")}
               disabled={createBlogMutation.isPending}
             >
               Cancel
@@ -237,7 +236,7 @@ export default function NewBlog() {
                 formData.status === null
               }
             >
-              {createBlogMutation.isPending ? 'Creating...' : 'Create'}
+              {createBlogMutation.isPending ? "Creating..." : "Create"}
             </Button>
           </div>
         </form>
