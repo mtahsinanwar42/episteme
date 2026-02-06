@@ -211,6 +211,8 @@ export default function Users() {
           isLoading={isLoading}
           error={error ? (error as Error).message : null}
           pageSize={pageSize}
+          enableSearch
+          searchPlaceholder="Search users"
         />
 
         {!isLoading && !error && total > 0 && (

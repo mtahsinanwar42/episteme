@@ -1,27 +1,30 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { ActivityStatus } from "@/models/activity";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { ActivityStatus } from '@/models/activity';
 import {
   useUpdateActivityMutation,
   useActivityById,
-} from "@/hooks/useActivities";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
-import PageTitle from "@/components/common/PageTitle";
-import PageSubTitle from "@/components/common/PageSubTitle";
-import { fileService } from "@/services/fileService";
-import { FileTypeEnum } from "@/models/file";
-import { FileText, Upload, Loader2 } from "lucide-react";
+} from '@/hooks/useActivities';
+import { Breadcrumb } from '@/components/common/Breadcrumb';
+import PageTitle from '@/components/common/PageTitle';
+import PageSubTitle from '@/components/common/PageSubTitle';
+import { LoadingOverlay } from '@/components/common/LoadingOverlay';
+import { fileService } from '@/services/fileService';
+import { FileTypeEnum } from '@/models/file';
+import { FileText, Loader2 } from 'lucide-react';
+import { FileUploadField } from '@/components/common/FileUploadField';
+import { useSuccessToast } from '@/hooks/useSuccessToast';
 
 export default function EditActivity() {
   const navigate = useNavigate();
@@ -29,13 +32,19 @@ export default function EditActivity() {
   const { data: activityData, isLoading: isLoadingActivity } =
     useActivityById(activityId);
   const updateActivityMutation = useUpdateActivityMutation(activityId!);
+  const { showSuccessToast } = useSuccessToast();
   const [error, setError] = useState<string | null>(null);
   const [metadataFile, setMetadataFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadedMetadataFile, setUploadedMetadataFile] = useState<{
+    name: string;
+    size: number;
+    storageKey: string;
+  } | null>(null);
 
   const [formData, setFormData] = useState({
-    title: "",
-    metadataFilePath: "",
+    title: '',
+    metadataFilePath: '',
     status: ActivityStatus.PUBLISHED.toString(),
   });
 
@@ -44,9 +53,14 @@ export default function EditActivity() {
       setFormData((prev) => ({
         ...prev,
         title: activityData.data.title,
-        metadataFilePath: activityData.data.metadataFilePath || "",
+        metadataFilePath: activityData.data.metadataFilePath || '',
         status: activityData.data.status.toString(),
       }));
+      if (activityData.data.metadataFilePath) {
+        const storageKey = activityData.data.metadataFilePath;
+        const name = storageKey.split('/').pop() || storageKey;
+        setUploadedMetadataFile({ name, size: 0, storageKey });
+      }
     }
   }, [activityData]);
 
@@ -54,12 +68,12 @@ export default function EditActivity() {
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      setError("Title is required");
+      setError('Title is required');
       return;
     }
 
     if (!formData.metadataFilePath) {
-      setError("Metadata file is required");
+      setError('Metadata file is required');
       return;
     }
 
@@ -73,11 +87,12 @@ export default function EditActivity() {
       },
       {
         onSuccess: () => {
-          navigate("/activities");
+          showSuccessToast('Activity updated successfully.');
+          navigate('/activities');
         },
         onError: (err: any) => {
           setError(
-            err instanceof Error ? err.message : "Failed to update activity",
+            err instanceof Error ? err.message : 'Failed to update activity',
           );
         },
       },
@@ -99,15 +114,12 @@ export default function EditActivity() {
     }));
   };
 
-  const handleMetadataFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = e.target.files?.[0];
+  const handleMetadataFileChange = async (file: File | null) => {
     if (!file) return;
 
     // Validate file type (JSON only)
-    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
-      setError("Please upload a JSON file");
+    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+      setError('Please upload a JSON file');
       return;
     }
 
@@ -117,7 +129,7 @@ export default function EditActivity() {
 
     try {
       const formDataToUpload = new FormData();
-      formDataToUpload.append("file", file);
+      formDataToUpload.append('file', file);
 
       const fileUploadResponse = await fileService.uploadFile(
         FileTypeEnum.ASSETS,
@@ -132,17 +144,24 @@ export default function EditActivity() {
           ...prev,
           metadataFilePath: fileUploadResponse.data.file.storageKey,
         }));
+        setUploadedMetadataFile({
+          name: fileUploadResponse.data.file.name,
+          size: fileUploadResponse.data.file.size,
+          storageKey: fileUploadResponse.data.file.storageKey,
+        });
       } else {
-        setError("Failed to upload file");
+        setError('Failed to upload file');
         setMetadataFile(null);
+        setUploadedMetadataFile(null);
       }
     } catch (error) {
-      console.error("Metadata file upload error:", error);
-      setError("Failed to upload metadata file");
+      console.error('Metadata file upload error:', error);
+      setError('Failed to upload metadata file');
       setMetadataFile(null);
+      setUploadedMetadataFile(null);
       setFormData((prev) => ({
         ...prev,
-        metadataFilePath: "",
+        metadataFilePath: '',
       }));
     } finally {
       setUploading(false);
@@ -165,8 +184,8 @@ export default function EditActivity() {
     <div>
       <Breadcrumb
         items={[
-          { label: "Activities", href: "/activities" },
-          { label: "Edit Activity" },
+          { label: 'Activities', href: '/activities' },
+          { label: 'Edit Activity' },
         ]}
       />
 
@@ -175,7 +194,10 @@ export default function EditActivity() {
         <PageSubTitle text="Update activity details and metadata configuration" />
       </div>
 
-      <div className="rounded-lg border border-border bg-card shadow-md p-6">
+      <div className="relative rounded-lg border border-border bg-card shadow-md p-6">
+        <LoadingOverlay
+          visible={updateActivityMutation.isPending || uploading}
+        />
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && <div className="text-red-600">{error}</div>}
 
@@ -196,43 +218,16 @@ export default function EditActivity() {
 
           {/* Metadata File Upload */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-heading">
-              Metadata File (JSON) *
-            </label>
             <div className="space-y-3">
-              {/* Current file info */}
-              {formData.metadataFilePath && !metadataFile && (
-                <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <FileText className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm text-blue-800">
-                    Current: {formData.metadataFilePath}
-                  </span>
-                </div>
-              )}
-
-              <div className="flex items-center gap-4">
-                <label
-                  htmlFor="metadata-file"
-                  className={`flex items-center gap-2 px-4 py-2 border border-accent rounded cursor-pointer hover:bg-accent/10 transition-colors ${
-                    uploading || updateActivityMutation.isPending
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
-                  }`}
-                >
-                  <Upload className="w-4 h-4" />
-                  <span className="text-sm">
-                    {uploading ? "Uploading..." : "Choose New JSON File"}
-                  </span>
-                </label>
-                <input
-                  id="metadata-file"
-                  type="file"
-                  accept=".json,application/json"
-                  onChange={handleMetadataFileChange}
-                  disabled={uploading || updateActivityMutation.isPending}
-                  className="hidden"
-                />
-              </div>
+              <FileUploadField
+                label="Metadata File (JSON) *"
+                selectedFile={metadataFile}
+                onFileSelect={handleMetadataFileChange}
+                disabled={uploading || updateActivityMutation.isPending}
+                accept=".json,application/json"
+                helperText="Upload a JSON file containing activity metadata"
+                uploadedFile={uploadedMetadataFile}
+              />
 
               {metadataFile && (
                 <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded">
@@ -242,16 +237,10 @@ export default function EditActivity() {
                   </span>
                   {formData.metadataFilePath && (
                     <span className="text-xs text-green-600 ml-auto">
-                      ✓ Uploaded
+                      Uploaded
                     </span>
                   )}
                 </div>
-              )}
-
-              {!metadataFile && !formData.metadataFilePath && (
-                <p className="text-xs text-body">
-                  Upload a JSON file containing activity metadata
-                </p>
               )}
             </div>
           </div>
@@ -288,7 +277,7 @@ export default function EditActivity() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/activities")}
+              onClick={() => navigate('/activities')}
               disabled={updateActivityMutation.isPending}
             >
               Cancel
@@ -304,7 +293,7 @@ export default function EditActivity() {
                 formData.status === null
               }
             >
-              {updateActivityMutation.isPending ? "Updating..." : "Update"}
+              {updateActivityMutation.isPending ? 'Updating...' : 'Update'}
             </Button>
           </div>
         </form>

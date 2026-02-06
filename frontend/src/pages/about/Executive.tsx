@@ -1,51 +1,50 @@
+import { Breadcrumb } from '@/components/common/Breadcrumb';
+import { UserRound } from 'lucide-react';
+
 export default function Executive() {
   const teamMembers = [
     {
-      name: "Dr. Sarah Chen",
-      role: "Chief Executive Officer",
-      bio: "Visionary leader with 15+ years in open science and academic publishing",
-      icon: "👩‍💼",
-      expertise: ["Strategy", "Innovation", "Leadership"],
+      name: 'Dr. Sarah Chen',
+      role: 'Chief Executive Officer',
+      bio: 'Visionary leader with 15+ years in open science and academic publishing',
+      image: '/assets/images/about_leadership_tahsin.jpg',
+      expertise: ['Strategy', 'Innovation', 'Leadership'],
     },
     {
-      name: "Prof. Michael Johnson",
-      role: "Chief Research Officer",
-      bio: "Pioneering researcher focused on open access and research integrity",
-      icon: "👨‍🔬",
-      expertise: ["Research", "Quality", "Standards"],
+      name: 'Prof. Michael Johnson',
+      role: 'Chief Research Officer',
+      bio: 'Pioneering researcher focused on open access and research integrity',
+      expertise: ['Research', 'Quality', 'Standards'],
     },
     {
-      name: "Dr. Elena Rodriguez",
-      role: "Chief Technology Officer",
-      bio: "Tech innovator leading our platform development and infrastructure",
-      icon: "👩‍💻",
-      expertise: ["Technology", "Architecture", "Security"],
+      name: 'Dr. Elena Rodriguez',
+      role: 'Chief Technology Officer',
+      bio: 'Tech innovator leading our platform development and infrastructure',
+      expertise: ['Technology', 'Architecture', 'Security'],
     },
     {
-      name: "James Wilson",
-      role: "Chief Financial Officer",
-      bio: "Finance expert ensuring sustainable growth and responsible stewardship",
-      icon: "👨‍💼",
-      expertise: ["Finance", "Operations", "Planning"],
+      name: 'James Wilson',
+      role: 'Chief Financial Officer',
+      bio: 'Finance expert ensuring sustainable growth and responsible stewardship',
+      expertise: ['Finance', 'Operations', 'Planning'],
     },
     {
-      name: "Dr. Amelia Okafor",
-      role: "Chief Diversity & Inclusion Officer",
-      bio: "Advocate for equitable access and inclusive research communities",
-      icon: "👩‍💼",
-      expertise: ["Diversity", "Inclusion", "Community"],
+      name: 'Dr. Amelia Okafor',
+      role: 'Chief Diversity & Inclusion Officer',
+      bio: 'Advocate for equitable access and inclusive research communities',
+      expertise: ['Diversity', 'Inclusion', 'Community'],
     },
     {
-      name: "David Kim",
-      role: "Chief Strategy Officer",
-      bio: "Strategic thinker driving partnerships and market expansion",
-      icon: "👨‍💼",
-      expertise: ["Strategy", "Partnerships", "Growth"],
+      name: 'David Kim',
+      role: 'Chief Strategy Officer',
+      bio: 'Strategic thinker driving partnerships and market expansion',
+      expertise: ['Strategy', 'Partnerships', 'Growth'],
     },
   ];
 
   return (
     <div className="min-h-screen">
+      <Breadcrumb items={[{ label: 'Executive Leadership' }]} />
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-slate-700 via-purple-600 to-slate-700 py-20 px-4 rounded-lg mb-16 overflow-hidden">
         <div className="absolute inset-0 opacity-20"></div>
@@ -76,8 +75,18 @@ export default function Executive() {
               key={idx}
               className="bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all border border-gray-700"
             >
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-center">
-                <div className="text-6xl mb-2">{member.icon}</div>
+              <div className="bg-gradient-to-b from-purple-900/30 to-slate-800 p-6 flex justify-center">
+                {member.image ? (
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-52 h-52 rounded-full object-cover object-[center_30%]"
+                  />
+                ) : (
+                  <div className="w-52 h-52 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center">
+                    <UserRound className="w-24 h-24 text-slate-400" />
+                  </div>
+                )}
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-1">{member.name}</h3>

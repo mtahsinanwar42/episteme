@@ -1,27 +1,30 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { TrainingStatus } from "@/models/training";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { TrainingStatus } from '@/models/training';
 import {
   useUpdateTrainingMutation,
   useTrainingById,
-} from "@/hooks/useTrainings";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
-import PageTitle from "@/components/common/PageTitle";
-import PageSubTitle from "@/components/common/PageSubTitle";
-import { fileService } from "@/services/fileService";
-import { FileTypeEnum } from "@/models/file";
-import { FileText, Upload, Loader2 } from "lucide-react";
+} from '@/hooks/useTrainings';
+import { Breadcrumb } from '@/components/common/Breadcrumb';
+import PageTitle from '@/components/common/PageTitle';
+import PageSubTitle from '@/components/common/PageSubTitle';
+import { LoadingOverlay } from '@/components/common/LoadingOverlay';
+import { fileService } from '@/services/fileService';
+import { FileTypeEnum } from '@/models/file';
+import { FileText, Loader2 } from 'lucide-react';
+import { FileUploadField } from '@/components/common/FileUploadField';
+import { useSuccessToast } from '@/hooks/useSuccessToast';
 
 export default function EditTraining() {
   const navigate = useNavigate();
@@ -29,13 +32,19 @@ export default function EditTraining() {
   const { data: trainingData, isLoading: isLoadingTraining } =
     useTrainingById(trainingId);
   const updateTrainingMutation = useUpdateTrainingMutation(trainingId!);
+  const { showSuccessToast } = useSuccessToast();
   const [error, setError] = useState<string | null>(null);
   const [metadataFile, setMetadataFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadedMetadataFile, setUploadedMetadataFile] = useState<{
+    name: string;
+    size: number;
+    storageKey: string;
+  } | null>(null);
 
   const [formData, setFormData] = useState({
-    title: "",
-    metadataFilePath: "",
+    title: '',
+    metadataFilePath: '',
     status: TrainingStatus.COMPLETED.toString(),
   });
 
@@ -45,9 +54,14 @@ export default function EditTraining() {
       setFormData((prev) => ({
         ...prev,
         title: trainingData.data.title,
-        metadataFilePath: trainingData.data.metadataFilePath || "",
+        metadataFilePath: trainingData.data.metadataFilePath || '',
         status: trainingData.data.status.toString(),
       }));
+      if (trainingData.data.metadataFilePath) {
+        const storageKey = trainingData.data.metadataFilePath;
+        const name = storageKey.split('/').pop() || storageKey;
+        setUploadedMetadataFile({ name, size: 0, storageKey });
+      }
     }
   }, [trainingData]);
 
@@ -55,12 +69,12 @@ export default function EditTraining() {
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      setError("Title is required");
+      setError('Title is required');
       return;
     }
 
     if (!formData.metadataFilePath) {
-      setError("Metadata file is required");
+      setError('Metadata file is required');
       return;
     }
 
@@ -74,11 +88,12 @@ export default function EditTraining() {
       },
       {
         onSuccess: () => {
-          navigate("/trainings");
+          showSuccessToast('Training updated successfully.');
+          navigate('/trainings');
         },
         onError: (err: any) => {
           setError(
-            err instanceof Error ? err.message : "Failed to update training",
+            err instanceof Error ? err.message : 'Failed to update training',
           );
         },
       },
@@ -100,15 +115,12 @@ export default function EditTraining() {
     }));
   };
 
-  const handleMetadataFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = e.target.files?.[0];
+  const handleMetadataFileChange = async (file: File | null) => {
     if (!file) return;
 
     // Validate file type (JSON only)
-    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
-      setError("Please upload a JSON file");
+    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+      setError('Please upload a JSON file');
       return;
     }
 
@@ -118,7 +130,7 @@ export default function EditTraining() {
 
     try {
       const formDataToUpload = new FormData();
-      formDataToUpload.append("file", file);
+      formDataToUpload.append('file', file);
 
       const fileUploadResponse = await fileService.uploadFile(
         FileTypeEnum.ASSETS,
@@ -133,17 +145,24 @@ export default function EditTraining() {
           ...prev,
           metadataFilePath: fileUploadResponse.data.file.storageKey,
         }));
+        setUploadedMetadataFile({
+          name: fileUploadResponse.data.file.name,
+          size: fileUploadResponse.data.file.size,
+          storageKey: fileUploadResponse.data.file.storageKey,
+        });
       } else {
-        setError("Failed to upload file");
+        setError('Failed to upload file');
         setMetadataFile(null);
+        setUploadedMetadataFile(null);
       }
     } catch (error) {
-      console.error("Metadata file upload error:", error);
-      setError("Failed to upload metadata file");
+      console.error('Metadata file upload error:', error);
+      setError('Failed to upload metadata file');
       setMetadataFile(null);
+      setUploadedMetadataFile(null);
       setFormData((prev) => ({
         ...prev,
-        metadataFilePath: "",
+        metadataFilePath: '',
       }));
     } finally {
       setUploading(false);
@@ -166,8 +185,8 @@ export default function EditTraining() {
     <div>
       <Breadcrumb
         items={[
-          { label: "Trainings", href: "/trainings" },
-          { label: "Edit Training" },
+          { label: 'Trainings', href: '/trainings' },
+          { label: 'Edit Training' },
         ]}
       />
 
@@ -176,7 +195,10 @@ export default function EditTraining() {
         <PageSubTitle text="Update training details and metadata configuration" />
       </div>
 
-      <div className="rounded-lg border border-border bg-card shadow-md p-6">
+      <div className="relative rounded-lg border border-border bg-card shadow-md p-6">
+        <LoadingOverlay
+          visible={updateTrainingMutation.isPending || uploading}
+        />
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && <div className="text-red-600">{error}</div>}
 
@@ -197,43 +219,16 @@ export default function EditTraining() {
 
           {/* Metadata File Upload */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-heading">
-              Metadata File (JSON) *
-            </label>
             <div className="space-y-3">
-              {/* Current file info */}
-              {formData.metadataFilePath && !metadataFile && (
-                <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <FileText className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm text-blue-800">
-                    Current: {formData.metadataFilePath}
-                  </span>
-                </div>
-              )}
-
-              <div className="flex items-center gap-4">
-                <label
-                  htmlFor="metadata-file"
-                  className={`flex items-center gap-2 px-4 py-2 border border-accent rounded cursor-pointer hover:bg-accent/10 transition-colors ${
-                    uploading || updateTrainingMutation.isPending
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
-                  }`}
-                >
-                  <Upload className="w-4 h-4" />
-                  <span className="text-sm">
-                    {uploading ? "Uploading..." : "Choose New JSON File"}
-                  </span>
-                </label>
-                <input
-                  id="metadata-file"
-                  type="file"
-                  accept=".json,application/json"
-                  onChange={handleMetadataFileChange}
-                  disabled={uploading || updateTrainingMutation.isPending}
-                  className="hidden"
-                />
-              </div>
+              <FileUploadField
+                label="Metadata File (JSON) *"
+                selectedFile={metadataFile}
+                onFileSelect={handleMetadataFileChange}
+                disabled={uploading || updateTrainingMutation.isPending}
+                accept=".json,application/json"
+                helperText="Upload a JSON file containing training metadata"
+                uploadedFile={uploadedMetadataFile}
+              />
 
               {metadataFile && (
                 <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded">
@@ -243,16 +238,10 @@ export default function EditTraining() {
                   </span>
                   {formData.metadataFilePath && (
                     <span className="text-xs text-green-600 ml-auto">
-                      ✓ Uploaded
+                      Uploaded
                     </span>
                   )}
                 </div>
-              )}
-
-              {!metadataFile && !formData.metadataFilePath && (
-                <p className="text-xs text-body">
-                  Upload a JSON file containing training metadata
-                </p>
               )}
             </div>
           </div>
@@ -292,7 +281,7 @@ export default function EditTraining() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/trainings")}
+              onClick={() => navigate('/trainings')}
               disabled={updateTrainingMutation.isPending}
             >
               Cancel
@@ -308,7 +297,7 @@ export default function EditTraining() {
                 formData.status === null
               }
             >
-              {updateTrainingMutation.isPending ? "Updating..." : "Update"}
+              {updateTrainingMutation.isPending ? 'Updating...' : 'Update'}
             </Button>
           </div>
         </form>

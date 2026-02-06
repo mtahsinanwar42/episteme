@@ -133,6 +133,8 @@ export default function Assets() {
           isLoading={isLoading}
           error={error ? (error as Error).message : null}
           pageSize={pageSize}
+          enableSearch
+          searchPlaceholder="Search assets"
         />
 
         {!isLoading && !error && total > 0 && (

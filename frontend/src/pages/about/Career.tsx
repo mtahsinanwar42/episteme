@@ -1,3 +1,5 @@
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+
 export default function Career() {
   const positions = [
     {
@@ -61,6 +63,7 @@ export default function Career() {
 
   return (
     <div className="min-h-screen">
+      <Breadcrumb items={[{ label: "Careers" }]} />
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-blue-600 via-purple-500 to-pink-400 py-20 px-4 rounded-lg mb-16 overflow-hidden">
         <div className="absolute inset-0 opacity-20"></div>

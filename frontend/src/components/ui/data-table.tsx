@@ -3,6 +3,7 @@ import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -15,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 
 interface DataTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[];
@@ -22,6 +24,8 @@ interface DataTableProps<TData, TValue = unknown> {
   isLoading?: boolean;
   error?: string | null;
   pageSize?: number;
+  enableSearch?: boolean;
+  searchPlaceholder?: string;
 }
 
 export function DataTable<TData, TValue = unknown>({
@@ -29,19 +33,26 @@ export function DataTable<TData, TValue = unknown>({
   data,
   isLoading = false,
   error = null,
+  enableSearch = false,
+  searchPlaceholder = "Search",
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState("");
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     // getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: "includesString",
     // enableSortingRemoval: false,
     state: {
       sorting,
+      globalFilter,
     },
     initialState: {
       // pagination: {
@@ -74,6 +85,16 @@ export function DataTable<TData, TValue = unknown>({
 
   return (
     <div>
+      {enableSearch && (
+        <div className="mb-4">
+          <Input
+            value={globalFilter ?? ""}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder={searchPlaceholder}
+            className="max-w-sm"
+          />
+        </div>
+      )}
       <div className="rounded-2xl border border-border shadow-lg overflow-hidden">
         <div className="bg-linear-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm">
           <Table>

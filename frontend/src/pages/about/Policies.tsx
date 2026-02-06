@@ -1,3 +1,5 @@
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+
 export default function Policies() {
   const policies = [
     {
@@ -85,6 +87,7 @@ export default function Policies() {
 
   return (
     <div className="min-h-screen">
+      <Breadcrumb items={[{ label: "Policies & Guidelines" }]} />
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-indigo-700 via-blue-600 to-indigo-700 py-20 px-4 rounded-lg mb-16 overflow-hidden">
         <div className="absolute inset-0 opacity-20"></div>

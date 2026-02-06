@@ -11,13 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authService } from "@/services/authService";
 import { useCountries } from "@/hooks/useUsers";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
 
 export default function Register() {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -25,21 +21,54 @@ export default function Register() {
 
   const { data: countriesData } = useCountries();
 
+  const EMAIL_REGEX =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+  const PHONE_REGEX = /^\+?[0-9][0-9\-\s]{6,20}$/;
+  const LINKEDIN_REGEX =
+    /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
+    confirmPassword: "",
     phone: "",
     institution: "",
     occupation: "",
-    country: "",
+    country: "Bangladesh",
     linkedinUrl: "",
   });
   const [selectedRoles, setSelectedRoles] = useState<string[]>(["USER"]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const { showSuccessToast } = useSuccessToast();
+
+  const isEmailValid = EMAIL_REGEX.test(formData.email);
+  const isPhoneValid = !formData.phone || PHONE_REGEX.test(formData.phone);
+  const isLinkedinValid =
+    !formData.linkedinUrl || LINKEDIN_REGEX.test(formData.linkedinUrl);
+  const passwordStrength = getPasswordStrength(formData.password);
+  const isPasswordStrong = passwordStrength.score >= 4;
+  const doPasswordsMatch =
+    formData.confirmPassword !== "" &&
+    formData.password === formData.confirmPassword;
+
+  const isFormValid =
+    formData.firstName.trim() !== "" &&
+    formData.lastName.trim() !== "" &&
+    formData.email.trim() !== "" &&
+    isEmailValid &&
+    formData.password !== "" &&
+    isPasswordStrong &&
+    formData.confirmPassword !== "" &&
+    doPasswordsMatch &&
+    isPhoneValid &&
+    isLinkedinValid &&
+    formData.country !== "" &&
+    formData.institution.trim() !== "" &&
+    formData.occupation.trim() !== "" &&
+    selectedRoles.length > 0;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -63,20 +92,20 @@ export default function Register() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormValid) return;
     setError("");
     setIsLoading(true);
 
     try {
+      const { confirmPassword: _, ...submitData } = formData;
       const response = await authService.register({
-        ...formData,
+        ...submitData,
         roles: selectedRoles,
       });
 
       if (response.success) {
-        setSuccess(true);
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
+        showSuccessToast("Registration successful! Redirecting to login...");
+        navigate("/login");
       }
     } catch (error) {
       const errorMessage =
@@ -99,6 +128,7 @@ export default function Register() {
       <div className="relative max-w-2xl w-full">
         <div className="absolute -inset-px bg-linear-to-br from-indigo-300/35 via-sky-200/30 to-emerald-200/25 rounded-3xl blur opacity-70" />
         <div className="relative rounded-3xl border border-border bg-card backdrop-blur-md shadow-2xl p-10">
+          <LoadingOverlay visible={isLoading} />
           <div className="flex flex-col gap-3 text-center mb-8">
             <p className="text-sm text-foreground tracking-[0.12em] uppercase">
               Join Us
@@ -147,11 +177,16 @@ export default function Register() {
               <Input
                 id="email"
                 name="email"
-                type="email"
+                type="text"
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleChange}
               />
+              {formData.email && !isEmailValid && (
+                <p className="text-red-400 text-xs">
+                  Please enter a valid email address.
+                </p>
+              )}
             </div>
 
             <PasswordInput
@@ -159,6 +194,24 @@ export default function Register() {
               onChange={handleChange}
               disabled={isLoading}
             />
+
+            <div className="flex flex-col space-y-2">
+              <label htmlFor="confirmPassword" className="text-sm font-medium ">
+                Confirm Password *
+              </label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="Re-enter your password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                disabled={isLoading}
+              />
+              {formData.confirmPassword && !doPasswordsMatch && (
+                <p className="text-red-400 text-xs">Passwords do not match.</p>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col space-y-2">
@@ -173,28 +226,24 @@ export default function Register() {
                   value={formData.phone}
                   onChange={handleChange}
                 />
+                {formData.phone && !isPhoneValid && (
+                  <p className="text-red-400 text-xs">
+                    Please enter a valid phone number.
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-2">
                 <label htmlFor="country" className="text-sm font-medium ">
                   Country *
                 </label>
-                <Select
+                <SearchableSelect
                   value={formData.country}
                   onValueChange={handleCountryChange}
+                  options={countriesData?.data || []}
+                  placeholder="Select a country"
                   disabled={isLoading}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countriesData?.data.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                />
               </div>
             </div>
 
@@ -235,15 +284,20 @@ export default function Register() {
               <Input
                 id="linkedinUrl"
                 name="linkedinUrl"
-                type="url"
+                type="text"
                 placeholder="https://www.linkedin.com/in/yourprofile"
                 value={formData.linkedinUrl}
                 onChange={handleChange}
               />
+              {formData.linkedinUrl && !isLinkedinValid && (
+                <p className="text-red-400 text-xs">
+                  Please enter a valid LinkedIn URL.
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col space-y-3">
-              <label className="text-sm font-medium ">Select Roles</label>
+              <label className="text-sm font-medium ">Select Roles *</label>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Checkbox
@@ -272,9 +326,6 @@ export default function Register() {
                   </label>
                 </div>
               </div>
-              <p className="text-xs">
-                Select at least one role for your account
-              </p>
             </div>
 
             {error && (
@@ -283,24 +334,16 @@ export default function Register() {
               </div>
             )}
 
-            {success && (
-              <div className="p-3 rounded-md text-sm border border-green-500/30 bg-green-500/10 text-green-800">
-                Registration successful! Redirecting to login...
-              </div>
-            )}
-
             <Button
               type="submit"
-              className="w-full text-foreground! shadow-lg hover:brightness-105"
+              className="w-full text-foreground! shadow-lg enabled:hover:brightness-105"
               style={{
                 background:
                   "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
               }}
-              disabled={
-                isLoading || getPasswordStrength(formData.password).score < 4
-              }
+              disabled={!isFormValid || isLoading}
             >
-              {isLoading ? "Creating Account..." : "Create"}
+              {isLoading ? "Registering..." : "Register"}
             </Button>
           </form>
 

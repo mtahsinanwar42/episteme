@@ -6,6 +6,7 @@ import Navbar from "@/components/navbar";
 import RouteConfig from "@/routeConfig";
 import { useAuthInitialization } from "@/hooks/useAuthInitialization";
 import { type RootState } from "@/stores/store";
+import { SuccessToastProvider } from "@/hooks/useSuccessToast";
 import "@/App.css";
 
 function App() {
@@ -20,19 +21,21 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen text-foreground grid grid-rows-[1fr_auto]">
-        <div className="h-full flex flex-col">
-          <div className="sticky top-0 left-0 z-100">
-            <Navbar />
+      <SuccessToastProvider>
+        <div className="min-h-screen text-foreground grid grid-rows-[1fr_auto]">
+          <div className="h-full flex flex-col">
+            <div className="sticky top-0 left-0 z-100">
+              <Navbar />
+            </div>
+
+            <main className="h-full p-4 mx-auto w-full 2xl:max-w-7xl 2xl:px-0">
+              <RouteConfig />
+            </main>
           </div>
 
-          <main className="h-full p-4 mx-auto w-full 2xl:max-w-7xl 2xl:px-0">
-            <RouteConfig />
-          </main>
+          <Footer />
         </div>
-
-        <Footer />
-      </div>
+      </SuccessToastProvider>
     </BrowserRouter>
   );
 }

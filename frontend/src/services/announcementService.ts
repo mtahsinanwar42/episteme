@@ -18,6 +18,10 @@ export const announcementService = {
     if (params?.sort) queryParams.append("sort", params.sort);
     if (params?.select) queryParams.append("select", params.select);
     if (params?.search) queryParams.append("search", params.search);
+    if (params?.status !== undefined)
+      queryParams.append("status", params.status.toString());
+    if (params?.statusIn)
+      queryParams.append("status[in]", params.statusIn);
     if (params?.paginate !== undefined)
       queryParams.append("paginate", params.paginate.toString());
 

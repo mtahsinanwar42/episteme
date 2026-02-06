@@ -2,17 +2,24 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useActivityById } from "@/hooks/useActivities";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Edit } from "lucide-react";
 import { config } from "@/config/config";
 import { MarkdownRenderer } from "@/components/common/MarkdownRenderer";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useMetadataFile } from "@/hooks/useMetadataFiles";
 import { getBlogActivityResourceStatusEnum } from "@/components/common/ResourceStatusBadge";
 import { formatDateTime } from "@/utils/dateFormatter";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/stores/store";
+import { UserRole } from "@/models/user";
 
 export default function ActivityDetails() {
   const { activityId } = useParams();
   const navigate = useNavigate();
+  const currentRoles = useSelector(
+    (state: RootState) => state?.auth?.user?.roles,
+  );
+  const isAdmin = currentRoles?.includes(UserRole.ADMIN);
   const { data, isLoading, isError, error } = useActivityById(activityId);
   const activity = data?.data;
 
@@ -78,15 +85,21 @@ export default function ActivityDetails() {
 
       <div className="space-y-6">
         <div className="rounded-lg border border-border shadow-sm relative gradient-card">
+          {isAdmin && activity?.id && (
+            <Edit
+              onClick={() => navigate(`/activities/edit/${activity.id}`)}
+              className="absolute top-4 right-4 z-10 h-4 w-4 cursor-pointer text-foreground hover:text-foreground/80"
+            />
+          )}
           {!metadataLoading && metadata?.heroImagePath ? (
             <img
               src={`${new URL(config.baseUrl).origin}/${metadata?.heroImagePath}`}
               crossOrigin="anonymous"
               alt="Activity Image"
-              className="w-full h-96 object-cover rounded-t-lg"
+              className="h-56 w-4/5 object-contain rounded-md mx-auto mt-6"
             />
           ) : (
-            <div className="w-full h-96 flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 animate-pulse">
+            <div className="w-full h-56 flex items-center justify-center bg-linear-to-br from-slate-700 to-slate-900 animate-pulse rounded-md mx-auto mt-6">
               <div className="text-center">
                 <ImageIcon className="w-12 h-12 text-slate-600 mx-auto mb-2" />
               </div>

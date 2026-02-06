@@ -94,7 +94,10 @@ export function NavItem({ item }: NavItemProps) {
 
   if (!hasChildren) {
     return (
-      <Link to={item.href || "/"} className="flex items-center text-white">
+      <Link
+        to={item.href || "/"}
+        className="flex items-center text-white whitespace-nowrap"
+      >
         {item.label}
       </Link>
     );
@@ -107,7 +110,7 @@ export function NavItem({ item }: NavItemProps) {
       onMouseLeave={handleMouseLeave}
     >
       {/* Parent Item */}
-      <div className="h-full flex items-center gap-1 text-white cursor-pointer">
+      <div className="h-full flex items-center gap-1 text-white cursor-pointer whitespace-nowrap">
         {item.label}
         <ChevronDown
           size={16}

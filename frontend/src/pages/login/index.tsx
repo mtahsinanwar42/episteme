@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { setLoading, setToken, setUser } from "@/stores/authSlice";
 import { authService } from "@/services/authService";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import Cookies from "js-cookie";
 
 function Login() {
@@ -63,6 +64,7 @@ function Login() {
       <div className="relative max-w-lg w-full">
         <div className="absolute -inset-[1px] bg-gradient-to-br from-indigo-300/35 via-sky-200/30 to-emerald-200/25 rounded-3xl blur opacity-70" />
         <div className="relative rounded-3xl border border-border bg-card backdrop-blur-md shadow-2xl p-10 ">
+          <LoadingOverlay visible={isLoading} />
           <div className="flex flex-col gap-3 text-center mb-8">
             <p className="text-sm tracking-[0.12em] uppercase">Welcome back</p>
             <h1 className="text-4xl font-semibold leading-tight bg-linear-to-r from-indigo-500 via-violet-500 to-indigo-500 bg-clip-text text-transparent">

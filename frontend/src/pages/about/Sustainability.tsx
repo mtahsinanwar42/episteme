@@ -1,6 +1,9 @@
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+
 export default function Sustainability() {
   return (
     <div className="min-h-screen">
+      <Breadcrumb items={[{ label: "Sustainability" }]} />
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-green-600 via-teal-500 to-blue-400 py-20 px-4 rounded-lg mb-16 overflow-hidden">
         <div className="absolute inset-0 opacity-20"></div>

@@ -1,6 +1,9 @@
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+
 export default function Mission() {
   return (
     <div className="min-h-screen">
+      <Breadcrumb items={[{ label: "Mission & Vision" }]} />
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 py-20 px-4 rounded-lg mb-16 overflow-hidden">
         <div className="absolute inset-0 opacity-20"></div>

@@ -10,6 +10,8 @@ import type { RootState } from "@/stores/store";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
+import type { Conference } from "@/models/conference";
+import { ConferenceStatusUpdateModal } from "@/components/conference/ConferenceStatusUpdateModal";
 
 export default function Conferences() {
   const navigate = useNavigate();
@@ -19,6 +21,9 @@ export default function Conferences() {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(9);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [selectedConference, setSelectedConference] =
+    useState<Conference | null>(null);
 
   const {
     data: response,
@@ -51,6 +56,16 @@ export default function Conferences() {
     setPage(1);
   };
 
+  const handleOpenStatusModal = (conference: Conference) => {
+    setSelectedConference(conference);
+    setIsStatusModalOpen(true);
+  };
+
+  const handleCloseStatusModal = () => {
+    setSelectedConference(null);
+    setIsStatusModalOpen(false);
+  };
+
   return (
     <div>
       <Breadcrumb items={[{ label: "Conferences", href: "/conferences" }]} />
@@ -78,14 +93,18 @@ export default function Conferences() {
       {error && <div className="text-red-600">{(error as Error).message}</div>}
 
       {!isLoading && !error && conferences?.length === 0 && (
-        <div className="text-slate-600">No conferences found.</div>
+        <div className="text-slate-600">No conference found.</div>
       )}
 
       {!isLoading && !error && conferences && conferences?.length > 0 && (
         <div className="flex flex-col items-center gap-6">
           <div className="w-full max-w-2/3 flex flex-col gap-12">
             {conferences?.map((conference) => (
-              <ConferenceCard key={conference.id} conference={conference} />
+              <ConferenceCard
+                key={conference.id}
+                conference={conference}
+                onStatusUpdate={handleOpenStatusModal}
+              />
             ))}
           </div>
 
@@ -102,6 +121,13 @@ export default function Conferences() {
           )}
         </div>
       )}
+
+      <ConferenceStatusUpdateModal
+        open={isStatusModalOpen}
+        onOpenChange={setIsStatusModalOpen}
+        selectedConference={selectedConference}
+        onClose={handleCloseStatusModal}
+      />
     </div>
   );
 }

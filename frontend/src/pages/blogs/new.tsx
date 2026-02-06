@@ -1,35 +1,44 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Input } from "@/components/ui/input";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { BlogStatus } from "@/models/blog";
-import { useCreateBlogMutation } from "@/hooks/useBlogs";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
-import PageTitle from "@/components/common/PageTitle";
-import PageSubTitle from "@/components/common/PageSubTitle";
-import { fileService } from "@/services/fileService";
-import { FileTypeEnum } from "@/models/file";
-import { FileText, Upload } from "lucide-react";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { BlogStatus } from '@/models/blog';
+import { useCreateBlogMutation } from '@/hooks/useBlogs';
+import { Breadcrumb } from '@/components/common/Breadcrumb';
+import PageTitle from '@/components/common/PageTitle';
+import PageSubTitle from '@/components/common/PageSubTitle';
+import { LoadingOverlay } from '@/components/common/LoadingOverlay';
+import { fileService } from '@/services/fileService';
+import { FileTypeEnum } from '@/models/file';
+import { FileText } from 'lucide-react';
+import { FileUploadField } from '@/components/common/FileUploadField';
+import { useSuccessToast } from '@/hooks/useSuccessToast';
 
 export default function NewBlog() {
   const navigate = useNavigate();
   const createBlogMutation = useCreateBlogMutation();
+  const { showSuccessToast } = useSuccessToast();
   const [error, setError] = useState<string | null>(null);
   const [metadataFile, setMetadataFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadedMetadataFile, setUploadedMetadataFile] = useState<{
+    name: string;
+    size: number;
+    storageKey: string;
+  } | null>(null);
 
   const [formData, setFormData] = useState({
-    title: "",
-    metadataFilePath: "",
+    title: '',
+    metadataFilePath: '',
     status: BlogStatus.DRAFT,
   });
 
@@ -37,12 +46,12 @@ export default function NewBlog() {
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      setError("Title is required");
+      setError('Title is required');
       return;
     }
 
     if (!formData.metadataFilePath) {
-      setError("Metadata file is required");
+      setError('Metadata file is required');
       return;
     }
 
@@ -56,11 +65,12 @@ export default function NewBlog() {
       },
       {
         onSuccess: () => {
-          navigate("/blogs");
+          showSuccessToast('Blog created successfully.');
+          navigate('/blogs');
         },
         onError: (err: any) => {
           setError(
-            err instanceof Error ? err.message : "Failed to create blog",
+            err instanceof Error ? err.message : 'Failed to create blog',
           );
         },
       },
@@ -82,15 +92,12 @@ export default function NewBlog() {
     }));
   };
 
-  const handleMetadataFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = e.target.files?.[0];
+  const handleMetadataFileChange = async (file: File | null) => {
     if (!file) return;
 
     // Validate file type (JSON only)
-    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
-      setError("Please upload a JSON file");
+    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+      setError('Please upload a JSON file');
       return;
     }
 
@@ -100,7 +107,7 @@ export default function NewBlog() {
 
     try {
       const formDataToUpload = new FormData();
-      formDataToUpload.append("file", file);
+      formDataToUpload.append('file', file);
 
       const fileUploadResponse = await fileService.uploadFile(
         FileTypeEnum.ASSETS,
@@ -115,17 +122,24 @@ export default function NewBlog() {
           ...prev,
           metadataFilePath: fileUploadResponse.data.file.storageKey,
         }));
+        setUploadedMetadataFile({
+          name: fileUploadResponse.data.file.name,
+          size: fileUploadResponse.data.file.size,
+          storageKey: fileUploadResponse.data.file.storageKey,
+        });
       } else {
-        setError("Failed to upload file");
+        setError('Failed to upload file');
         setMetadataFile(null);
+        setUploadedMetadataFile(null);
       }
     } catch (error) {
-      console.error("Metadata file upload error:", error);
-      setError("Failed to upload metadata file");
+      console.error('Metadata file upload error:', error);
+      setError('Failed to upload metadata file');
       setMetadataFile(null);
+      setUploadedMetadataFile(null);
       setFormData((prev) => ({
         ...prev,
-        metadataFilePath: "",
+        metadataFilePath: '',
       }));
     } finally {
       setUploading(false);
@@ -135,7 +149,7 @@ export default function NewBlog() {
   return (
     <div>
       <Breadcrumb
-        items={[{ label: "Blogs", href: "/blogs" }, { label: "New Blog" }]}
+        items={[{ label: 'Blogs', href: '/blogs' }, { label: 'New Blog' }]}
       />
 
       <div className="mb-8">
@@ -143,7 +157,8 @@ export default function NewBlog() {
         <PageSubTitle text="Add a new blog post with metadata configuration" />
       </div>
 
-      <div className="rounded-lg border border-border bg-card shadow-md p-6">
+      <div className="relative rounded-lg border border-border bg-card shadow-md p-6">
+        <LoadingOverlay visible={createBlogMutation.isPending || uploading} />
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && <div className="text-red-600">{error}</div>}
 
@@ -164,53 +179,16 @@ export default function NewBlog() {
 
           {/* Metadata File Upload */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-heading">
-              Metadata File (JSON) *
-            </label>
             <div className="space-y-3">
-              <div className="flex items-center gap-4">
-                <label
-                  htmlFor="metadata-file"
-                  className={`flex items-center gap-2 px-4 py-2 border border-accent rounded cursor-pointer hover:bg-accent/10 transition-colors ${
-                    uploading || createBlogMutation.isPending
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
-                  }`}
-                >
-                  <Upload className="w-4 h-4" />
-                  <span className="text-sm">
-                    {uploading ? "Uploading..." : "Choose JSON File"}
-                  </span>
-                </label>
-                <input
-                  id="metadata-file"
-                  type="file"
-                  accept=".json,application/json"
-                  onChange={handleMetadataFileChange}
-                  disabled={uploading || createBlogMutation.isPending}
-                  className="hidden"
-                />
-              </div>
-
-              {metadataFile && (
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded">
-                  <FileText className="w-4 h-4 text-green-600" />
-                  <span className="text-sm text-green-800">
-                    {metadataFile.name}
-                  </span>
-                  {formData.metadataFilePath && (
-                    <span className="text-xs text-green-600 ml-auto">
-                      ✓ Uploaded
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {!metadataFile && (
-                <p className="text-xs text-body">
-                  Upload a JSON file containing blog metadata
-                </p>
-              )}
+              <FileUploadField
+                label="Metadata File (JSON) *"
+                selectedFile={metadataFile}
+                onFileSelect={handleMetadataFileChange}
+                disabled={uploading || createBlogMutation.isPending}
+                accept=".json,application/json"
+                helperText="Upload a JSON file containing blog metadata"
+                uploadedFile={uploadedMetadataFile}
+              />
             </div>
           </div>
 
@@ -243,7 +221,7 @@ export default function NewBlog() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/blogs")}
+              onClick={() => navigate('/blogs')}
               disabled={createBlogMutation.isPending}
             >
               Cancel
@@ -259,7 +237,7 @@ export default function NewBlog() {
                 formData.status === null
               }
             >
-              {createBlogMutation.isPending ? "Creating..." : "Create"}
+              {createBlogMutation.isPending ? 'Creating...' : 'Create'}
             </Button>
           </div>
         </form>

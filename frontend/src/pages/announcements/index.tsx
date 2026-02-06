@@ -29,14 +29,10 @@ export default function Announcements() {
     limit: pageSize,
     sort: "-createdAt",
     paginate: true,
+    statusIn: currentRoles?.includes(UserRole.ADMIN) ? undefined : "1,2",
   });
 
-  const announcements = currentRoles?.includes(UserRole.ADMIN)
-    ? response?.data
-    : response?.data.filter(
-        (announcement) =>
-          announcement.status === 1 || announcement.status === 2,
-      ) || [];
+  const announcements = response?.data || [];
   const total = response?.total || 0;
 
   const currentPage = page;
@@ -84,7 +80,11 @@ export default function Announcements() {
       )}
       {error && <div className="text-red-600">{(error as Error).message}</div>}
 
-      {!isLoading && !error && (
+      {!isLoading && !error && announcements.length === 0 && (
+        <div className="text-slate-600">No announcement found.</div>
+      )}
+
+      {!isLoading && !error && announcements.length > 0 && (
         <div className="flex flex-col items-center gap-6">
           <div className="w-full max-w-2/3 flex flex-col gap-12">
             {announcements?.map((announcement) => (

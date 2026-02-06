@@ -29,13 +29,10 @@ export default function Trainings() {
     limit: pageSize,
     sort: "-createdAt",
     paginate: true,
+    status: currentRoles?.includes(UserRole.ADMIN) ? undefined : 1,
   });
 
-  const trainings = currentRoles?.includes(UserRole.ADMIN)
-    ? response?.data
-    : response?.data.filter(
-        (training) => training.status === 1 || training.status === 2,
-      ) || [];
+  const trainings = response?.data || [];
   const total = response?.total || 0;
 
   const currentPage = page;
@@ -79,7 +76,11 @@ export default function Trainings() {
       {isLoading && <div className="text-slate-600">Loading trainings...</div>}
       {error && <div className="text-red-600">{(error as Error).message}</div>}
 
-      {!isLoading && !error && (
+      {!isLoading && !error && trainings.length === 0 && (
+        <div className="text-slate-600">No training found.</div>
+      )}
+
+      {!isLoading && !error && trainings.length > 0 && (
         <div className="flex flex-col items-center gap-6">
           <div className="w-full max-w-2/3 flex flex-col gap-12">
             {trainings?.map((training) => (

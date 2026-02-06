@@ -1,44 +1,35 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { FileTypeEnum } from "@/models/file";
-import { fileService } from "@/services/fileService";
-import { Upload, FileText, AlertCircle, CheckCircle } from "lucide-react";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
-import PageSubTitle from "@/components/common/PageSubTitle";
-import PageTitle from "@/components/common/PageTitle";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { FileTypeEnum } from '@/models/file';
+import { fileService } from '@/services/fileService';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import { Breadcrumb } from '@/components/common/Breadcrumb';
+import PageSubTitle from '@/components/common/PageSubTitle';
+import PageTitle from '@/components/common/PageTitle';
+import { LoadingOverlay } from '@/components/common/LoadingOverlay';
+import { FileUploadField } from '@/components/common/FileUploadField';
+import { useSuccessToast } from '@/hooks/useSuccessToast';
 
 export default function NewAsset() {
   const navigate = useNavigate();
+  const { showSuccessToast } = useSuccessToast();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
   const [uploadedFile, setUploadedFile] = useState<any>(null);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setError("");
-      setSuccess(false);
-    }
-  };
+  const handleFileSelect = async (file: File | null) => {
+    if (!file) return;
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      setError("Please select a file to upload");
-      return;
-    }
-
+    setSelectedFile(file);
+    setError('');
     setIsUploading(true);
-    setError("");
-    setSuccess(false);
 
     try {
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append('file', file);
 
       const response = await fileService.uploadFile(
         FileTypeEnum.ASSETS,
@@ -46,19 +37,13 @@ export default function NewAsset() {
       );
 
       if (response.success && response.data.file) {
-        setSuccess(true);
         setUploadedFile(response.data.file);
         setSelectedFile(null);
-        // Reset form after 2 seconds
-        setTimeout(() => {
-          setSuccess(false);
-          setUploadedFile(null);
-          navigate(`/assets`);
-        }, 2000);
+        showSuccessToast('Asset uploaded successfully.');
       }
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to upload file";
+        err instanceof Error ? err.message : 'Failed to upload file';
       setError(errorMessage);
     } finally {
       setIsUploading(false);
@@ -68,7 +53,7 @@ export default function NewAsset() {
   return (
     <div>
       <Breadcrumb
-        items={[{ label: "Assets", href: "/assets" }, { label: "New Asset" }]}
+        items={[{ label: 'Assets', href: '/assets' }, { label: 'New Asset' }]}
       />
 
       <div className="space-y-6">
@@ -79,57 +64,19 @@ export default function NewAsset() {
         </div>
 
         {/* Form Card */}
-        <div className="rounded-lg border border-border bg-card shadow-md p-6">
+        <div className="relative rounded-lg border border-border bg-card shadow-md p-6">
+          <LoadingOverlay visible={isUploading} />
           <div className="space-y-3">
             {/* Asset Type is fixed to ASSETS; no selection needed */}
 
             {/* File Upload Area */}
-            <div className="flex flex-col space-y-3 max-w-lg">
-              <label className="text-sm font-medium">Select File *</label>
-              <div className="relative">
-                <input
-                  type="file"
-                  onChange={handleFileSelect}
-                  disabled={isUploading}
-                  className="cursor-pointer hidden"
-                  id="file-input"
-                />
-                <label
-                  htmlFor="file-input"
-                  className={`flex items-center justify-center w-full px-6 py-8 border-2 border-dashed rounded-lg transition-colors ${
-                    selectedFile
-                      ? "border-green-500 bg-green-50"
-                      : "border-border bg-slate-900 hover:border-slate-500"
-                  } ${isUploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-                >
-                  <div className="flex flex-col items-center space-y-2">
-                    <Upload className="w-8 h-8 text-foreground/80" />
-                    <div className="text-sm text-foreground/80">
-                      {selectedFile ? (
-                        <div className="flex flex-col items-center space-y-1">
-                          <FileText className="w-5 h-5 text-green-600" />
-                          <p className="font-medium text-green-600">
-                            {selectedFile.name}
-                          </p>
-                          <p className="text-xs text-foreground/80">
-                            ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-                          </p>
-                        </div>
-                      ) : (
-                        <>
-                          <p className="font-medium">
-                            Click to select or drag and drop
-                          </p>
-                          <p className="text-xs text-foreground/60">
-                            Any file type is supported
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </label>
-              </div>
-            </div>
+            <FileUploadField
+              label="Select File *"
+              selectedFile={selectedFile}
+              onFileSelect={handleFileSelect}
+              disabled={isUploading}
+              uploadedFile={uploadedFile}
+            />
 
             {/* Error Message */}
             {error && (
@@ -140,7 +87,7 @@ export default function NewAsset() {
             )}
 
             {/* Success Message */}
-            {success && uploadedFile && (
+            {uploadedFile && (
               <div className="p-4 rounded-md text-sm border border-green-500/30 bg-green-500/10 text-green-800 flex items-start gap-3">
                 <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <div>
@@ -151,9 +98,6 @@ export default function NewAsset() {
                   <p className="text-xs text-green-700">
                     Size: {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
                   </p>
-                  <p className="text-xs text-green-700">
-                    Redirecting to asset details...
-                  </p>
                 </div>
               </div>
             )}
@@ -163,18 +107,10 @@ export default function NewAsset() {
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => navigate("/assets")}
+                onClick={() => navigate('/assets')}
                 disabled={isUploading}
               >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleUpload}
-                disabled={isUploading || !selectedFile || success}
-              >
-                {isUploading ? "Uploading..." : "Upload Asset"}
+                Close
               </Button>
             </div>
           </div>

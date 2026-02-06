@@ -1,12 +1,12 @@
-import { useSelector, useDispatch } from "react-redux";
-import { type RootState } from "@/stores/store";
+import { useSelector, useDispatch } from 'react-redux';
+import { type RootState } from '@/stores/store';
 import {
   NavItem,
   type NavItemConfig,
   canViewNavItem,
-} from "@/components/common/NavItem";
-import { Link, useNavigate } from "react-router-dom";
-import { logout } from "@/stores/authSlice";
+} from '@/components/common/NavItem';
+import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '@/stores/authSlice';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,136 +14,264 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { User, LogOut, Menu } from "lucide-react";
-import { UserRole } from "@/models/user";
-import { config } from "@/config/config";
+} from '@/components/ui/dropdown-menu';
+import { User, LogOut, Menu } from 'lucide-react';
+import { UserRole } from '@/models/user';
+import { config } from '@/config/config';
 
-const navItems: NavItemConfig[] = [
+const avatarColors = [
   {
-    label: "Activities",
-    href: "/activities",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
+    bg: 'bg-red-100',
+    text: 'text-red-800',
+    border: 'border-red-500',
+    hoverBorder: 'hover:border-red-600',
   },
   {
-    label: "Trainings",
-    href: "/trainings",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
+    bg: 'bg-orange-100',
+    text: 'text-orange-800',
+    border: 'border-orange-500',
+    hoverBorder: 'hover:border-orange-600',
   },
   {
-    label: "Announcements",
-    href: "/announcements",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
+    bg: 'bg-emerald-100',
+    text: 'text-emerald-800',
+    border: 'border-emerald-500',
+    hoverBorder: 'hover:border-emerald-600',
   },
   {
-    label: "Blogs",
-    href: "/blogs",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
+    bg: 'bg-teal-100',
+    text: 'text-teal-800',
+    border: 'border-teal-500',
+    hoverBorder: 'hover:border-teal-600',
   },
   {
-    label: "Conferences",
-    href: "/conferences",
-    visibleTo: [UserRole.PUBLIC, UserRole.USER, UserRole.ADMIN],
+    bg: 'bg-sky-100',
+    text: 'text-sky-800',
+    border: 'border-sky-500',
+    hoverBorder: 'hover:border-sky-600',
   },
   {
-    label: "Users",
-    href: "/users",
-    children: [
-      {
-        label: "All",
-        href: "/users",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "New",
-        href: "/users/new",
-        visibleTo: UserRole.ADMIN,
-      },
-    ],
-    visibleTo: UserRole.ADMIN,
+    bg: 'bg-blue-100',
+    text: 'text-blue-800',
+    border: 'border-blue-500',
+    hoverBorder: 'hover:border-blue-600',
   },
   {
-    label: "Assets",
-    href: "/assets",
-    children: [
-      {
-        label: "All",
-        href: "/assets",
-        visibleTo: UserRole.ADMIN,
-      },
-      {
-        label: "New",
-        href: "/assets/new",
-        visibleTo: UserRole.ADMIN,
-      },
-    ],
-    visibleTo: UserRole.ADMIN,
+    bg: 'bg-indigo-100',
+    text: 'text-indigo-800',
+    border: 'border-indigo-500',
+    hoverBorder: 'hover:border-indigo-600',
   },
+  {
+    bg: 'bg-violet-100',
+    text: 'text-violet-800',
+    border: 'border-violet-500',
+    hoverBorder: 'hover:border-violet-600',
+  },
+  {
+    bg: 'bg-pink-100',
+    text: 'text-pink-800',
+    border: 'border-pink-500',
+    hoverBorder: 'hover:border-pink-600',
+  },
+  {
+    bg: 'bg-rose-100',
+    text: 'text-rose-800',
+    border: 'border-rose-500',
+    hoverBorder: 'hover:border-rose-600',
+  },
+];
 
+const getAvatarColor = (name?: string) => {
+  const str = name || '';
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % avatarColors.length;
+  return avatarColors[index];
+};
+
+const aboutNavItem: NavItemConfig = {
+  label: 'About',
+  children: [
+    {
+      label: 'Mission & Vision',
+      href: '/about/mission',
+    },
+    {
+      label: 'Ethics',
+      href: '/about/ethics',
+    },
+    {
+      label: 'Sustainability',
+      href: '/about/sustainability',
+    },
+    {
+      label: 'Executive Committee',
+      href: '/about/executive',
+    },
+    {
+      label: 'Policies',
+      href: '/about/policies',
+    },
+    {
+      label: 'Career',
+      href: '/about/career',
+    },
+    {
+      label: 'Contact',
+      href: '/about/contact',
+    },
+  ],
+};
+
+const publicNavItems: NavItemConfig[] = [
+  aboutNavItem,
+  { label: 'Conferences', href: '/conferences' },
+  { label: 'Trainings', href: '/trainings' },
+  { label: 'Announcements', href: '/announcements' },
+  { label: 'Blogs', href: '/blogs' },
+  { label: 'Activities', href: '/activities' },
+];
+
+const adminNavItems: NavItemConfig[] = [
+  aboutNavItem,
   {
-    label: "Submissions",
-    href: "/user/submissions",
-    visibleTo: UserRole.USER,
-  },
-  {
-    label: "Submissions",
-    href: "/admin/submissions",
-    visibleTo: UserRole.ADMIN,
-  },
-  {
-    label: "Review Assignments",
-    href: "/reviewer/review-assignments",
-    visibleTo: UserRole.REVIEWER,
-  },
-  {
-    label: "About",
+    label: 'Users',
+    href: '/users',
     children: [
-      {
-        label: "Mission & Vision",
-        href: "/about/mission",
-      },
-      {
-        label: "Ethics",
-        href: "/about/ethics",
-      },
-      {
-        label: "Sustainability",
-        href: "/about/sustainability",
-      },
-      {
-        label: "Executive Committee",
-        href: "/about/executive",
-      },
-      {
-        label: "Policies",
-        href: "/about/policies",
-      },
-      {
-        label: "Career",
-        href: "/about/career",
-      },
-      {
-        label: "Contact",
-        href: "/about/contact",
-      },
+      { label: 'New', href: '/users/new' },
+      { label: 'All', href: '/users' },
+    ],
+  },
+  {
+    label: 'Submissions',
+    href: '/submissions',
+  },
+  {
+    label: 'Reviewer Assignments',
+    href: '/reviewer/review-assignments',
+  },
+  {
+    label: 'Conferences',
+    href: '/conferences',
+    children: [
+      { label: 'New', href: '/conferences/new' },
+      { label: 'All', href: '/conferences' },
+    ],
+  },
+  {
+    label: 'Trainings',
+    href: '/trainings',
+    children: [
+      { label: 'New', href: '/trainings/new' },
+      { label: 'All', href: '/trainings' },
+    ],
+  },
+  {
+    label: 'Announcements',
+    href: '/announcements',
+    children: [
+      { label: 'New', href: '/announcements/new' },
+      { label: 'All', href: '/announcements' },
+    ],
+  },
+  {
+    label: 'Blogs',
+    href: '/blogs',
+    children: [
+      { label: 'New', href: '/blogs/new' },
+      { label: 'All', href: '/blogs' },
+    ],
+  },
+  {
+    label: 'Activities',
+    href: '/activities',
+    children: [
+      { label: 'New', href: '/activities/new' },
+      { label: 'All', href: '/activities' },
+    ],
+  },
+  {
+    label: 'Assets',
+    href: '/assets',
+    children: [
+      { label: 'New', href: '/assets/new' },
+      { label: 'All', href: '/assets' },
     ],
   },
 ];
 
+const reviewerNavItems: NavItemConfig[] = [
+  aboutNavItem,
+  {
+    label: 'Submissions',
+    href: '/user/submissions',
+    children: [
+      { label: 'New', href: '/user/submissions/new' },
+      { label: 'My Submissions', href: '/user/submissions' },
+      {
+        label: 'Assigned Reviews',
+        href: '/reviewer/review-assignments',
+      },
+    ],
+  },
+  { label: 'Conferences', href: '/conferences' },
+  { label: 'Trainings', href: '/trainings' },
+  { label: 'Announcements', href: '/announcements' },
+  { label: 'Blogs', href: '/blogs' },
+  { label: 'Activities', href: '/activities' },
+];
+
+const userNavItems: NavItemConfig[] = [
+  aboutNavItem,
+  {
+    label: 'Submissions',
+    href: '/user/submissions',
+    children: [
+      { label: 'New', href: '/user/submissions/new' },
+      { label: 'My Submissions', href: '/user/submissions' },
+    ],
+  },
+  { label: 'Conferences', href: '/conferences' },
+  { label: 'Trainings', href: '/trainings' },
+  { label: 'Announcements', href: '/announcements' },
+  { label: 'Blogs', href: '/blogs' },
+  { label: 'Activities', href: '/activities' },
+];
+
+const getNavItemsForUser = (
+  roles: UserRole[] | undefined,
+  isLoggedIn: boolean,
+): NavItemConfig[] => {
+  if (!isLoggedIn) return publicNavItems;
+  if (roles?.includes(UserRole.ADMIN)) return adminNavItems;
+  if (roles?.includes(UserRole.REVIEWER)) return reviewerNavItems;
+  return userNavItems;
+};
+
 export default function Navbar() {
   const user = useSelector((state: RootState) => state.auth.user);
   const isLoggedIn = user !== null;
+  const isAdmin = user?.roles?.includes(UserRole.ADMIN);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate('/login');
   };
+
+  const navItems = getNavItemsForUser(user?.roles, isLoggedIn);
 
   return (
     <nav className="py-2 px-4 border-b border-border bg-background backdrop-blur-xs">
-      <div className="flex justify-between items-center mx-auto 2xl:max-w-7xl">
+      <div
+        className={`flex justify-between items-center ${
+          isAdmin ? 'w-full' : 'mx-auto 2xl:max-w-7xl'
+        }`}
+      >
         <div>
           <Link
             to="/"
@@ -153,7 +281,9 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <div className="hidden lg:flex! gap-8 lg:h-12">
+        <div
+          className={`hidden lg:flex! ${isAdmin ? 'gap-6' : 'gap-8'} lg:h-12`}
+        >
           {navItems.map((item, index) =>
             canViewNavItem(item.visibleTo, user?.roles, isLoggedIn) ? (
               <NavItem key={index} item={item} />
@@ -174,7 +304,9 @@ export default function Navbar() {
                       className="w-12 h-12 rounded-full border-2 border-indigo-600"
                     />
                   ) : (
-                    <div className="w-12 h-12 border-2 border-indigo-600 rounded-full flex items-center justify-center bg-accent text-indigo-800 uppercase text-2xl font-bold hover:border-indigo-700 transition-colors">
+                    <div
+                      className={`w-12 h-12 border-2 ${getAvatarColor(user?.firstName).border} rounded-full flex items-center justify-center ${getAvatarColor(user?.firstName).bg} ${getAvatarColor(user?.firstName).text} uppercase text-2xl font-bold ${getAvatarColor(user?.firstName).hoverBorder} transition-colors`}
+                    >
                       {user?.firstName?.charAt(0)}
                     </div>
                   )}
@@ -195,7 +327,9 @@ export default function Navbar() {
                         className="w-12 h-12 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-12 h-12 border-2 border-indigo-600 rounded-full flex items-center justify-center bg-accent text-indigo-800 uppercase text-xl font-bold">
+                      <div
+                        className={`w-12 h-12 border-2 ${getAvatarColor(user?.firstName).border} rounded-full flex items-center justify-center ${getAvatarColor(user?.firstName).bg} ${getAvatarColor(user?.firstName).text} uppercase text-xl font-bold`}
+                      >
                         {user?.firstName?.charAt(0)}
                       </div>
                     )}
@@ -213,7 +347,7 @@ export default function Navbar() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                  onClick={() => navigate("/profile")}
+                  onClick={() => navigate('/profile')}
                   className="text-accent hover:text-accent-foreground"
                 >
                   <User className="mr-2 h-4 w-4" />
@@ -233,12 +367,19 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center">
               <Link
                 to="/login"
                 className="block text-left px-2 py-2 text-white hover:text-gray-200 transition-colors duration-150"
               >
                 Login
+              </Link>
+              <span className="text-white">|</span>
+              <Link
+                to="/register"
+                className="block text-left px-2 py-2 text-white hover:text-gray-200 transition-colors duration-150"
+              >
+                Register
               </Link>
             </div>
           )}

@@ -76,7 +76,11 @@ export default function Blogs() {
       {isLoading && <div className="text-slate-600">Loading blogs...</div>}
       {error && <div className="text-red-600">{(error as Error).message}</div>}
 
-      {!isLoading && !error && (
+      {!isLoading && !error && blogs.length === 0 && (
+        <div className="text-slate-600">No blog found.</div>
+      )}
+
+      {!isLoading && !error && blogs.length > 0 && (
         <div className="flex flex-col items-center gap-6">
           <div className="w-full max-w-2/3 flex flex-col gap-12">
             {blogs.map((blog) => (

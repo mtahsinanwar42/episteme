@@ -17,22 +17,38 @@ import { fileService } from "@/services/fileService";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import PageTitle from "@/components/common/PageTitle";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
+import { FileUploadField } from "@/components/common/FileUploadField";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
+import {
+  getPasswordStrength,
+  PasswordInput,
+} from "@/components/common/PasswordInput";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export default function NewUser() {
   const navigate = useNavigate();
   const createUserMutation = useCreateUserMutation();
+  const { showSuccessToast } = useSuccessToast();
 
   const { data: countriesData } = useCountries();
+
+  const EMAIL_REGEX =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+  const PHONE_REGEX = /^\+?[0-9][0-9\-\s]{6,20}$/;
+  const LINKEDIN_REGEX =
+    /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
 
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
+    confirmPassword: "",
     phone: "",
     institution: "",
     occupation: "",
-    country: "",
+    country: "Bangladesh",
     linkedinUrl: "",
     status: 1,
     photoFilePath: "",
@@ -43,6 +59,42 @@ export default function NewUser() {
   const [error, setError] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [uploadedPhotoFile, setUploadedPhotoFile] = useState<{
+    name: string;
+    size: number;
+    storageKey: string;
+  } | null>(null);
+  const [uploadedCvFile, setUploadedCvFile] = useState<{
+    name: string;
+    size: number;
+    storageKey: string;
+  } | null>(null);
+
+  const isEmailValid = EMAIL_REGEX.test(formData.email);
+  const isPhoneValid = !formData.phone || PHONE_REGEX.test(formData.phone);
+  const isLinkedinValid =
+    !formData.linkedinUrl || LINKEDIN_REGEX.test(formData.linkedinUrl);
+  const passwordStrength = getPasswordStrength(formData.password);
+  const isPasswordStrong = passwordStrength.score >= 4;
+  const doPasswordsMatch =
+    formData.confirmPassword !== "" &&
+    formData.password === formData.confirmPassword;
+
+  const isFormValid =
+    formData.firstName.trim() !== "" &&
+    formData.lastName.trim() !== "" &&
+    formData.email.trim() !== "" &&
+    isEmailValid &&
+    formData.password !== "" &&
+    isPasswordStrong &&
+    formData.confirmPassword !== "" &&
+    doPasswordsMatch &&
+    isPhoneValid &&
+    isLinkedinValid &&
+    formData.country !== "" &&
+    formData.institution.trim() !== "" &&
+    formData.occupation.trim() !== "" &&
+    selectedRoles.length > 0;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -52,107 +104,107 @@ export default function NewUser() {
   const handleRoleToggle = (role: string) => {
     setSelectedRoles((prev) => {
       if (prev.includes(role)) {
-        // Don't allow deselecting if it's the only role
-        // if (prev.length === 1) return prev;
         return prev.filter((r) => r !== role);
       }
-      return [...prev, role];
+      if (role === "ADMIN") {
+        return ["ADMIN"];
+      }
+      return [...prev.filter((r) => r !== "ADMIN"), role];
     });
   };
 
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
+  const handleFileSelect = async (
+    file: File | null,
     type: FileTypeEnum,
   ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (type === FileTypeEnum.PROFILE_PHOTOS) {
-        setPhotoFile(file);
-        try {
-          let formDataToUpload = new FormData();
-          formDataToUpload.append("file", file);
+    if (!file) return;
+    if (type === FileTypeEnum.PROFILE_PHOTOS) {
+      setPhotoFile(file);
+      try {
+        const formDataToUpload = new FormData();
+        formDataToUpload.append("file", file);
 
-          let fileUploadResponse = await fileService.uploadFile(
-            type,
-            formDataToUpload,
-          );
+        const fileUploadResponse = await fileService.uploadFile(
+          type,
+          formDataToUpload,
+        );
 
-          if (
-            fileUploadResponse.success &&
-            fileUploadResponse.data.file.storageKey
-          ) {
-            setFormData((prev) => ({
-              ...prev,
-              photoFilePath: fileUploadResponse.data.file.storageKey,
-            }));
-          }
-        } catch (error) {
-          console.error("Photo upload error:", error);
-          setPhotoFile(null);
+        if (
+          fileUploadResponse.success &&
+          fileUploadResponse.data.file.storageKey
+        ) {
           setFormData((prev) => ({
             ...prev,
-            photoFilePath: "",
+            photoFilePath: fileUploadResponse.data.file.storageKey,
           }));
+          setUploadedPhotoFile({
+            name: file.name,
+            size: file.size,
+            storageKey: fileUploadResponse.data.file.storageKey,
+          });
         }
-      } else {
-        setCvFile(file);
-
-        try {
-          let formDataToUpload = new FormData();
-          formDataToUpload.append("file", file);
-
-          let fileUploadResponse = await fileService.uploadFile(
-            type,
-            formDataToUpload,
-          );
-
-          if (
-            fileUploadResponse.success &&
-            fileUploadResponse.data.file.storageKey
-          ) {
-            setFormData((prev) => ({
-              ...prev,
-              cvFilePath: fileUploadResponse.data.file.storageKey,
-            }));
-          }
-        } catch (error) {
-          console.error("CV upload error:", error);
-          setCvFile(null);
-          setFormData((prev) => ({
-            ...prev,
-            cvFilePath: "",
-          }));
-        }
+      } catch (error) {
+        console.error("Photo upload error:", error);
+        setPhotoFile(null);
+        setUploadedPhotoFile(null);
+        setFormData((prev) => ({
+          ...prev,
+          photoFilePath: "",
+        }));
       }
+      return;
+    }
+
+    setCvFile(file);
+    try {
+      const formDataToUpload = new FormData();
+      formDataToUpload.append("file", file);
+
+      const fileUploadResponse = await fileService.uploadFile(
+        type,
+        formDataToUpload,
+      );
+
+      if (
+        fileUploadResponse.success &&
+        fileUploadResponse.data.file.storageKey
+      ) {
+        setFormData((prev) => ({
+          ...prev,
+          cvFilePath: fileUploadResponse.data.file.storageKey,
+        }));
+        setUploadedCvFile({
+          name: file.name,
+          size: file.size,
+          storageKey: fileUploadResponse.data.file.storageKey,
+        });
+      }
+    } catch (error) {
+      console.error("CV upload error:", error);
+      setCvFile(null);
+      setUploadedCvFile(null);
+      setFormData((prev) => ({
+        ...prev,
+        cvFilePath: "",
+      }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormValid) return;
     setError("");
 
-    // Validate required fields
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.phone ||
-      !formData.institution ||
-      !formData.occupation ||
-      !formData.country
-    ) {
-      setError("Please fill in all required fields");
-      return;
-    }
+    const { confirmPassword: _, ...submitData } = formData;
 
     createUserMutation.mutate(
       {
-        ...formData,
+        ...submitData,
         roles: selectedRoles,
       },
       {
         onSuccess: () => {
+          showSuccessToast("User created successfully.");
           navigate("/users");
         },
         onError: (error) => {
@@ -176,7 +228,8 @@ export default function NewUser() {
           <PageSubTitle text="Add a new user to the system" />
         </div>
 
-        <div className="rounded-lg border border-border bg-card shadow-md p-6">
+        <div className="relative rounded-lg border border-border bg-card shadow-md p-6">
+          <LoadingOverlay visible={createUserMutation.isPending} />
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col space-y-2">
@@ -206,38 +259,55 @@ export default function NewUser() {
                   onChange={handleChange}
                 />
               </div>
+            </div>
 
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">
-                  Email *
-                </label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="user@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-              </div>
+            <div className="flex flex-col space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
+                Email *
+              </label>
+              <Input
+                id="email"
+                name="email"
+                type="text"
+                placeholder="user@example.com"
+                value={formData.email}
+                onChange={handleChange}
+              />
+              {formData.email && !isEmailValid && (
+                <p className="text-red-400 text-xs">
+                  Please enter a valid email address.
+                </p>
+              )}
+            </div>
 
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="password" className="text-sm font-medium ">
-                  Password *
-                </label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Enter a secure password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
+            <PasswordInput
+              value={formData.password}
+              onChange={handleChange}
+              disabled={createUserMutation.isPending}
+            />
 
+            <div className="flex flex-col space-y-2">
+              <label htmlFor="confirmPassword" className="text-sm font-medium">
+                Confirm Password *
+              </label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="Re-enter your password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                disabled={createUserMutation.isPending}
+              />
+              {formData.confirmPassword && !doPasswordsMatch && (
+                <p className="text-red-400 text-xs">Passwords do not match.</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col space-y-2">
-                <label htmlFor="phone" className="text-sm font-medium ">
-                  Phone *
+                <label htmlFor="phone" className="text-sm font-medium">
+                  Phone
                 </label>
                 <Input
                   id="phone"
@@ -247,35 +317,30 @@ export default function NewUser() {
                   value={formData.phone}
                   onChange={handleChange}
                 />
+                {formData.phone && !isPhoneValid && (
+                  <p className="text-red-400 text-xs">
+                    Please enter a valid phone number.
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label htmlFor="country" className="text-sm font-medium ">
+                <label htmlFor="country" className="text-sm font-medium">
                   Country *
                 </label>
-
-                <Select
+                <SearchableSelect
                   value={formData.country}
                   onValueChange={(value) => {
                     setFormData((prev) => ({ ...prev, country: value }));
                   }}
+                  options={countriesData?.data || []}
+                  placeholder="Select a country"
                   disabled={createUserMutation.isPending}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countriesData?.data.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                />
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label htmlFor="institution" className="text-sm font-medium ">
+                <label htmlFor="institution" className="text-sm font-medium">
                   Institution *
                 </label>
                 <Input
@@ -289,7 +354,7 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label htmlFor="occupation" className="text-sm font-medium ">
+                <label htmlFor="occupation" className="text-sm font-medium">
                   Occupation *
                 </label>
                 <Input
@@ -303,21 +368,26 @@ export default function NewUser() {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label htmlFor="linkedinUrl" className="text-sm font-medium ">
+                <label htmlFor="linkedinUrl" className="text-sm font-medium">
                   LinkedIn URL
                 </label>
                 <Input
                   id="linkedinUrl"
                   name="linkedinUrl"
-                  type="url"
+                  type="text"
                   placeholder="https://www.linkedin.com/in/yourprofile"
                   value={formData.linkedinUrl}
                   onChange={handleChange}
                 />
+                {formData.linkedinUrl && !isLinkedinValid && (
+                  <p className="text-red-400 text-xs">
+                    Please enter a valid LinkedIn URL.
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label className="text-sm font-medium ">Status *</label>
+                <label className="text-sm font-medium">Status *</label>
                 <Select
                   value={formData.status.toString()}
                   onValueChange={(value) =>
@@ -334,61 +404,39 @@ export default function NewUser() {
                     <SelectItem value={UserStatus.ACTIVE.toString()}>
                       Active
                     </SelectItem>
-                    <SelectItem value={UserStatus.SUSPENDED.toString()}>
-                      Suspended
-                    </SelectItem>
-                    <SelectItem value={UserStatus.DELETED.toString()}>
-                      Deleted
-                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="flex flex-col space-y-3">
-                <label className="text-sm text-muted-foreground">
-                  Profile picture
-                </label>
-                <div>
-                  <Input
-                    id="photo"
-                    name="photo"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleFileChange(e, FileTypeEnum.PROFILE_PHOTOS)
-                    }
-                    className="cursor-pointer"
-                  />
-                  {photoFile && (
-                    <p className="text-xs text-slate-500 mt-2">
-                      Selected: {photoFile.name}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <FileUploadField
+                label="Profile picture"
+                selectedFile={photoFile}
+                onFileSelect={(file) =>
+                  handleFileSelect(file, FileTypeEnum.PROFILE_PHOTOS)
+                }
+                accept="image/*"
+                disabled={createUserMutation.isPending}
+                helperText="Upload a profile photo (JPG, PNG)"
+                uploadedFile={uploadedPhotoFile}
+                maxNameLength={40}
+              />
 
-              <div className="flex flex-col space-y-3">
-                <label className="text-sm text-muted-foreground">CV</label>
-                <div>
-                  <Input
-                    id="cv"
-                    name="cv"
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={(e) => handleFileChange(e, FileTypeEnum.CVS)}
-                    className="cursor-pointer"
-                  />
-                  {cvFile && (
-                    <p className="text-xs text-slate-500 mt-2">
-                      Selected: {cvFile.name}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <FileUploadField
+                label="CV"
+                selectedFile={cvFile}
+                onFileSelect={(file) =>
+                  handleFileSelect(file, FileTypeEnum.CVS)
+                }
+                accept=".pdf,.doc,.docx"
+                disabled={createUserMutation.isPending}
+                helperText="Upload a CV (PDF, DOC, DOCX)"
+                uploadedFile={uploadedCvFile}
+                maxNameLength={40}
+              />
             </div>
 
             <div className="flex flex-col space-y-3">
-              <label className="text-sm font-medium ">Select Roles</label>
+              <label className="text-sm font-medium">Select Roles *</label>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Checkbox
@@ -416,10 +464,20 @@ export default function NewUser() {
                     Reviewer
                   </label>
                 </div>
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="role-admin"
+                    checked={selectedRoles.includes("ADMIN")}
+                    onCheckedChange={() => handleRoleToggle("ADMIN")}
+                  />
+                  <label
+                    htmlFor="role-admin"
+                    className="text-sm  cursor-pointer"
+                  >
+                    Admin
+                  </label>
+                </div>
               </div>
-              <p className="text-xs text-slate-500">
-                Select at least one role for the user
-              </p>
             </div>
 
             {error && (
@@ -440,17 +498,7 @@ export default function NewUser() {
               <Button
                 type="submit"
                 size="sm"
-                disabled={
-                  createUserMutation.isPending ||
-                  !formData.firstName.trim() ||
-                  !formData.lastName.trim() ||
-                  !formData.email.trim() ||
-                  !formData.password.trim() ||
-                  !formData.phone.trim() ||
-                  !formData.institution.trim() ||
-                  !formData.occupation.trim() ||
-                  !formData.country.trim()
-                }
+                disabled={!isFormValid || createUserMutation.isPending}
               >
                 {createUserMutation.isPending ? "Creating..." : "Create"}
               </Button>
