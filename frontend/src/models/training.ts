@@ -44,6 +44,9 @@ export interface GetTrainingsParams {
   paginate?: boolean;
   status?: number;
   statusIn?: string;
+  title?: string;
+  createdAtFrom?: string;
+  createdAtTo?: string;
 }
 
 export interface CreateTrainingRequest {

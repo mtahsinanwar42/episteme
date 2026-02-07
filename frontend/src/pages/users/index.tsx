@@ -211,7 +211,14 @@ export default function Users() {
         <PageTitle title="Users" />
         <PageSubTitle text="View and manage all registered users" />
         {currentRoles?.includes(UserRole.ADMIN) && (
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/users/search")}
+              className="mb-4 px-4 py-2"
+            >
+              Advanced Search
+            </Button>
             <Button
               onClick={() => navigate("/users/new")}
               className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
@@ -230,7 +237,7 @@ export default function Users() {
           error={error ? (error as Error).message : null}
           pageSize={pageSize}
           enableSearch
-          searchPlaceholder="Search Users"
+          searchPlaceholder="Filter Users"
         />
 
         {!isLoading && !error && total > 0 && (

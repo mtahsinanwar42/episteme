@@ -6,8 +6,16 @@ export interface GetUsersParams {
   limit?: number;
   sort?: string;
   select?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  institution?: string;
+  occupation?: string;
+  createdAtFrom?: string;
+  createdAtTo?: string;
   roles?: string;
   status?: number;
+  statusIn?: string;
   search?: string;
   paginate?: boolean;
 }
@@ -20,9 +28,21 @@ export const userService = {
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.sort) queryParams.append("sort", params.sort);
     if (params?.select) queryParams.append("select", params.select);
+    if (params?.firstName) queryParams.append("firstName[iLike]", params.firstName);
+    if (params?.lastName) queryParams.append("lastName[iLike]", params.lastName);
+    if (params?.email) queryParams.append("email[iLike]", params.email);
+    if (params?.institution)
+      queryParams.append("institution[iLike]", params.institution);
+    if (params?.occupation)
+      queryParams.append("occupation[iLike]", params.occupation);
+    if (params?.createdAtFrom)
+      queryParams.append("createdAt[gte]", params.createdAtFrom);
+    if (params?.createdAtTo)
+      queryParams.append("createdAt[lte]", `${params.createdAtTo}T23:59:59`);
     if (params?.roles) queryParams.append("roles[contains]", params.roles);
     if (params?.status !== undefined)
       queryParams.append("status", params.status.toString());
+    if (params?.statusIn) queryParams.append("status[in]", params.statusIn);
     if (params?.search) queryParams.append("search", params.search);
     if (params?.paginate !== undefined)
       queryParams.append("paginate", params.paginate.toString());

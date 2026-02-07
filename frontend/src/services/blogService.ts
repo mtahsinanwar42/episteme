@@ -18,6 +18,13 @@ export const blogService = {
     if (params?.search) queryParams.append("search", params.search);
     if (params?.status !== undefined)
       queryParams.append("status", params.status.toString());
+    if (params?.statusIn)
+      queryParams.append("status[in]", params.statusIn);
+    if (params?.title) queryParams.append("title[iLike]", params.title);
+    if (params?.createdAtFrom)
+      queryParams.append("createdAt[gte]", params.createdAtFrom);
+    if (params?.createdAtTo)
+      queryParams.append("createdAt[lte]", `${params.createdAtTo}T23:59:59`);
     if (params?.paginate !== undefined)
       queryParams.append("paginate", params.paginate.toString());
 

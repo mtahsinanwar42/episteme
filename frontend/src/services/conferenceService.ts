@@ -20,8 +20,30 @@ export const conferenceService = {
     if (params?.sort) queryParams.append("sort", params.sort);
     if (params?.select) queryParams.append("select", params.select);
     if (params?.search) queryParams.append("search", params.search);
+    if (params?.title) queryParams.append("title[iLike]", params.title);
+    if (params?.slug) queryParams.append("slug[iLike]", params.slug);
+    if (params?.status !== undefined)
+      queryParams.append("status", params.status.toString());
     if (params?.statusIn)
       queryParams.append("status[in]", params.statusIn);
+    if (params?.startAtFrom)
+      queryParams.append("startAt[gte]", params.startAtFrom);
+    if (params?.startAtTo)
+      queryParams.append("startAt[lte]", `${params.startAtTo}T23:59:59`);
+    if (params?.submissionStartAtFrom)
+      queryParams.append(
+        "submissionPeriodStartAt[gte]",
+        params.submissionStartAtFrom,
+      );
+    if (params?.submissionStartAtTo)
+      queryParams.append(
+        "submissionPeriodStartAt[lte]",
+        `${params.submissionStartAtTo}T23:59:59`,
+      );
+    if (params?.createdAtFrom)
+      queryParams.append("createdAt[gte]", params.createdAtFrom);
+    if (params?.createdAtTo)
+      queryParams.append("createdAt[lte]", `${params.createdAtTo}T23:59:59`);
     if (params?.paginate !== undefined)
       queryParams.append("paginate", params.paginate.toString());
 
