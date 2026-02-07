@@ -1,10 +1,11 @@
 import { Op } from "sequelize";
 import { sequelize } from "../config/db.js";
-import { findSubmissionByIdAndUserDetails, findSubmissionsByUserDetails, markSubmissionAsApprovedOrRejected, markSubmissionAsDeleted, markSubmissionAsStatus } from "../repositories/contentSubmission.js";
+import { findSubmissionByIdAndUserDetails, findSubmissionsBySearchFilters, findSubmissionsByUserDetails, markSubmissionAsApprovedOrRejected, markSubmissionAsDeleted, markSubmissionAsStatus } from "../repositories/contentSubmission.js";
 import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { serializeContentSubmission } from "../utils/serializers.js";
 import { isEmpty } from "../utils/string.js";
+import { normalizeNumberArray, normalizeTextArray, toOptionalDateText, toOptionalInteger } from "../utils/search.js";
 
 export function createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, User, conferenceService, fileService, emailPublisher }) {
   if (!ContentSubmission || !ContentSubmissionVersion || !User) {
@@ -25,6 +26,56 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       loggedInUserRoles: user.roles,
       page,
       limit,
+    });
+  }
+
+  async function searchSubmissions(user, filters) {
+    const roles = Array.isArray(user.roles) ? user.roles : [];
+    const isAdmin = roles.includes(USER_ROLE.ADMIN);
+
+    const safeTitle = isEmpty(filters.title) ? null : String(filters.title).trim();
+    const safeDoi = isEmpty(filters.doi) ? null : String(filters.doi).trim();
+
+    const safeTopics = normalizeTextArray(filters.topics, { fieldName: "topics" });
+    const safeStatuses = normalizeNumberArray(filters.status, { fieldName: "status" });
+    const allStatuses = Object.values(CONTENT_SUBMISSION_STATUS);
+
+    if (safeStatuses != null && safeStatuses.some((s) => !allStatuses.includes(s))) {
+      throw new ErrorResponse(400, "Invalid ContentSubmission status");
+    }
+
+    if (!isAdmin && safeStatuses?.includes(CONTENT_SUBMISSION_STATUS.DELETED)) {
+      throw new ErrorResponse(400, "DELETED status is not accepted for user search");
+    }
+
+    const safeConferenceId = toOptionalInteger(filters.conferenceId, { fieldName: "conferenceId" });
+    const ownerUsrIdFromInput = toOptionalInteger(filters.ownerUsrId, { fieldName: "ownerUsrId" });
+
+    if (!isAdmin && ownerUsrIdFromInput != null) {
+      throw new ErrorResponse(400, "ownerUsrId can only be provided by admin");
+    }
+
+    const safeCreatedDateFrom = toOptionalDateText(filters.createdDateFrom, { fieldName: "createdDateFrom" });
+    const safeCreatedDateTo = toOptionalDateText(filters.createdDateTo, { fieldName: "createdDateTo" });
+
+    if (safeCreatedDateFrom && safeCreatedDateTo && safeCreatedDateFrom > safeCreatedDateTo) {
+      throw new ErrorResponse(400, "createdDateFrom cannot be greater than createdDateTo");
+    }
+
+    return findSubmissionsBySearchFilters({
+      loggedInUserId: user.id,
+      loggedInUserRoles: roles,
+      page: filters.page,
+      limit: filters.limit,
+      title: safeTitle,
+      topics: safeTopics,
+      doi: safeDoi,
+      conferenceId: safeConferenceId,
+      statuses: safeStatuses,
+      ownerUsrId: isAdmin ? ownerUsrIdFromInput : user.id,
+      createdDateFrom: safeCreatedDateFrom,
+      createdDateTo: safeCreatedDateTo,
+      excludeDeleted: !isAdmin,
     });
   }
 
@@ -223,6 +274,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
 
   return {
     getSubmissionsByUserIdAndRoles,
+    searchSubmissions,
     getSubmissionById,
     saveSubmission,
     updateSubmissionDoiById,

@@ -22,7 +22,40 @@ Example:
 /api/v1/submissions?page=2&limit=10
 ```
 
-## 2. Save Submission
+## 2. Search Submissions
+
+**GET /search**
+Access: USER/ADMIN
+
+### Request Params
+
+Optional:
+
+- page _(default to 1)_
+- limit _(default to 10)_
+- title (text)
+- topics (text[])
+- doi (text)
+- conferenceId (integer)
+- status (integer[])
+- ownerUsrId (integer), ADMIN only
+- createdDateFrom (date in YYYY-MM-DD)
+- createdDateTo (date in YYYY-MM-DD)
+
+Notes:
+
+- `status` values are validated against `CONTENT_SUBMISSION_STATUS`.
+- USER cannot pass `DELETED` in `status`.
+- USER is always filtered by logged-in `ownerUsrId`.
+- USER always excludes `DELETED` submissions.
+
+Example:
+
+```perl
+/api/v1/submissions/search?page=1&limit=10&title=graph&status=1,2&conferenceId=5&createdDateFrom=2026-06-01&createdDateTo=2026-06-30
+```
+
+## 3. Save Submission
 
 **POST /**
 Access: USER
@@ -52,7 +85,7 @@ Example:
 }
 ```
 
-## 3. Get Submission by ID
+## 4. Get Submission by ID
 
 **GET /:id**
 Access: USER/ADMIN/REVIEWER
@@ -63,7 +96,7 @@ Required:
 
 - id
 
-## 4. Update Submission DOI
+## 5. Update Submission DOI
 
 **PUT /:id/doi**
 Access: ADMIN, for APPROVED submissions only.
@@ -82,7 +115,7 @@ Example:
 }
 ```
 
-## 5. Update Submission Status
+## 6. Update Submission Status
 
 **PUT /:id/status**
 Access: ADMIN

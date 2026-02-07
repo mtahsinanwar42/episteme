@@ -30,6 +30,45 @@ export const getSubmissions = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Search submissions
+// @route   GET /api/v1/submissions/search
+// @access  Private
+export const searchSubmissions = asyncHandler(async (req, res) => {
+  const {
+    page = DEFAULT_PAGE_NO,
+    limit = DEFAULT_PAGE_LIMIT,
+    title,
+    topics,
+    doi,
+    conferenceId,
+    status,
+    ownerUsrId,
+    createdDateFrom,
+    createdDateTo,
+  } = req.query;
+
+  const submissions = await submissionService.searchSubmissions(req.user, {
+    page,
+    limit,
+    title,
+    topics,
+    doi,
+    conferenceId,
+    status,
+    ownerUsrId,
+    createdDateFrom,
+    createdDateTo,
+  });
+
+  return res.status(200).json({
+    success: true,
+    page: submissions.page,
+    limit: submissions.limit,
+    total: submissions.total,
+    data: submissions.data,
+  });
+});
+
 // @desc    Get submission by id
 // @route   GET /api/v1/submissions/:id
 // @access  Private

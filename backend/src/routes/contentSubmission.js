@@ -1,5 +1,5 @@
 import express from 'express';
-import { getSubmissions, getSubmission, updateSubmissionStatus, updateSubmissionDoi, saveSubmission } from '../controllers/contentSubmission.js';
+import { getSubmissions, searchSubmissions, getSubmission, updateSubmissionStatus, updateSubmissionDoi, saveSubmission } from '../controllers/contentSubmission.js';
 import { getSubmissionVersions, saveSubmissionVersion } from '../controllers/contentSubmissionVersion.js';
 import { authenticate, authorize } from '../middlewares/auth.js';
 import { getSubmissionMessages, saveSubmissionMessage } from '../controllers/contentSubmissionMessage.js';
@@ -13,6 +13,10 @@ router
   .route('/')
   .get(authorize(USER_ROLE.USER, USER_ROLE.ADMIN), getSubmissions)
   .post(authorize(USER_ROLE.USER), saveSubmission);
+
+router
+  .route('/search')
+  .get(authorize(USER_ROLE.USER, USER_ROLE.ADMIN), searchSubmissions);
 
 router
   .route('/:id')
