@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
 
 interface StatusUpdateModalProps {
   open: boolean;
@@ -35,6 +36,7 @@ export function StatusUpdateModal({
   const [selectedStatus, setSelectedStatus] = useState<number>(1);
   const [statusUpdateNotes, setStatusUpdateNotes] = useState<string>("");
   const updateStatusMutation = useUserDetailsMutation();
+  const { showSuccessToast } = useSuccessToast();
 
   useEffect(() => {
     if (selectedUser) {
@@ -57,7 +59,7 @@ export function StatusUpdateModal({
       {
         onSuccess: () => {
           onClose();
-          console.log("User status updated successfully");
+          showSuccessToast("User status updated successfully.");
         },
         onError: (error) => {
           console.error("Error updating user status:", error);

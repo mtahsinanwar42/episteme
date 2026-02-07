@@ -16,6 +16,13 @@ export const fileService = {
     if (params?.select) queryParams.append("select", params.select);
     if (params?.paginate !== undefined)
       queryParams.append("paginate", params.paginate.toString());
+    if (params?.name) queryParams.append("name[iLike]", params.name);
+    if (params?.storageKey)
+      queryParams.append("storageKey[iLike]", params.storageKey);
+    if (params?.createdAtFrom)
+      queryParams.append("createdAt[gte]", params.createdAtFrom);
+    if (params?.createdAtTo)
+      queryParams.append("createdAt[lte]", `${params.createdAtTo}T23:59:59`);
 
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/files?${queryString}` : "/files";

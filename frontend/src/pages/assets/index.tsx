@@ -133,7 +133,14 @@ export default function Assets() {
         <PageTitle title="Assets" />
         <PageSubTitle text="View and manage all assets" />
         {currentRoles?.includes(UserRole.ADMIN) && (
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/assets/search")}
+              className="mb-4 px-4 py-2"
+            >
+              Advanced Search
+            </Button>
             <Button
               onClick={() => navigate("/assets/new")}
               className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
@@ -152,7 +159,7 @@ export default function Assets() {
           error={error ? (error as Error).message : null}
           pageSize={pageSize}
           enableSearch
-          searchPlaceholder="Search Assets"
+          searchPlaceholder="Filter Assets"
         />
 
         {!isLoading && !error && total > 0 && (

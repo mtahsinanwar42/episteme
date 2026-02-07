@@ -85,7 +85,16 @@ export interface GetConferencesParams {
   select?: string;
   search?: string;
   paginate?: boolean;
+  title?: string;
+  slug?: string;
+  status?: number;
   statusIn?: string;
+  startAtFrom?: string;
+  startAtTo?: string;
+  submissionStartAtFrom?: string;
+  submissionStartAtTo?: string;
+  createdAtFrom?: string;
+  createdAtTo?: string;
 }
 
 export interface CreateConferenceRequest {

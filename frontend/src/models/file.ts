@@ -14,6 +14,10 @@ export interface GetFilesParams {
   select?: string;
   search?: string;
   paginate?: boolean;
+  name?: string;
+  storageKey?: string;
+  createdAtFrom?: string;
+  createdAtTo?: string;
 }
 
 export interface FileResponse {

@@ -22,7 +22,7 @@ import PageSubTitle from '@/components/common/PageSubTitle';
 import { LoadingOverlay } from '@/components/common/LoadingOverlay';
 import { fileService } from '@/services/fileService';
 import { FileTypeEnum } from '@/models/file';
-import { FileText, Loader2 } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { FileUploadField } from '@/components/common/FileUploadField';
 import { useSuccessToast } from '@/hooks/useSuccessToast';
 import { formatDateForInput, formatDateFromInput } from '@/utils/dateFormatter';
@@ -218,8 +218,8 @@ export default function EditConference() {
 
   if (isLoadingConference) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="relative h-64 rounded-lg border border-border bg-card shadow-md">
+        <LoadingOverlay visible />
       </div>
     );
   }

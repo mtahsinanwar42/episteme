@@ -42,6 +42,10 @@ export interface GetBlogsParams {
   search?: string;
   paginate?: boolean;
   status?: number;
+  statusIn?: string;
+  title?: string;
+  createdAtFrom?: string;
+  createdAtTo?: string;
 }
 
 export interface CreateBlogRequest {
