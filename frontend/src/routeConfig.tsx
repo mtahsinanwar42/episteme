@@ -17,25 +17,32 @@ import Blogs from "@/pages/blogs";
 import Register from "@/pages/register";
 import UserDetails from "@/pages/users/details";
 import NewUser from "@/pages/users/new";
+import UserSearch from "@/pages/users/search";
 import Assets from "@/pages/assets";
 import AssetDetails from "@/pages/assets/details";
 import NewAsset from "@/pages/assets/new";
+import AssetSearch from "@/pages/assets/search";
 import Activities from "@/pages/activities";
+import ActivitySearch from "@/pages/activities/search";
 import ActivityDetails from "@/pages/activities/details";
 import NewActivity from "@/pages/activities/new";
 import EditActivity from "@/pages/activities/edit";
 import TrainingDetails from "@/pages/trainings/details";
 import NewTraining from "@/pages/trainings/new";
 import EditTraining from "@/pages/trainings/edit";
+import TrainingSearch from "@/pages/trainings/search";
 import AnnouncementDetails from "@/pages/announcements/details";
 import NewAnnouncement from "@/pages/announcements/new";
 import EditAnnouncement from "@/pages/announcements/edit";
+import AnnouncementSearch from "@/pages/announcements/search";
 import BlogDetails from "@/pages/blogs/details";
 import NewBlog from "@/pages/blogs/new";
 import EditBlog from "@/pages/blogs/edit";
+import BlogSearch from "@/pages/blogs/search";
 import ConferenceDetails from "@/pages/conferences/details";
 import NewConference from "@/pages/conferences/new";
 import EditConference from "@/pages/conferences/edit";
+import ConferenceSearch from "@/pages/conferences/search";
 import { aboutPageFlags } from "@/config/featureFlags";
 import Unauthorized from "@/pages/misc/unauthorized";
 import NotFound from "@/pages/misc/notFound";
@@ -88,6 +95,14 @@ export default function RouteConfig() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/users/search"
+        element={
+          <ProtectedRoute>
+            <UserSearch />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/users/:userId"
@@ -103,6 +118,14 @@ export default function RouteConfig() {
         element={
           <ProtectedRoute>
             <Assets />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/assets/search"
+        element={
+          <ProtectedRoute>
+            <AssetSearch />
           </ProtectedRoute>
         }
       />
@@ -124,6 +147,7 @@ export default function RouteConfig() {
       />
 
       <Route path="/activities" element={<Activities />} />
+      <Route path="/activities/search" element={<ActivitySearch />} />
       <Route path="/activities/:activityId" element={<ActivityDetails />} />
       <Route
         path="/activities/new"
@@ -143,6 +167,7 @@ export default function RouteConfig() {
       />
 
       <Route path="/trainings" element={<Trainings />} />
+      <Route path="/trainings/search" element={<TrainingSearch />} />
       <Route path="/trainings/:trainingId" element={<TrainingDetails />} />
       <Route
         path="/trainings/new"
@@ -162,6 +187,7 @@ export default function RouteConfig() {
       />
 
       <Route path="/announcements" element={<Announcements />} />
+      <Route path="/announcements/search" element={<AnnouncementSearch />} />
       <Route
         path="/announcements/:announcementId"
         element={<AnnouncementDetails />}
@@ -184,6 +210,7 @@ export default function RouteConfig() {
       />
 
       <Route path="/conferences" element={<Conferences />} />
+      <Route path="/conferences/search" element={<ConferenceSearch />} />
       <Route
         path="/conferences/:conferenceId"
         element={<ConferenceDetails />}
@@ -208,6 +235,7 @@ export default function RouteConfig() {
       />
 
       <Route path="/blogs" element={<Blogs />} />
+      <Route path="/blogs/search" element={<BlogSearch />} />
       <Route path="/blogs/:blogId" element={<BlogDetails />} />
       <Route
         path="/blogs/new"

@@ -134,8 +134,8 @@ const adminNavItems: NavItemConfig[] = [
     href: "/submissions",
   },
   {
-    label: "Reviewer Assignments",
-    href: "/reviewer/review-assignments",
+    label: "Review Assignments",
+    href: "/review-assignments",
   },
   {
     label: "Conferences",

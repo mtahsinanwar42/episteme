@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getConferenceStatusLabel } from "@/components/common/ConferenceStatusBadge";
+import { useSuccessToast } from "@/hooks/useSuccessToast";
 
 interface ConferenceStatusUpdateModalProps {
   open: boolean;
@@ -36,6 +37,7 @@ export function ConferenceStatusUpdateModal({
   const [selectedStatus, setSelectedStatus] = useState<number>(
     ConferenceStatus.ACTIVE,
   );
+  const { showSuccessToast } = useSuccessToast();
   const updateStatusMutation = useUpdateConferenceStatusMutation(
     selectedConference?.id ?? "",
   );
@@ -56,6 +58,7 @@ export function ConferenceStatusUpdateModal({
       {
         onSuccess: () => {
           onClose();
+          showSuccessToast("Conference status updated successfully.");
         },
         onError: (error) => {
           console.error("Error updating conference status:", error);

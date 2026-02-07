@@ -10,12 +10,14 @@ import type { RootState } from "@/stores/store";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 
 export default function Trainings() {
   const navigate = useNavigate();
   const currentRoles = useSelector(
     (state: RootState) => state?.auth?.user?.roles,
   );
+  const isAdmin = currentRoles?.includes(UserRole.ADMIN);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(9); // 3 cards x 3 rows by default
@@ -61,19 +63,26 @@ export default function Trainings() {
           <PageSubTitle text="Professional development and training programs" />
         </div>
 
-        {currentRoles?.includes(UserRole.ADMIN) && (
-          <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/trainings/search")}
+            className="mb-4 px-4 py-2"
+          >
+            Advanced Search
+          </Button>
+          {isAdmin && (
             <Button
               onClick={() => navigate("/trainings/new")}
               className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
             >
               Add New Training
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {isLoading && <div className="text-slate-600">Loading trainings...</div>}
+      {isLoading && <LoadingOverlay visible />}
       {error && <div className="text-red-600">{(error as Error).message}</div>}
 
       {!isLoading && !error && trainings.length === 0 && (

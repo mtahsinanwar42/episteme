@@ -70,7 +70,7 @@ export default function HomeActivitySection() {
       <div className="text-center">
         <Link
           to="/activities"
-          className="inline-block bg-linear-to-r from-emerald-600 to-teal-500 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition-all"
+          className="inline-block bg-linear-to-r from-purple-600 to-pink-500 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition-all"
         >
           See All Activities
         </Link>

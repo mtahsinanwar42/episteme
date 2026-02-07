@@ -12,6 +12,7 @@ import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import type { Conference } from "@/models/conference";
 import { ConferenceStatusUpdateModal } from "@/components/conference/ConferenceStatusUpdateModal";
+import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 
 export default function Conferences() {
   const navigate = useNavigate();
@@ -72,20 +73,27 @@ export default function Conferences() {
           <PageSubTitle text="Browse upcoming and past conferences" />
         </div>
 
-        {currentRoles?.includes(UserRole.ADMIN) && (
-          <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/conferences/search")}
+            className="mb-4 px-4 py-2"
+          >
+            Advanced Search
+          </Button>
+          {currentRoles?.includes(UserRole.ADMIN) && (
             <Button
               onClick={() => navigate("/conferences/new")}
               className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
             >
               Add New Conference
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {isLoading && (
-        <div className="text-slate-600">Loading conferences...</div>
+          <LoadingOverlay visible />
       )}
       {error && <div className="text-red-600">{(error as Error).message}</div>}
 

@@ -44,6 +44,9 @@ export interface GetAnnouncementsParams {
   paginate?: boolean;
   status?: number;
   statusIn?: string;
+  title?: string;
+  createdAtFrom?: string;
+  createdAtTo?: string;
 }
 
 export interface CreateAnnouncementRequest {
