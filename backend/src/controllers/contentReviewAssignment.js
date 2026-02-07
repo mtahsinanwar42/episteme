@@ -43,6 +43,47 @@ export const getMyReviewAssignments = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Search review assignments
+// @route   GET /api/v1/review-assignments/search
+// @access  Private
+export const searchReviewAssignments = asyncHandler(async (req, res) => {
+  const {
+    page = DEFAULT_PAGE_NO,
+    limit = DEFAULT_PAGE_LIMIT,
+    submissionTitle,
+    submissionStatuses,
+    submissionOwnerUsrIds,
+    conferenceId,
+    reviewerUsrIds,
+    assignmentStatuses,
+    assignedByUsrIds,
+    assignedDateFrom,
+    assignedDateTo,
+  } = req.query;
+
+  const assignments = await reviewAssignmentService.searchReviewAssignments(req.user, {
+    page,
+    limit,
+    submissionTitle,
+    submissionStatuses,
+    submissionOwnerUsrIds,
+    conferenceId,
+    reviewerUsrIds,
+    assignmentStatuses,
+    assignedByUsrIds,
+    assignedDateFrom,
+    assignedDateTo,
+  });
+
+  return res.status(200).json({
+    success: true,
+    page: assignments.page,
+    limit: assignments.limit,
+    total: assignments.total,
+    data: assignments.data,
+  });
+});
+
 // @desc    Save review assignment status
 // @route   POST /api/v1/review-assignments
 // @access  Private

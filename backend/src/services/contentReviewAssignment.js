@@ -1,8 +1,9 @@
 import { Op } from "sequelize";
-import { canCreateReviewAssignment, canUpdateReviewAssignmentStatus, findReviewAssignments, findReviewAssignmentsByUserId } from "../repositories/contentReviewAssignment.js";
+import { canCreateReviewAssignment, canUpdateReviewAssignmentStatus, findReviewAssignments, findReviewAssignmentsBySearchFilters, findReviewAssignmentsByUserId } from "../repositories/contentReviewAssignment.js";
 import { CONTENT_SUBMISSION_STATUS, REVIEW_ASSIGNMENT_STATUS, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
-import { isNotEmpty } from "../utils/string.js";
+import { isEmpty, isNotEmpty } from "../utils/string.js";
+import { normalizeNumberArray, toOptionalDateText, toOptionalInteger } from "../utils/search.js";
 
 export function createReviewAssignmentService({ ContentReviewAssignment, ContentSubmission, User, fileService, emailPublisher }) {
   if (!ContentReviewAssignment) {
@@ -31,6 +32,68 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
 
   async function getReviewAssignments(page, limit) {
     return findReviewAssignments({ page, limit });
+  }
+
+  async function searchReviewAssignments(user, filters) {
+    const roles = Array.isArray(user.roles) ? user.roles : [];
+    const isAdmin = roles.includes(USER_ROLE.ADMIN);
+    const isReviewer = roles.includes(USER_ROLE.REVIEWER);
+
+    const safeSubmissionTitle = isEmpty(filters.submissionTitle) ? null : String(filters.submissionTitle).trim();
+    const safeSubmissionStatuses = normalizeNumberArray(filters.submissionStatuses, { fieldName: "submissionStatuses" });
+    const safeAssignmentStatuses = normalizeNumberArray(filters.assignmentStatuses, { fieldName: "assignmentStatuses" });
+
+    if (safeSubmissionStatuses != null && safeSubmissionStatuses.some((s) => !Object.values(CONTENT_SUBMISSION_STATUS).includes(s))) {
+      throw new ErrorResponse(400, "Invalid submission status");
+    }
+
+    if (safeAssignmentStatuses != null && safeAssignmentStatuses.some((s) => !Object.values(REVIEW_ASSIGNMENT_STATUS).includes(s))) {
+      throw new ErrorResponse(400, "Invalid assignment status");
+    }
+
+    if (isReviewer) {
+      if (safeSubmissionStatuses?.includes(CONTENT_SUBMISSION_STATUS.DELETED)) {
+        throw new ErrorResponse(400, "DELETED submission status is not accepted for reviewer search");
+      }
+
+      if (safeAssignmentStatuses?.includes(REVIEW_ASSIGNMENT_STATUS.DELETED)) {
+        throw new ErrorResponse(400, "DELETED assignment status is not accepted for reviewer search");
+      }
+    }
+
+    const safeConferenceId = toOptionalInteger(filters.conferenceId, { fieldName: "conferenceId" });
+    const safeAssignedByUsrIds = normalizeNumberArray(filters.assignedByUsrIds, { fieldName: "assignedByUsrIds" });
+
+    const safeSubmissionOwnerUsrIds = normalizeNumberArray(filters.submissionOwnerUsrIds, { fieldName: "submissionOwnerUsrIds" });
+    const safeReviewerUsrIds = normalizeNumberArray(filters.reviewerUsrIds, { fieldName: "reviewerUsrIds" });
+
+    if (isReviewer && (safeSubmissionOwnerUsrIds != null || safeReviewerUsrIds != null)) {
+      throw new ErrorResponse(400, "submissionOwnerUsrIds and reviewerUsrIds are admin-only filters");
+    }
+
+    const safeAssignedDateFrom = toOptionalDateText(filters.assignedDateFrom, { fieldName: "assignedDateFrom" });
+    const safeAssignedDateTo = toOptionalDateText(filters.assignedDateTo, { fieldName: "assignedDateTo" });
+
+    if (safeAssignedDateFrom && safeAssignedDateTo && safeAssignedDateFrom > safeAssignedDateTo) {
+      throw new ErrorResponse(400, "assignedDateFrom cannot be greater than assignedDateTo");
+    }
+
+    return findReviewAssignmentsBySearchFilters({
+      loggedInUserId: user.id,
+      loggedInUserRoles: roles,
+      page: filters.page,
+      limit: filters.limit,
+      submissionTitle: safeSubmissionTitle,
+      submissionStatuses: safeSubmissionStatuses,
+      submissionOwnerUsrIds: safeSubmissionOwnerUsrIds,
+      conferenceId: safeConferenceId,
+      reviewerUsrIds: safeReviewerUsrIds,
+      assignmentStatuses: safeAssignmentStatuses,
+      assignedByUsrIds: safeAssignedByUsrIds,
+      assignedDateFrom: safeAssignedDateFrom,
+      assignedDateTo: safeAssignedDateTo,
+      isAdmin,
+    });
   }
 
   async function saveReviewAssignment(user, payload) {
@@ -220,6 +283,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
   return {
     getMyReviewAssignments,
     getReviewAssignments,
+    searchReviewAssignments,
     saveReviewAssignment,
     updateReviewAssignmentStatusById,
   };

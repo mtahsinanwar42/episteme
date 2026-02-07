@@ -1,6 +1,6 @@
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
-import { REVIEW_ASSIGNMENT_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS } from "../utils/constants.js";
+import { REVIEW_ASSIGNMENT_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, USER_ROLE } from "../utils/constants.js";
 
 const GET_REVIEW_ASSIGNMENTS_BASE_SELECT = `
   SELECT
@@ -102,6 +102,111 @@ export async function findReviewAssignments({ page, limit }) {
       limit: limitNum,
       offset,
     },
+  });
+
+  return {
+    page: pageNum,
+    limit: limitNum,
+    total: rows.length ? Number(rows[0].total) : 0,
+    data: rows.map(({ total, ...row }) => row),
+  };
+}
+
+export async function findReviewAssignmentsBySearchFilters({
+  loggedInUserId,
+  loggedInUserRoles,
+  page = DEFAULT_PAGE_NO,
+  limit = DEFAULT_PAGE_LIMIT,
+  submissionTitle,
+  submissionStatuses,
+  submissionOwnerUsrIds,
+  conferenceId,
+  reviewerUsrIds,
+  assignmentStatuses,
+  assignedByUsrIds,
+  assignedDateFrom,
+  assignedDateTo,
+  isAdmin = false,
+}) {
+  const pageNum = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
+  const limitNum = Math.min(100, Math.max(1, Number(limit) || DEFAULT_PAGE_LIMIT));
+  const offset = (pageNum - 1) * limitNum;
+
+  const roles = Array.isArray(loggedInUserRoles) ? loggedInUserRoles : [];
+  const adminMode = isAdmin || roles.includes(USER_ROLE.ADMIN);
+
+  const replacements = {
+    limit: limitNum,
+    offset,
+  };
+
+  const where = [];
+
+  if (!adminMode) {
+    where.push(`CRA.reviewer_usr_id = :reviewerUserId`);
+    where.push(`CRA.status <> :deletedAssignmentStatus`);
+    where.push(`CS.current_status <> :deletedSubmissionStatus`);
+    replacements.reviewerUserId = Number(loggedInUserId);
+    replacements.deletedAssignmentStatus = REVIEW_ASSIGNMENT_STATUS.DELETED;
+    replacements.deletedSubmissionStatus = CONTENT_SUBMISSION_STATUS.DELETED;
+  }
+
+  if (submissionTitle != null) {
+    where.push(`CS.title ILIKE :submissionTitle`);
+    replacements.submissionTitle = `%${submissionTitle}%`;
+  }
+
+  if (submissionStatuses != null) {
+    where.push(`CS.current_status IN (:submissionStatuses)`);
+    replacements.submissionStatuses = submissionStatuses;
+  }
+
+  if (submissionOwnerUsrIds != null) {
+    where.push(`OW.id IN (:submissionOwnerUsrIds)`);
+    replacements.submissionOwnerUsrIds = submissionOwnerUsrIds;
+  }
+
+  if (conferenceId != null) {
+    where.push(`CS.conference_id = :conferenceId`);
+    replacements.conferenceId = conferenceId;
+  }
+
+  if (reviewerUsrIds != null) {
+    where.push(`REV.id IN (:reviewerUsrIds)`);
+    replacements.reviewerUsrIds = reviewerUsrIds;
+  }
+
+  if (assignmentStatuses != null) {
+    where.push(`CRA.status IN (:assignmentStatuses)`);
+    replacements.assignmentStatuses = assignmentStatuses;
+  }
+
+  if (assignedByUsrIds != null) {
+    where.push(`CRA.assigned_by_usr_id IN (:assignedByUsrIds)`);
+    replacements.assignedByUsrIds = assignedByUsrIds;
+  }
+
+  if (assignedDateFrom != null) {
+    where.push(`CRA.assigned_at >= :assignedDateFrom::DATE`);
+    replacements.assignedDateFrom = assignedDateFrom;
+  }
+
+  if (assignedDateTo != null) {
+    where.push(`CRA.assigned_at < (:assignedDateTo::DATE + INTERVAL '1 day')`);
+    replacements.assignedDateTo = assignedDateTo;
+  }
+
+  const sql = `
+    ${GET_REVIEW_ASSIGNMENTS_BASE_SELECT}
+    ${GET_REVIEW_ASSIGNMENTS_BASE_FROM_JOINS}
+    ${where.length ? `WHERE ${where.join("\n      AND ")}` : ``}
+    ORDER BY CRA.assigned_at DESC
+    LIMIT :limit OFFSET :offset;
+  `;
+
+  const rows = await sequelize.query(sql, {
+    type: QueryTypes.SELECT,
+    replacements,
   });
 
   return {
