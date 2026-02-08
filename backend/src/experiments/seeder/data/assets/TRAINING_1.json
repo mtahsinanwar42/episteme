@@ -1,0 +1,19 @@
+{
+  "type": "training",
+  "heroImagePath": "storage/public/assets/IMG_7.jpg",
+  "summary": "A practical training on building reliable backend APIs: validation, error handling, pagination, querying, and designing endpoints that stay maintainable as features grow.",
+  "sections": [
+    {
+      "heading": "Training goals",
+      "content": "## Backend API Design for Real Systems\n\nThis training focuses on patterns you can apply immediately:\n\n- consistent request validation\n- predictable error shapes\n- pagination and advanced querying\n- idempotency and safe updates\n- clean service/repo boundaries\n\nWe will use realistic examples and discuss trade-offs—no toy-only advice.\n"
+    },
+    {
+      "heading": "Curriculum",
+      "content": "### Modules\n\n1. **API resources and naming**\n   - routes, nouns vs verbs, versioning\n\n2. **Validation strategy**\n   - server-side rules, edge cases, helpful errors\n\n3. **Pagination and search**\n   - limit/offset vs cursor, filters, sorting\n\n4. **Update semantics**\n   - PATCH vs PUT, partial updates, audit notes\n\n5. **Observability basics**\n   - logs, metrics, debugging production issues\n"
+    },
+    {
+      "heading": "Hands-on work",
+      "content": "## Workshop exercises\n\nYou’ll implement:\n\n- a list endpoint with filters + pagination\n- an update endpoint with a status transition\n- a small test suite to prevent regressions\n\nWe end with a review of common mistakes and a template you can copy into your own project.\n"
+    }
+  ]
+}

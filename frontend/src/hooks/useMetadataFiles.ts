@@ -7,11 +7,11 @@ export function useMetadataFile({
   enabled = true,
 }: {
   filePath: string;
-  resourceId: string | number;
+  resourceId?: string | number;
   enabled?: boolean;
 }) {
   return useQuery({
-    queryKey: ["metadataFile", resourceId],
+    queryKey: ["metadataFile", resourceId ?? "no-resource-id", filePath],
     queryFn: () => fileService.getMetadataFile(filePath),
     staleTime: 1000 * 60 * 60, // 1 hour
     gcTime: 1000 * 60 * 60 * 24, // 24 hours (formerly cacheTime)

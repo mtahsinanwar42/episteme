@@ -1,0 +1,23 @@
+{
+  "type": "activity",
+  "heroImagePath": "storage/public/assets/IMG_2.jpg",
+  "summary": "A mini ‘systems design gym’ where participants practice designing a production-ready feature end-to-end, including data model, APIs, failure modes, and observability.",
+  "sections": [
+    {
+      "heading": "Theme",
+      "content": "## Systems Design Gym: Shipping a Feature\n\nThe theme for this session: **“Submit, review, and publish content safely at scale.”**\n\nWe’ll treat this like a real product:\n\n- user journeys and edge cases\n- data model decisions\n- async workflows (emails, payments, status changes)\n- concurrency issues\n- operational concerns (monitoring, rollback)\n\nThis is not an exam—it's a collaborative practice session.\n"
+    },
+    {
+      "heading": "Exercise format",
+      "content": "### How we work\n\n- You’ll join a small group (3–5 people)\n- Each group gets the same problem brief\n- We design in rounds, each round adds constraints\n\n#### Rounds\n\n1. **Happy path**: basic design\n2. **Constraints**: rate limits, retries, partial failures\n3. **Scale**: pagination, indexing, caching, batching\n4. **Operations**: dashboards, alerts, runbooks\n\nAt the end, each group presents a diagram and key decisions.\n"
+    },
+    {
+      "heading": "What we cover",
+      "content": "## Topics we’ll likely touch\n\n- API resource design and versioning\n- status machines and audit trails\n- idempotency keys and de-duplication\n- outbox pattern vs direct publish to Kafka\n- data modeling choices (TIMESTAMPTZ, constraints)\n- observability: logs, metrics, tracing, SLOs\n\n> You can bring your own domain too; the format stays the same.\n"
+    },
+    {
+      "heading": "Takeaways",
+      "content": "### Deliverables\n\nYou’ll get:\n\n- a reusable design template (problem → assumptions → APIs → data → workflows → ops)\n- a sample reference design we share after the session\n- a set of common pitfalls and how to avoid them\n\nIf you want, we can also collect best answers into a community playbook.\n"
+    }
+  ]
+}

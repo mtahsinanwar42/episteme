@@ -1,0 +1,23 @@
+{
+  "type": "blog",
+  "heroImagePath": "storage/public/assets/IMG_4.jpg",
+  "summary": "A practical guide to designing status-driven workflows (draft → review → publish) without creating a tangled mess of ad-hoc conditions, including auditability and safe transitions.",
+  "sections": [
+    {
+      "heading": "Why statuses become messy",
+      "content": "## The Hidden Cost of “Just Add a Status”\n\nStatuses start simple: **DRAFT → SUBMITTED → APPROVED**.\n\nThen reality arrives:\n\n- payments\n- revisions\n- reviewer assignment\n- rejections with notes\n- time windows\n- retries and email notifications\n\nSoon you have scattered `if/else` blocks across controllers, workers, and cron jobs.\n\nThis post explains how to model statuses as a **state machine** backed by explicit transitions and a clean audit trail.\n"
+    },
+    {
+      "heading": "A state machine approach",
+      "content": "### A pragmatic model\n\nStart with:\n\n- a `current_status` field\n- a transition table / configuration\n- an append-only history log for status changes\n\n#### Key idea\n\nEvery status change must be:\n\n- validated (`from` → `to` allowed)\n- attributable (who/what changed it)\n- explainable (notes, reason code)\n\n> If you can’t explain a transition, you can’t operate it reliably.\n"
+    },
+    {
+      "heading": "Operational concerns",
+      "content": "## The operator’s checklist\n\nWhen you ship state machines, ship operations too:\n\n- metrics: transitions per status per hour\n- alerts: “stuck” items (e.g., SUBMITTED for > 72h)\n- dashboards: funnel conversion and failure reasons\n- audit: who changed status, from where, with what notes\n\nFinally, we discuss how event-driven propagation (Kafka) can help, and where it can hurt if you skip idempotency.\n"
+    },
+    {
+      "heading": "Closing thoughts",
+      "content": "### Keep it boring\n\nThe goal is not to build an academic FSM framework.\n\nThe goal is to keep status changes:\n\n- explicit\n- testable\n- observable\n- reversible when possible\n\nIf you adopt only one thing: create a single **transition function** that every component must use.\n"
+    }
+  ]
+}

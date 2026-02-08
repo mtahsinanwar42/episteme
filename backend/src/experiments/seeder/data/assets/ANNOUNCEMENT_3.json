@@ -1,0 +1,19 @@
+{
+  "type": "announcement",
+  "heroImagePath": "storage/public/assets/IMG_12.jpg",
+  "summary": "We’re opening early access for reviewers and program committee members, including new tools for reviewing submissions and leaving structured feedback.",
+  "sections": [
+    {
+      "heading": "Early access",
+      "content": "## Reviewer early access is open\n\nWe’re inviting a small group of reviewers and program committee members to try the reviewing workflow.\n\nEarly access helps us validate:\n\n- assignment visibility and filtering\n- review submission UX\n- feedback structure and clarity\n- edge cases (withdrawals, revisions, conflicts)\n\nIf you enjoy improving processes, your feedback will have real impact.\n"
+    },
+    {
+      "heading": "What reviewers can do",
+      "content": "### Reviewer tools included\n\n- view assigned items\n- leave structured comments\n- track review status\n- communicate clarifications via notes\n\nWe’re intentionally keeping the workflow minimal, so we can make it excellent before adding more.\n"
+    },
+    {
+      "heading": "How to join",
+      "content": "## Getting access\n\nTo join early access:\n\n- ensure your account email matches your reviewer invitation\n- complete your profile (name + affiliation)\n- follow the onboarding message you received\n\n> If you believe you should have access but don’t, contact support with your email address.\n"
+    }
+  ]
+}

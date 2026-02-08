@@ -9,8 +9,18 @@ import { authService } from "@/services/authService";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import Cookies from "js-cookie";
 
+function sanitizeRedirectUrl(rawValue: string | null): string {
+  if (!rawValue) return "/";
+
+  if (!rawValue.startsWith("/")) return "/";
+  if (rawValue.startsWith("//")) return "/";
+
+  return rawValue;
+}
+
 function Login() {
   const token = useSelector((state: RootState) => state.auth.token);
+  const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -18,6 +28,9 @@ function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const redirectUrl = sanitizeRedirectUrl(
+    new URLSearchParams(location.search).get("redirectUrl"),
+  );
 
   const handleEmailPasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,14 +47,14 @@ function Login() {
           sameSite: "strict",
         });
 
-        await dispatch(setToken(response.token));
+        dispatch(setToken(response.token));
 
         // Fetch user details
         const userDetailsResponse = await authService.getLoggedInUserDetails();
         if (userDetailsResponse.success && userDetailsResponse.data) {
           dispatch(setUser(userDetailsResponse.data));
           dispatch(setLoading(false));
-          navigate("/");
+          navigate(redirectUrl, { replace: true });
         }
       }
     } catch (error) {
@@ -61,10 +74,10 @@ function Login() {
   }, [location]);
 
   useEffect(() => {
-    if (token) {
-      navigate("/");
+    if (token && user) {
+      navigate(redirectUrl, { replace: true });
     }
-  }, [token, navigate]);
+  }, [token, user, redirectUrl, navigate]);
 
   return (
     <div className="h-full flex items-center justify-center">
