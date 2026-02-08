@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Breadcrumb } from '@/components/common/Breadcrumb';
 import { contactService } from '@/services/contactService';
 import { LoadingOverlay } from '@/components/common/LoadingOverlay';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -106,73 +108,85 @@ export default function Contact() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold mb-2">Name</label>
-                <input
+          <form onSubmit={handleSubmit} className="max-w-2xl space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="flex flex-col space-y-2">
+                <label htmlFor="name" className="text-sm font-medium">
+                  Name *
+                </label>
+                <Input
+                  id="name"
                   type="text"
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Your name"
+                  disabled={submitting}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Email
+              <div className="flex flex-col space-y-2">
+                <label htmlFor="email" className="text-sm font-medium">
+                  Email *
                 </label>
-                <input
+                <Input
+                  id="email"
+                  type="email"
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="your@email.com"
+                  disabled={submitting}
                 />
                 {form.email && !isEmailValid && (
-                  <p className="text-red-400 text-sm mt-1">
+                  <p className="text-red-400 text-xs">
                     Please enter a valid email address.
                   </p>
                 )}
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold mb-2">
-                Subject
+            <div className="flex flex-col space-y-2">
+              <label htmlFor="subject" className="text-sm font-medium">
+                Subject *
               </label>
-              <input
+              <Input
+                id="subject"
                 type="text"
                 name="subject"
                 value={form.subject}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="What is this about?"
+                disabled={submitting}
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold mb-2">
-                Message
+            <div className="flex flex-col space-y-2">
+              <label htmlFor="message" className="text-sm font-medium">
+                Message *
               </label>
               <textarea
+                id="message"
                 name="message"
                 value={form.message}
                 onChange={handleChange}
                 rows={5}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full ps-3 pe-3 py-2.5 text-heading text-sm rounded-lg border border-accent focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 placeholder:text-body"
                 placeholder="Tell us more..."
+                disabled={submitting}
               ></textarea>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={!isFormValid || submitting}
-              className="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-8 py-3 rounded-lg font-semibold enabled:hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full text-foreground! shadow-lg enabled:hover:brightness-105"
+              style={{
+                background:
+                  'linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)',
+              }}
             >
               {submitting ? 'Sending...' : 'Send'}
-            </button>
+            </Button>
           </form>
         </div>
       </section>

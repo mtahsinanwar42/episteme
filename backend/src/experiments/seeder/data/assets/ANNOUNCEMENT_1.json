@@ -1,0 +1,19 @@
+{
+  "type": "announcement",
+  "heroImagePath": "storage/public/assets/IMG_10.jpg",
+  "summary": "We’ve launched the first MVP of Episteme with core flows for content submission, browsing public components, and account management—plus a roadmap for the next iteration.",
+  "sections": [
+    {
+      "heading": "What’s live",
+      "content": "## Episteme MVP is now live\n\nThe first MVP release focuses on a clean foundation:\n\n- user registration and login\n- browsing conferences, trainings, blogs, activities, announcements\n- creating and managing submissions\n- basic moderation workflow\n\nWe’ve prioritized stability, clear error messages, and consistent APIs over a huge feature set.\n"
+    },
+    {
+      "heading": "What’s next",
+      "content": "### Roadmap (next iteration)\n\nPlanned improvements:\n\n- richer search and filtering\n- reviewer assignment workflow enhancements\n- better file upload UX (CV, profile photos, assets)\n- email reliability improvements (dedupe, retries)\n- admin dashboards for operational visibility\n\n> If you find rough edges, please report them—we’re iterating quickly.\n"
+    },
+    {
+      "heading": "How to help",
+      "content": "## Feedback channels\n\nThe most useful feedback includes:\n\n- what you tried to do\n- what you expected\n- what actually happened\n- screenshots or logs if possible\n\nWe also welcome feature ideas, but bug reports with context are the fastest way to improve the MVP.\n"
+    }
+  ]
+}

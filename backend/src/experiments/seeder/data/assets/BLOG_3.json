@@ -1,0 +1,19 @@
+{
+  "type": "blog",
+  "heroImagePath": "storage/public/assets/IMG_6.jpg",
+  "summary": "A field guide to evolving a backend from many microservices into a smaller number of well-designed ‘semi-monoliths’—without losing autonomy, reliability, or deployment safety.",
+  "sections": [
+    {
+      "heading": "Why consolidation happens",
+      "content": "## When microservices stop being worth it\n\nMicroservices can help teams scale, but they also add:\n\n- distributed tracing overhead\n- network failure modes everywhere\n- duplicated auth/validation logic\n- operational burden (CI/CD, secrets, observability)\n\nConsolidation becomes attractive when the system is tightly coupled by business flow and deployment cadence.\n\nThis post shares a practical roadmap for moving toward **semi-monoliths**.\n"
+    },
+    {
+      "heading": "A step-by-step roadmap",
+      "content": "### A safe migration sequence\n\n1. **Map boundaries** using real call graphs and DB interactions\n2. **Pick a target slice** that frequently changes together\n3. Introduce **shared libraries** for validation and DTOs\n4. Move to a **single deployable** with internal modules\n5. Keep external contracts stable using a **compat layer**\n\nWe also cover transitional patterns:\n\n- strangler fig\n- outbox events for integration\n- shared DB vs replicated read models\n"
+    },
+    {
+      "heading": "Keeping quality high",
+      "content": "## The quality bar\n\nConsolidation fails when it becomes a “big ball of mud.”\n\nGuardrails that help:\n\n- module boundaries enforced by tooling\n- consistent error shapes\n- strict observability conventions\n- test pyramids with contract tests\n- clear ownership per module\n\nDone right, semi-monoliths can reduce cognitive load and increase delivery speed—without giving up engineering discipline.\n"
+    }
+  ]
+}

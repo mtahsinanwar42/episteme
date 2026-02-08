@@ -1,0 +1,19 @@
+{
+  "type": "training",
+  "heroImagePath": "storage/public/assets/IMG_8.jpg",
+  "summary": "A hands-on training covering Kafka fundamentals, event-driven patterns, idempotency, retries, and how to prevent duplicate processing in real production workflows.",
+  "sections": [
+    {
+      "heading": "Who it’s for",
+      "content": "## Event-Driven Systems with Kafka\n\nThis training is for backend engineers who:\n\n- want to decouple services safely\n- need reliable email/payment/status propagation\n- are unsure about idempotency and message duplication\n\nWe focus on practical implementation patterns and operational realities.\n"
+    },
+    {
+      "heading": "What you’ll learn",
+      "content": "### Topics\n\n- brokers, topics, partitions, consumer groups\n- delivery semantics (at-most-once / at-least-once / exactly-once concepts)\n- idempotent consumers and de-duplication strategies\n- retries, DLQs, and poison messages\n- outbox pattern and transactional publishing\n- monitoring: lag, throughput, failure rates\n\n> You’ll leave with a checklist for production readiness.\n"
+    },
+    {
+      "heading": "Lab exercises",
+      "content": "## Hands-on labs\n\nParticipants will build:\n\n- a producer that publishes “status changed” events\n- a worker that sends emails reliably\n- a dedupe mechanism using a fast store (e.g., Redis)\n- a small metrics dashboard for consumer health\n\nWe’ll also discuss how to test message flows without brittle integration setups.\n"
+    }
+  ]
+}

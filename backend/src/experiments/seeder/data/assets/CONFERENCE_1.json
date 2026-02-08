@@ -1,0 +1,23 @@
+{
+  "type": "conference",
+  "heroImagePath": "storage/public/assets/IMG_13.jpg",
+  "summary": "A three-day conference exploring modern backend architecture, distributed systems, and pragmatic AI in software engineering—bridging research insights and production constraints.",
+  "sections": [
+    {
+      "heading": "Conference focus",
+      "content": "## Episteme Systems & AI Conference\n\nThis conference brings together engineers, researchers, and platform teams who care about **building systems that last**.\n\nCore themes:\n\n- scalable backend systems\n- reliability engineering and observability\n- data-intensive architecture\n- AI-assisted development (with guardrails)\n\nWe prioritize talks that combine **hard lessons** with **actionable patterns**.\n"
+    },
+    {
+      "heading": "Tracks",
+      "content": "### Main tracks\n\n1. **Architecture & Evolution**\n   - service boundaries, consolidation, modular monoliths\n   - API design and versioning\n\n2. **Reliability & Operations**\n   - SLOs, incident response, on-call maturity\n   - tracing, metrics, log quality\n\n3. **Applied AI for Engineering**\n   - code generation with verification\n   - retrieval-based tooling\n   - evaluation and failure analysis\n\n> Workshops and tutorials run in parallel each afternoon.\n"
+    },
+    {
+      "heading": "Participation",
+      "content": "## Who should attend\n\n- backend engineers and tech leads\n- platform / SRE engineers\n- PhD students and applied researchers\n- product-oriented engineering managers\n\nThe program includes:\n\n- peer-reviewed paper sessions\n- industry case studies\n- hands-on tutorials\n- networking and poster sessions\n"
+    },
+    {
+      "heading": "Submission format",
+      "content": "### Paper and talk proposals\n\nWe accept:\n\n- **full papers** (research or engineering)\n- **short papers** (ideas, tools, early results)\n- **industry talks** (lessons learned, postmortems)\n\nSubmissions are evaluated on:\n\n- clarity and technical depth\n- relevance to practitioners\n- evidence (data, experiments, or operational results)\n"
+    }
+  ]
+}

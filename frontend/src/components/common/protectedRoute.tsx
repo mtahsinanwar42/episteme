@@ -1,15 +1,18 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { type RootState } from "@/stores/store";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
+import type { UserRole } from "@/models/user";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  allowedRoles?: UserRole[];
 }
 
-function ProtectedRoute({ children }: ProtectedRouteProps) {
+function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const user = useSelector((state: RootState) => state.auth.user);
   const loading = useSelector((state: RootState) => state.auth.loading);
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -23,6 +26,16 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!user) {
+    const targetPath = `${location.pathname}${location.search}${location.hash}`;
+    const loginPath = `/login?redirectUrl=${encodeURIComponent(targetPath)}`;
+    return <Navigate to={loginPath} replace />;
+  }
+
+  if (
+    allowedRoles &&
+    allowedRoles.length > 0 &&
+    !allowedRoles.some((role) => user.roles?.includes(role))
+  ) {
     return <Navigate to="/unauthorized" replace />;
   }
 

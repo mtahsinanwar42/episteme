@@ -1,0 +1,19 @@
+{
+  "type": "conference",
+  "heroImagePath": "storage/public/assets/IMG_15.jpg",
+  "summary": "A research-to-production conference on secure software systems, privacy-aware design, and verification techniques that fit modern delivery pipelines.",
+  "sections": [
+    {
+      "heading": "Security by design",
+      "content": "## Secure Systems in Practice\n\nSecurity is often treated as a gate at the end.\nThis conference treats it as a **design constraint** from the start.\n\nWe focus on:\n\n- secure architecture patterns\n- privacy by design\n- supply chain integrity\n- threat modeling as a living process\n\nThe goal is to connect deep security thinking with the realities of CI/CD and rapid delivery.\n"
+    },
+    {
+      "heading": "Key areas",
+      "content": "### Areas we highlight\n\n- authentication and authorization patterns\n- secure data modeling and auditability\n- incident detection and response\n- secure defaults for developer platforms\n- verification and testing strategies\n\nWe welcome:\n\n- empirical studies\n- tools and case studies\n- war stories with lessons learned\n"
+    },
+    {
+      "heading": "Community and outcomes",
+      "content": "## What we want to achieve\n\nBeyond talks and papers, we aim to produce:\n\n- a public set of recommended secure patterns\n- templates for threat modeling and review checklists\n- a curated list of practical tools and references\n\nWe believe security improves fastest when teams share what actually worked—and what didn’t.\n"
+    }
+  ]
+}

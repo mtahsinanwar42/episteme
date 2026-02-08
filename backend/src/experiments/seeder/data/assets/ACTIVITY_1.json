@@ -1,0 +1,23 @@
+{
+  "type": "activity",
+  "heroImagePath": "storage/public/assets/IMG_1.jpg",
+  "summary": "A hands-on community evening where small groups refactor messy backend modules into clean, testable services, with a focus on pragmatic patterns and real trade-offs.",
+  "sections": [
+    {
+      "heading": "What this activity is",
+      "content": "## Refactor Night: From Spaghetti to Services\n\nThis activity is a guided, practical session where we take a deliberately messy codebase and refactor it into something maintainable.\n\nYou will work in small teams and rotate roles (driver/navigator/reviewer) to experience different perspectives.\n\n### What you'll practice\n\n- identifying seams for refactoring\n- carving out service boundaries\n- writing characterization tests before changes\n- improving naming, validation, and error handling\n- designing clear DTOs and API contracts\n"
+    },
+    {
+      "heading": "Schedule",
+      "content": "### Timeline\n\n- **19:00–19:15** Arrival + intro, what we will refactor\n- **19:15–19:45** Baseline tests + \"first safe change\"\n- **19:45–20:30** Refactor sprint 1: extraction + layering\n- **20:30–20:45** Break + quick demos\n- **20:45–21:30** Refactor sprint 2: validation + observability\n- **21:30–22:00** Demos + lessons learned + takeaways\n\n> Bring a laptop. We provide the repo and starter tasks.\n"
+    },
+    {
+      "heading": "What to bring",
+      "content": "### Preparation checklist\n\n- Laptop with Node.js or Java installed (either is fine)\n- Your favorite editor + Git\n- Willingness to discuss trade-offs (not perfection)\n\n### Optional\n\n- A small example from your own project you want to improve\n- A \"pain point\" story (slow onboarding, flaky tests, unclear boundaries)\n"
+    },
+    {
+      "heading": "Outcomes",
+      "content": "## What you’ll leave with\n\nBy the end, you should have:\n\n- a refactoring approach you can reuse at work\n- a short list of patterns for evolving APIs without breaking users\n- a checklist for introducing logs/metrics during change\n\nWe’ll also share a cleaned-up reference branch and notes from each team.\n"
+    }
+  ]
+}

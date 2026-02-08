@@ -1,0 +1,23 @@
+{
+  "type": "activity",
+  "heroImagePath": "storage/public/assets/IMG_3.jpg",
+  "summary": "A friendly show-and-tell evening focused on developer productivity tooling: generators, internal CLIs, automated docs, and pragmatic AI-assisted workflows that don’t compromise code quality.",
+  "sections": [
+    {
+      "heading": "Overview",
+      "content": "## Dev Productivity Show & Tell\n\nWe all build little tools to make life easier: scripts, generators, templates, checks, dashboards.\n\nThis activity is a lightweight evening where people demo:\n\n- internal CLIs (project bootstrap, migrations, seeders)\n- documentation automation\n- code quality helpers (linting, formatting, CI gates)\n- AI-assisted workflows (safely, with guardrails)\n\nDemos can be **5–10 minutes**. No pressure to be perfect.\n"
+    },
+    {
+      "heading": "Demo ideas",
+      "content": "### What you can present\n\n- A script that saved you hours (even a small one)\n- A migration workflow you finally made safe\n- An approach to keep constants/enums in sync across FE/BE\n- A CI pipeline improvement\n- A reliable test strategy for tricky integrations\n\n#### AI tooling (optional)\n\nIf you present AI usage, focus on:\n\n- how you prevent wrong changes\n- how you validate outputs\n- what guardrails keep quality high\n"
+    },
+    {
+      "heading": "Flow",
+      "content": "### Agenda\n\n- **19:00–19:10** Welcome + lightning introductions\n- **19:10–20:20** Demos (6–8 slots)\n- **20:20–20:40** Break + networking\n- **20:40–21:40** Demos (remaining slots)\n- **21:40–22:00** Wrap-up + shared notes\n\nWe’ll collect links and tips into a shared page after the session.\n"
+    },
+    {
+      "heading": "Community notes",
+      "content": "## How to participate\n\n- You can present or just attend\n- Questions are encouraged, but keep them constructive\n- If you share code, redact secrets and private customer details\n\n> The goal is to learn practical patterns we can apply the next day.\n"
+    }
+  ]
+}

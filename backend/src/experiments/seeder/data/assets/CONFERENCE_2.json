@@ -1,0 +1,19 @@
+{
+  "type": "conference",
+  "heroImagePath": "storage/public/assets/IMG_14.jpg",
+  "summary": "A practitioner-first event dedicated to developer platforms, internal tooling, and the engineering economics of reducing friction across teams at scale.",
+  "sections": [
+    {
+      "heading": "Overview",
+      "content": "## Platform Engineering Summit\n\nDeveloper productivity is not about “moving faster” blindly.\nIt’s about reducing **waste**:\n\n- slow onboarding\n- inconsistent environments\n- fragile CI pipelines\n- unclear ownership\n- missing observability standards\n\nThis summit focuses on proven approaches to build developer platforms that teams actually adopt.\n"
+    },
+    {
+      "heading": "Topics",
+      "content": "### Topics of interest\n\n- golden paths and paved roads\n- internal CLIs and templates\n- secrets management and policy-as-code\n- CI/CD standardization without blocking teams\n- cost visibility and engineering economics\n- metrics for platform success (not vanity metrics)\n\nWe encourage talks that share:\n\n- measurable outcomes\n- adoption challenges\n- organizational lessons\n"
+    },
+    {
+      "heading": "Workshops",
+      "content": "## Workshops and labs\n\nHands-on sessions include:\n\n- building an internal CLI with safe defaults\n- implementing an outbox pattern for reliable events\n- defining SLOs that map to real user pain\n- designing schema migrations that won’t wake you up at 3am\n\nBring a laptop; labs are guided but allow custom extensions.\n"
+    }
+  ]
+}

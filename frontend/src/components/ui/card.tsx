@@ -25,7 +25,9 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className="grid grid-cols-[50%_44%_6%] rounded-lg border-b-2 border-border gradient-card shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className={`grid grid-cols-[50%_44%_6%] rounded-lg border-b-2 border-border gradient-card shadow-sm overflow-hidden transition-shadow ${
+        onClick ? "hover:shadow-md cursor-pointer" : ""
+      }`}
       onClick={onClick}
     >
       <div className="h-full p-4 flex flex-col justify-start gap-6 col-span-1">

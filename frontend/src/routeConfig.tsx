@@ -50,6 +50,7 @@ import UpdatePassword from "@/pages/me/updatePassword";
 import MyProfile from "@/pages/me/myProfile";
 import ForgotPassword from "./pages/me/forgotPassword";
 import ResetPassword from "./pages/me/resetPassword";
+import { UserRole } from "@/models/user";
 
 export default function RouteConfig() {
   return (
@@ -82,7 +83,7 @@ export default function RouteConfig() {
       <Route
         path="/users"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <Users />
           </ProtectedRoute>
         }
@@ -90,7 +91,7 @@ export default function RouteConfig() {
       <Route
         path="/users/new"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <NewUser />
           </ProtectedRoute>
         }
@@ -98,7 +99,7 @@ export default function RouteConfig() {
       <Route
         path="/users/search"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <UserSearch />
           </ProtectedRoute>
         }
@@ -107,7 +108,7 @@ export default function RouteConfig() {
       <Route
         path="/users/:userId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <UserDetails />
           </ProtectedRoute>
         }
@@ -116,7 +117,7 @@ export default function RouteConfig() {
       <Route
         path="/assets"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <Assets />
           </ProtectedRoute>
         }
@@ -124,7 +125,7 @@ export default function RouteConfig() {
       <Route
         path="/assets/search"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <AssetSearch />
           </ProtectedRoute>
         }
@@ -132,7 +133,7 @@ export default function RouteConfig() {
       <Route
         path="/assets/:fileId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <AssetDetails />
           </ProtectedRoute>
         }
@@ -140,7 +141,7 @@ export default function RouteConfig() {
       <Route
         path="/assets/new"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <NewAsset />
           </ProtectedRoute>
         }
@@ -152,7 +153,7 @@ export default function RouteConfig() {
       <Route
         path="/activities/new"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <NewActivity />
           </ProtectedRoute>
         }
@@ -160,7 +161,7 @@ export default function RouteConfig() {
       <Route
         path="/activities/edit/:activityId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <EditActivity />
           </ProtectedRoute>
         }
@@ -172,7 +173,7 @@ export default function RouteConfig() {
       <Route
         path="/trainings/new"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <NewTraining />
           </ProtectedRoute>
         }
@@ -180,7 +181,7 @@ export default function RouteConfig() {
       <Route
         path="/trainings/edit/:trainingId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <EditTraining />
           </ProtectedRoute>
         }
@@ -195,7 +196,7 @@ export default function RouteConfig() {
       <Route
         path="/announcements/new"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <NewAnnouncement />
           </ProtectedRoute>
         }
@@ -203,7 +204,7 @@ export default function RouteConfig() {
       <Route
         path="/announcements/edit/:announcementId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <EditAnnouncement />
           </ProtectedRoute>
         }
@@ -219,7 +220,7 @@ export default function RouteConfig() {
       <Route
         path="/conferences/new"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <NewConference />
           </ProtectedRoute>
         }
@@ -228,7 +229,7 @@ export default function RouteConfig() {
       <Route
         path="/conferences/edit/:conferenceId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <EditConference />
           </ProtectedRoute>
         }
@@ -240,7 +241,7 @@ export default function RouteConfig() {
       <Route
         path="/blogs/new"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <NewBlog />
           </ProtectedRoute>
         }
@@ -248,7 +249,7 @@ export default function RouteConfig() {
       <Route
         path="/blogs/edit/:blogId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
             <EditBlog />
           </ProtectedRoute>
         }

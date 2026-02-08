@@ -1,0 +1,19 @@
+{
+  "type": "announcement",
+  "heroImagePath": "storage/public/assets/IMG_11.jpg",
+  "summary": "Important platform update: improved content status transitions, clearer validation messages, and a safer workflow for handling payments and email notifications.",
+  "sections": [
+    {
+      "heading": "Release highlights",
+      "content": "## Platform update: safer workflows\n\nThis release improves reliability in three areas:\n\n1. **Status transitions** are now validated centrally\n2. **Validation errors** are more descriptive and consistent\n3. **Notification flow** is more resilient (better retry behavior)\n\nThese changes reduce the chance of “impossible states” and make troubleshooting much easier.\n"
+    },
+    {
+      "heading": "What changed",
+      "content": "### Details\n\n- Status updates now require a valid transition\n- Optional `statusUpdateNotes` are captured consistently\n- API responses use a uniform error structure\n- Improved logs for operational diagnosis\n\nIf your integration relies on a specific error message format, review the updated error schema and adjust accordingly.\n"
+    },
+    {
+      "heading": "Action needed",
+      "content": "## Do you need to do anything?\n\nMost users do **not** need to take action.\n\nIf you operate an integration or automation:\n\n- verify you handle `400` errors with structured details\n- confirm you treat email sending as asynchronous and retryable\n\nWe recommend re-running any stuck submissions after the update.\n"
+    }
+  ]
+}

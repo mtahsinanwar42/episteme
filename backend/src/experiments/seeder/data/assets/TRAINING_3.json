@@ -1,0 +1,19 @@
+{
+  "type": "training",
+  "heroImagePath": "storage/public/assets/IMG_9.jpg",
+  "summary": "A production-minded training on observability: structured logs, metrics, tracing, SLOs, and debugging distributed systems without guesswork or “it works on my machine”.",
+  "sections": [
+    {
+      "heading": "Why observability matters",
+      "content": "## Observability for Backend Engineers\n\nWhen something breaks, your first question is not “what changed?”\nIt’s:\n\n- what is the user experiencing?\n- where is it failing?\n- is it isolated or systemic?\n\nObservability is the difference between guessing and knowing.\nThis training teaches practical techniques to instrument and operate your services.\n"
+    },
+    {
+      "heading": "Curriculum",
+      "content": "### What we cover\n\n- structured logging (fields, correlation IDs, log levels)\n- metrics that matter (latency, error rate, saturation)\n- distributed tracing fundamentals\n- defining SLOs that map to user pain\n- alerting strategies that reduce noise\n\nWe’ll use examples like:\n\n- “stuck submission” detection\n- email delivery failures\n- slow list endpoints due to missing indexes\n"
+    },
+    {
+      "heading": "Hands-on",
+      "content": "## Practical workshop\n\nYou will:\n\n- add request-level correlation and log context\n- export service metrics and build simple dashboards\n- trace a multi-step workflow end-to-end\n- create alerts for failure modes you care about\n\nWe finish with a checklist you can apply to any service before shipping.\n"
+    }
+  ]
+}

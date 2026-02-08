@@ -1,0 +1,19 @@
+{
+  "type": "blog",
+  "heroImagePath": "storage/public/assets/IMG_5.jpg",
+  "summary": "How to store and serve date-times correctly in distributed systems: TIMESTAMPTZ, UTC everywhere, and rendering in the user’s locale without confusion or hidden conversions.",
+  "sections": [
+    {
+      "heading": "The problem",
+      "content": "## Timezones break trust\n\nUsers don’t complain when your API is 20ms slower.\nThey complain when:\n\n- deadlines appear different on different devices\n- a date “moves” after saving\n- a conference starts at 09:00 for one user and 10:00 for another\n\nIn distributed systems, date-time bugs are often **data bugs**.\nThis post is a practical guide to avoid them.\n"
+    },
+    {
+      "heading": "Recommended approach",
+      "content": "### Store in UTC, render locally\n\nA reliable baseline:\n\n- store timestamps in **UTC**\n- keep fields as `TIMESTAMPTZ` (or equivalent)\n- avoid storing “local times” unless it is a business requirement\n\nWhen you must store a local time (like “submission closes at 23:59 local time”), store:\n\n- the local wall-clock time\n- the timezone identifier (e.g., Europe/Amsterdam)\n- the derived UTC instant for the current rules\n\n> Daylight saving changes make naive timestamps dangerous.\n"
+    },
+    {
+      "heading": "APIs and clients",
+      "content": "## Serving time correctly\n\nAPI recommendations:\n\n- accept ISO-8601 with offset from clients\n- respond in ISO-8601 with `Z` (UTC) or explicit offset\n- never send ambiguous formats\n\nClient rendering:\n\n- parse as an instant\n- render with user locale/timezone\n- show timezone when it matters (deadlines, schedules)\n\nWe close with a checklist for tests that catch timezone regressions.\n"
+    }
+  ]
+}
