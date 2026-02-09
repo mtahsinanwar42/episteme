@@ -31,6 +31,7 @@ import { createKafkaTopics, startKafkaProducer, stopKafkaProducer } from "./conf
 import { startRedis, stopRedis } from "./config/redis.js";
 import { startEmailWorker, stopEmailWorker } from "./workers/email.js";
 import { KAFKA_TOPICS } from "./utils/constants.js";
+import { initializeBaseData } from "./seeder/index.js";
 
 dotenv.config();
 
@@ -105,6 +106,7 @@ async function start() {
   try {
     await connectDb();
     initModels(sequelize);
+    await initializeBaseData();
 
     schedulerService.start();
 
