@@ -50,7 +50,7 @@ export enum FileTypeEnum {
 
 export interface FileUploadRequest {
   bucketName: string;
-  file: unknown;
+  file: any;
 }
 
 export interface FileUploadResponse {

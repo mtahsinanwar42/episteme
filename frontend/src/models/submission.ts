@@ -6,6 +6,7 @@ export interface Submission {
   topics?: string[];
   doi?: string | null;
   status?: number;
+  statusUpdateNotes?: string | null;
   createdAt?: string;
   updatedAt?: string;
   conferenceId?: string | number;
@@ -53,4 +54,18 @@ export interface CreateSubmissionRequest {
   topics?: string[];
   contentFilePath: string;
   message?: string;
+}
+
+export enum ContentSubmissionStatus {
+  DRAFT = 0,
+  PENDING_APPROVAL = 1,
+  RETURNED = 2,
+  APPROVED = 3,
+  REJECTED = 4,
+  DELETED = 9,
+}
+
+export interface UpdateSubmissionStatusRequest {
+  status: number;
+  statusUpdateNotes?: string;
 }

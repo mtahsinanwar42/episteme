@@ -3,6 +3,7 @@ import type {
   SubmissionResponse,
   SubmissionDetailsResponse,
   CreateSubmissionRequest,
+  UpdateSubmissionStatusRequest,
 } from "@/models/submission";
 
 export interface GetSubmissionsParams {
@@ -45,5 +46,16 @@ export const submissionService = {
     data: CreateSubmissionRequest,
   ): Promise<SubmissionDetailsResponse> => {
     return api.post<SubmissionDetailsResponse>("/submissions", data, true);
+  },
+
+  updateSubmissionStatus: async (
+    submissionId: string | number,
+    data: UpdateSubmissionStatusRequest,
+  ): Promise<SubmissionDetailsResponse> => {
+    return api.put<SubmissionDetailsResponse>(
+      `/submissions/${submissionId}/status`,
+      data,
+      true,
+    );
   },
 };

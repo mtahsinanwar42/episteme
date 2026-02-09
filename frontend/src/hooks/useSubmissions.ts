@@ -3,7 +3,10 @@ import {
   submissionService,
   type GetSubmissionsParams,
 } from "@/services/submissionService";
-import type { CreateSubmissionRequest } from "@/models/submission";
+import type {
+  CreateSubmissionRequest,
+  UpdateSubmissionStatusRequest,
+} from "@/models/submission";
 
 export function useSubmissions(params?: GetSubmissionsParams) {
   return useQuery({
@@ -27,6 +30,21 @@ export function useCreateSubmissionMutation() {
     mutationFn: (data: CreateSubmissionRequest) =>
       submissionService.createSubmission(data),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["submissions"] });
+    },
+  });
+}
+
+export function useUpdateSubmissionStatusMutation(
+  submissionId: string | number,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: UpdateSubmissionStatusRequest) =>
+      submissionService.updateSubmissionStatus(submissionId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["submission", submissionId] });
       queryClient.invalidateQueries({ queryKey: ["submissions"] });
     },
   });

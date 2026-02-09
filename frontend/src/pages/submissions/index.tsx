@@ -5,7 +5,6 @@ import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowUpDown, Eye } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import PageTitle from "@/components/common/PageTitle";
@@ -15,6 +14,10 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/store";
 import { UserRole } from "@/models/user";
 import { Button } from "@/components/ui/button";
+import {
+  getPaymentStatusBadge,
+  getSubmissionStatusBadge,
+} from "@/components/common/ResourceStatusBadge";
 
 export default function Submissions() {
   const navigate = useNavigate();
@@ -43,36 +46,6 @@ export default function Submissions() {
   const currentPage = page;
   const currentLimit = response?.pagination?.next?.limit || pageSize;
   const totalPages = Math.ceil(total / currentLimit);
-
-  const getStatusBadge = useCallback((status?: number) => {
-    switch (status) {
-      case 1:
-        return <Badge variant="secondary">Draft</Badge>;
-      case 2:
-        return <Badge variant="default">Submitted</Badge>;
-      case 3:
-        return <Badge variant="default">Approved</Badge>;
-      case 4:
-        return <Badge variant="secondary">In Review</Badge>;
-      case 9:
-        return <Badge variant="destructive">Rejected</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  }, []);
-
-  const getPaymentStatusBadge = useCallback((status?: number) => {
-    switch (status) {
-      case 1:
-        return <Badge variant="secondary">Pending</Badge>;
-      case 2:
-        return <Badge variant="default">Paid</Badge>;
-      case 9:
-        return <Badge variant="destructive">Failed</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  }, []);
 
   const handlePageChange = useCallback((newPage: number) => {
     setPage(newPage);
@@ -176,7 +149,7 @@ export default function Submissions() {
           const status = row.getValue("status") as number;
           return (
             <div className="flex place-self-center">
-              {getStatusBadge(status)}
+              {getSubmissionStatusBadge(status)}
             </div>
           );
         },
@@ -221,7 +194,7 @@ export default function Submissions() {
         enableSorting: false,
       },
     ];
-  }, [getStatusBadge, getPaymentStatusBadge, isAdmin]);
+  }, [isAdmin]);
 
   return (
     <div>
