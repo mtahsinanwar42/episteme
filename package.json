@@ -11,8 +11,8 @@
     "start": "node backend/src/server.js",
     "dev": "nodemon backend/src/server.js",
     "server": "nodemon backend/src/server.js",
-    "data:import": "node backend/src/experiments/seeder/index.js",
-    "data:destroy": "node backend/src/experiments/seeder/index.js -d"
+    "data:import": "node backend/src/seeder/index.js",
+    "data:destroy": "node backend/src/seeder/index.js -d"
   },
   "repository": {
     "type": "git",

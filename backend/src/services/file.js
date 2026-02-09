@@ -1,3 +1,4 @@
+import path from "path";
 import { USER_ROLE } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { generateContentSha256 } from "../utils/hashing.js";
@@ -8,8 +9,40 @@ export function createFileService({ File }) {
     throw new Error("createFileService requires { File } model");
   }
 
+  function deriveStorageKey(filePath) {
+    const normalizedPath = String(filePath || "").replace(/\\/g, "/");
+    if (!normalizedPath) {
+      return normalizedPath;
+    }
+
+    const storageMatch = normalizedPath.match(/(?:^|\/)(storage\/.+)$/);
+    if (storageMatch?.[1]) {
+      return storageMatch[1].replace(/^\/+/, "");
+    }
+
+    if (!path.isAbsolute(filePath)) {
+      return normalizedPath.replace(/^\.?\//, "").replace(/^\/+/, "");
+    }
+
+    const baseDir = process.env.FILE_STORAGE_PATH;
+    if (!baseDir) {
+      return normalizedPath.replace(/^\/+/, "");
+    }
+
+    const resolvedBaseDir = path.resolve(baseDir);
+    const resolvedFilePath = path.resolve(filePath);
+    const baseParent = path.dirname(resolvedBaseDir);
+    const relFromBaseParent = path.relative(baseParent, resolvedFilePath).replace(/\\/g, "/");
+
+    if (relFromBaseParent && !relFromBaseParent.startsWith("..")) {
+      return relFromBaseParent.replace(/^\/+/, "");
+    }
+
+    return normalizedPath.replace(/^\/+/, "");
+  }
+
   async function save(req) {
-    const storageKey = req.file.path.replace(/\\/g, "/").replace(/^\/+/, "");
+    const storageKey = deriveStorageKey(req.file.path);
     const sha256 = await generateContentSha256(req.file.path);
 
     const file = await File.create({
