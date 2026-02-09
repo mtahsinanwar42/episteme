@@ -72,7 +72,7 @@ export const getSubmissionStatusBadge = (status?: number) => {
     case ContentSubmissionStatus.DRAFT:
       return <Badge variant="secondary">Draft</Badge>;
     case ContentSubmissionStatus.PENDING_APPROVAL:
-      return <Badge variant="default">Pending Approval</Badge>;
+      return <Badge variant="secondary">Pending Approval</Badge>;
     case ContentSubmissionStatus.RETURNED:
       return <Badge variant="secondary">Returned</Badge>;
     case ContentSubmissionStatus.APPROVED:
