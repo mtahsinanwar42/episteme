@@ -1,5 +1,6 @@
 import * as React from "react";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
+import { FixedSizeList as List } from "react-window";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -123,6 +124,9 @@ export function MultiSelect({
     option.label.toLowerCase().includes(searchValue.toLowerCase()),
   );
 
+  const rowHeight = 36;
+  const listHeight = Math.min(220, filteredOptions.length * rowHeight);
+
   const selectedLabels = options
     .filter((option) => selectedValues.includes(option.value))
     .map((option) => option.label);
@@ -201,48 +205,63 @@ export function MultiSelect({
             </div>
           )}
 
-          <div className="max-h-[220px] overflow-y-auto p-1">
+          <div className="p-1">
             {filteredOptions.length === 0 ? (
               <div className="py-2 px-3 text-sm text-body">
                 {emptyIndicator ?? "No results found."}
               </div>
             ) : (
-              filteredOptions.map((option) => {
-                const isSelected = selectedValues.includes(option.value);
-                return (
-                  <div
-                    key={option.value}
-                    role="button"
-                    tabIndex={option.disabled ? -1 : 0}
-                    aria-disabled={option.disabled}
-                    aria-pressed={isSelected}
-                    onClick={() => toggleValue(option.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        toggleValue(option.value);
-                      }
-                    }}
-                    className={cn(
-                      "cursor-pointer flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left hover:bg-accent/40 hover:text-foreground",
-                      isSelected && "bg-muted text-foreground",
-                      option.disabled && "opacity-50 cursor-not-allowed",
-                    )}
-                  >
+              <List
+                height={listHeight}
+                itemCount={filteredOptions.length}
+                itemSize={rowHeight}
+                width="100%"
+                itemKey={(index: number) => filteredOptions[index].value}
+              >
+                {({
+                  index,
+                  style,
+                }: {
+                  index: number;
+                  style: React.CSSProperties;
+                }) => {
+                  const option = filteredOptions[index];
+                  const isSelected = selectedValues.includes(option.value);
+                  return (
                     <div
+                      style={style}
+                      role="button"
+                      tabIndex={option.disabled ? -1 : 0}
+                      aria-disabled={option.disabled}
+                      aria-pressed={isSelected}
+                      onClick={() => toggleValue(option.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          toggleValue(option.value);
+                        }
+                      }}
                       className={cn(
-                        "flex h-4 w-4 items-center justify-center rounded border border-accent",
-                        isSelected && "bg-accent text-accent-foreground",
-                        option.disabled && "opacity-50",
+                        "cursor-pointer flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left hover:bg-accent/40 hover:text-foreground",
+                        isSelected && "bg-muted text-foreground",
+                        option.disabled && "opacity-50 cursor-not-allowed",
                       )}
                     >
-                      {isSelected && <CheckIcon className="h-3 w-3" />}
+                      <div
+                        className={cn(
+                          "flex h-4 w-4 items-center justify-center rounded border border-accent",
+                          isSelected && "bg-accent text-accent-foreground",
+                          option.disabled && "opacity-50",
+                        )}
+                      >
+                        {isSelected && <CheckIcon className="h-3 w-3" />}
+                      </div>
+                      <span className="flex-1">{option.label}</span>
+                      {isSelected && <CheckIcon className="h-4 w-4" />}
                     </div>
-                    <span className="flex-1">{option.label}</span>
-                    {isSelected && <CheckIcon className="h-4 w-4" />}
-                  </div>
-                );
-              })
+                  );
+                }}
+              </List>
             )}
           </div>
         </div>

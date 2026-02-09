@@ -266,7 +266,7 @@ export default function NewSubmission() {
               Topics
             </label>
             <MultiSelect
-              options={topics.slice(0, 10).map((topic) => ({
+              options={topics.map((topic) => ({
                 label: topic,
                 value: topic,
               }))}
