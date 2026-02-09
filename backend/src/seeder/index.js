@@ -3,8 +3,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import colors from "colors";
-import { sequelize, connectDb } from "../../config/db.js";
-import { initModels } from "../../models/index.js";
+import { sequelize, connectDb } from "../config/db.js";
+import { initModels } from "../models/index.js";
 import {
   ACTIVITY_STATUS,
   ANNOUNCEMENT_STATUS,
@@ -19,13 +19,13 @@ import {
   USER_ROLE,
   USER_STATUS,
   TRAINING_STATUS,
-} from "../../utils/constants.js";
+} from "../utils/constants.js";
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const projectRoot = path.resolve(__dirname, "../../../..");
+const projectRoot = path.resolve(__dirname, "../../..");
 const seederDataDir = path.join(__dirname, "data");
 
 const storageBaseDir = process.env.FILE_STORAGE_PATH || "./storage";
@@ -56,20 +56,35 @@ const {
   Activity,
 } = initModels(sequelize);
 
+export const ADMIN_USER_SEED = {
+  firstName: "Admin",
+  lastName: "User",
+  phone: "+31616849000",
+  email: "admin@episteme.org",
+  password: "admin",
+  roles: [USER_ROLE.ADMIN],
+  status: USER_STATUS.ACTIVE,
+  institution: "Episteme University",
+  occupation: "Program Chair",
+  country: "Netherlands",
+  linkedinUrl: "https://www.linkedin.com/in/admin/",
+};
+
+export async function createAdminUser() {
+  const existing = await User.findOne({ where: { email: ADMIN_USER_SEED.email } });
+  
+  if (!existing) {
+    const [created] = await User.bulkCreate([ADMIN_USER_SEED], {
+      individualHooks: true,
+      returning: true,
+    });
+    return created;
+  }
+
+  return existing;
+}
+
 const users = [
-  {
-    firstName: "Admin",
-    lastName: "User",
-    phone: "+31616849000",
-    email: "admin@episteme.org",
-    password: "admin",
-    roles: [USER_ROLE.ADMIN],
-    status: USER_STATUS.ACTIVE,
-    institution: "Episteme University",
-    occupation: "Program Chair",
-    country: "Netherlands",
-    linkedinUrl: "https://www.linkedin.com/in/admin/",
-  },
   {
     firstName: "Regular",
     lastName: "User",
@@ -498,7 +513,8 @@ async function createSubmissionBundle({
 
 async function importData() {
   try {
-    const [admin, user, reviewer] = await User.bulkCreate(users, {
+    const admin = await createAdminUser();
+    const [user, reviewer] = await User.bulkCreate(users, {
       individualHooks: true,
       returning: true,
     });
@@ -670,8 +686,13 @@ async function importData() {
   }
 }
 
-if (process.argv[2] === "-d") {
-  await destroyData();
-} else {
-  await importData();
+const isDirectExecution =
+  process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
+
+if (isDirectExecution) {
+  if (process.argv[2] === "-d") {
+    await destroyData();
+  } else {
+    await importData();
+  }
 }
