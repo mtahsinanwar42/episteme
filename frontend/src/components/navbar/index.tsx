@@ -94,13 +94,21 @@ const getAvatarColor = (name?: string) => {
 };
 
 const allAboutChildren: (NavItemConfig & { flagKey: string })[] = [
-  { label: 'Mission & Vision', href: '/about/mission', flagKey: 'mission' },
-  { label: 'Ethics', href: '/about/ethics', flagKey: 'ethics' },
-  { label: 'Sustainability', href: '/about/sustainability', flagKey: 'sustainability' },
-  { label: 'Executive Committee', href: '/about/executive', flagKey: 'executive' },
-  { label: 'Policies', href: '/about/policies', flagKey: 'policies' },
-  { label: 'Career', href: '/about/career', flagKey: 'career' },
-  { label: 'Contact', href: '/about/contact', flagKey: 'contact' },
+  { label: "Mission & Vision", href: "/about/mission", flagKey: "mission" },
+  { label: "Ethics", href: "/about/ethics", flagKey: "ethics" },
+  {
+    label: "Sustainability",
+    href: "/about/sustainability",
+    flagKey: "sustainability",
+  },
+  {
+    label: "Executive Committee",
+    href: "/about/executive",
+    flagKey: "executive",
+  },
+  { label: "Policies", href: "/about/policies", flagKey: "policies" },
+  { label: "Career", href: "/about/career", flagKey: "career" },
+  { label: "Contact", href: "/about/contact", flagKey: "contact" },
 ];
 
 const aboutNavItem: NavItemConfig = {
@@ -212,10 +220,10 @@ const userNavItems: NavItemConfig[] = [
   aboutNavItem,
   {
     label: "Submissions",
-    href: "/user/submissions",
+    href: "/submissions",
     children: [
-      { label: "New", href: "/user/submissions/new" },
-      { label: "My Submissions", href: "/user/submissions" },
+      { label: "New", href: "/submissions/new" },
+      { label: "My Submissions", href: "/submissions" },
     ],
   },
   { label: "Conferences", href: "/conferences" },

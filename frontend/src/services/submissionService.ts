@@ -1,0 +1,49 @@
+import { api } from "./api";
+import type {
+  SubmissionResponse,
+  SubmissionDetailsResponse,
+  CreateSubmissionRequest,
+} from "@/models/submission";
+
+export interface GetSubmissionsParams {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  search?: string;
+  paginate?: boolean;
+  status?: number;
+}
+
+export const submissionService = {
+  getSubmissions: async (
+    params?: GetSubmissionsParams,
+  ): Promise<SubmissionResponse> => {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.paginate !== undefined)
+      queryParams.append("paginate", params.paginate.toString());
+
+    const queryString = queryParams.toString();
+    const endpoint = queryString
+      ? `/submissions?${queryString}`
+      : "/submissions";
+
+    return api.get<SubmissionResponse>(endpoint, true);
+  },
+
+  getSubmissionById: async (
+    submissionId: string | number,
+  ): Promise<SubmissionDetailsResponse> => {
+    return api.get<SubmissionDetailsResponse>(
+      `/submissions/${submissionId}`,
+      true,
+    );
+  },
+
+  createSubmission: async (
+    data: CreateSubmissionRequest,
+  ): Promise<SubmissionDetailsResponse> => {
+    return api.post<SubmissionDetailsResponse>("/submissions", data, true);
+  },
+};

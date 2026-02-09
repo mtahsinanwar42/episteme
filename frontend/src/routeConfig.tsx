@@ -39,6 +39,8 @@ import BlogDetails from "@/pages/blogs/details";
 import NewBlog from "@/pages/blogs/new";
 import EditBlog from "@/pages/blogs/edit";
 import BlogSearch from "@/pages/blogs/search";
+import Submissions from "@/pages/submissions";
+import SubmissionDetails from "@/pages/submissions/details";
 import ConferenceDetails from "@/pages/conferences/details";
 import NewConference from "@/pages/conferences/new";
 import EditConference from "@/pages/conferences/edit";
@@ -48,9 +50,10 @@ import Unauthorized from "@/pages/misc/unauthorized";
 import NotFound from "@/pages/misc/notFound";
 import UpdatePassword from "@/pages/me/updatePassword";
 import MyProfile from "@/pages/me/myProfile";
-import ForgotPassword from "./pages/me/forgotPassword";
-import ResetPassword from "./pages/me/resetPassword";
+import ForgotPassword from "@/pages/me/forgotPassword";
+import ResetPassword from "@/pages/me/resetPassword";
 import { UserRole } from "@/models/user";
+import NewSubmission from "@/pages/submissions/new";
 
 export default function RouteConfig() {
   return (
@@ -99,7 +102,7 @@ export default function RouteConfig() {
       <Route
         path="/users/search"
         element={
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+          <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
             <UserSearch />
           </ProtectedRoute>
         }
@@ -108,8 +111,35 @@ export default function RouteConfig() {
       <Route
         path="/users/:userId"
         element={
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+          <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
             <UserDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/submissions"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+            <Submissions />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/submissions/new"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.USER]}>
+            <NewSubmission />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/submissions/:submissionId"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+            <SubmissionDetails />
           </ProtectedRoute>
         }
       />
