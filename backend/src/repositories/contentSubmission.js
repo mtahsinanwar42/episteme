@@ -230,6 +230,8 @@ export async function findSubmissionByIdAndUserDetails({
     deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
   };
 
+  const ownerJoin = isAdmin ? `JOIN episteme.user U ON U.id = CS.owner_usr_id` : ``;
+
   const baseSelect = `
     SELECT
       CS.id              AS "submissionId",
@@ -245,10 +247,22 @@ export async function findSubmissionByIdAndUserDetails({
       C.title            AS "conferenceTitle",
       C.slug             AS "conferenceSlug",
       C.status           AS "conferenceStatus"
-      ${isAdmin ? `, CSP.status AS "paymentStatus"` : ``}
+      ${isAdmin ? `,
+      CSP.status         AS "paymentStatus",
+
+      U.id               AS "ownerUserId",
+      U.email            AS "ownerEmail",
+      U.first_name       AS "ownerFirstName",
+      U.last_name        AS "ownerLastName",
+      U.institution      AS "ownerInstitution",
+      U.occupation       AS "ownerOccupation",
+      U.country          AS "ownerCountry"`
+      : ``
+    }
     FROM episteme.content_submission CS
     JOIN episteme.conference C ON C.id = CS.conference_id
     LEFT JOIN episteme.content_submission_payment CSP ON CSP.content_submission_id = CS.id
+    ${ownerJoin}
     WHERE
       CS.id = :submissionId
       AND CS.current_status <> :deletedSubmissionStatus
