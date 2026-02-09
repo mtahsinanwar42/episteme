@@ -10,7 +10,7 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import PageTitle from "@/components/common/PageTitle";
 import type { Submission } from "@/models/submission";
-import { formatDateTime } from "@/utils/dateFormatter";
+import { formatDate } from "@/utils/dateFormatter";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/store";
 import { UserRole } from "@/models/user";
@@ -200,7 +200,7 @@ export default function Submissions() {
         },
         cell: ({ row }) => (
           <span className="text-sm">
-            {formatDateTime(row.getValue("createdAt") as string)}
+            {formatDate(row.getValue("createdAt") as string)}
           </span>
         ),
       },
