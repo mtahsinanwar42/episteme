@@ -15,11 +15,11 @@ import {
   CONTENT_SUBMISSION_STATUS,
   CONTENT_SUBMISSION_UPLOADER_USER_TYPE,
   REVIEW_ASSIGNMENT_STATUS,
-  REVIEW_RECOMMENDATION,
   USER_ROLE,
   USER_STATUS,
   TRAINING_STATUS,
 } from "../utils/constants.js";
+import { createRefDataService } from "../services/referenceData.js";
 
 dotenv.config();
 
@@ -48,7 +48,6 @@ const {
   ContentSubmissionVersion,
   ContentSubmissionMessage,
   ContentReviewAssignment,
-  ContentReview,
   ContentSubmissionPayment,
   Training,
   Announcement,
@@ -70,46 +69,120 @@ export const ADMIN_USER_SEED = {
   linkedinUrl: "https://www.linkedin.com/in/admin/",
 };
 
-export async function createAdminUser() {
-  const existing = await User.findOne({ where: { email: ADMIN_USER_SEED.email } });
-  
-  if (!existing) {
-    const [created] = await User.bulkCreate([ADMIN_USER_SEED], {
-      individualHooks: true,
-      returning: true,
-    });
-    return created;
-  }
+export async function initializeBaseData() {
+  const refDataService = createRefDataService({});
 
-  return existing;
+  const [adminUser, countries, topics] = await Promise.all([
+    (async () => {
+      const existing = await User.findOne({ where: { email: ADMIN_USER_SEED.email } });
+      if (!existing) {
+        const [created] = await User.bulkCreate([ADMIN_USER_SEED], {
+          individualHooks: true,
+          returning: true,
+        });
+        return created;
+      }
+      return existing;
+    })(),
+    refDataService.getCountries(),
+    refDataService.getTopics(),
+  ]);
+
+  console.log(`Reference data ready (${countries.length} countries, ${topics.length} topics)`.cyan);
+  return adminUser;
 }
 
 const users = [
   {
-    firstName: "Regular",
-    lastName: "User",
-    phone: "+8801710912970",
-    email: "user@episteme.org",
-    password: "user",
+    firstName: "Alice",
+    lastName: "Morgan",
+    phone: "+31612340001",
+    email: "user1@episteme.org",
+    password: "user1",
     roles: [USER_ROLE.USER],
     status: USER_STATUS.ACTIVE,
-    institution: "Episteme University",
-    occupation: "Graduate Student",
+    institution: "Delft University of Technology",
+    occupation: "PhD Candidate",
     country: "Netherlands",
-    linkedinUrl: "https://www.linkedin.com/in/user/",
+    linkedinUrl: "https://www.linkedin.com/in/alicemorgan/",
   },
   {
-    firstName: "Reviewer",
-    lastName: "User",
-    phone: "01710912970",
-    email: "reviewer@episteme.org",
-    password: "reviewer",
-    roles: [USER_ROLE.REVIEWER, USER_ROLE.USER],
+    firstName: "Bob",
+    lastName: "Chen",
+    phone: "+31612340002",
+    email: "user2@episteme.org",
+    password: "user2",
+    roles: [USER_ROLE.USER],
     status: USER_STATUS.ACTIVE,
-    institution: "Episteme University",
-    occupation: "Researcher",
-    country: "Netherlands",
-    linkedinUrl: "https://www.linkedin.com/in/reviewer/",
+    institution: "ETH Zurich",
+    occupation: "Research Assistant",
+    country: "Switzerland",
+    linkedinUrl: "https://www.linkedin.com/in/bobchen/",
+  },
+  {
+    firstName: "Clara",
+    lastName: "Silva",
+    phone: "+31612340003",
+    email: "user3@episteme.org",
+    password: "user3",
+    roles: [USER_ROLE.USER],
+    status: USER_STATUS.ACTIVE,
+    institution: "University of Lisbon",
+    occupation: "Postdoctoral Researcher",
+    country: "Portugal",
+    linkedinUrl: "https://www.linkedin.com/in/clarasilva/",
+  },
+  {
+    firstName: "David",
+    lastName: "Okafor",
+    phone: "+31612340004",
+    email: "reviewer1@episteme.org",
+    password: "reviewer1",
+    roles: [USER_ROLE.REVIEWER],
+    status: USER_STATUS.ACTIVE,
+    institution: "University of Oxford",
+    occupation: "Associate Professor",
+    country: "United Kingdom",
+    linkedinUrl: "https://www.linkedin.com/in/davidokafor/",
+  },
+  {
+    firstName: "Elena",
+    lastName: "Petrova",
+    phone: "+31612340005",
+    email: "reviewer2@episteme.org",
+    password: "reviewer2",
+    roles: [USER_ROLE.REVIEWER],
+    status: USER_STATUS.ACTIVE,
+    institution: "Technical University of Munich",
+    occupation: "Senior Researcher",
+    country: "Germany",
+    linkedinUrl: "https://www.linkedin.com/in/elenapetrova/",
+  },
+  {
+    firstName: "Fatih",
+    lastName: "Yilmaz",
+    phone: "+31612340006",
+    email: "reviewer3@episteme.org",
+    password: "reviewer3",
+    roles: [USER_ROLE.REVIEWER],
+    status: USER_STATUS.ACTIVE,
+    institution: "Bogazici University",
+    occupation: "Professor",
+    country: "Turkey",
+    linkedinUrl: "https://www.linkedin.com/in/fatihyilmaz/",
+  },
+  {
+    firstName: "Grace",
+    lastName: "Kim",
+    phone: "+31612340007",
+    email: "userreviewer@episteme.org",
+    password: "userreviewer",
+    roles: [USER_ROLE.USER, USER_ROLE.REVIEWER],
+    status: USER_STATUS.ACTIVE,
+    institution: "KAIST",
+    occupation: "Assistant Professor",
+    country: "South Korea",
+    linkedinUrl: "https://www.linkedin.com/in/gracekim/",
   },
 ];
 
@@ -236,6 +309,155 @@ const metadataHeroImageMap = new Map([
   ["CONFERENCE_3.JSON", "IMG_15.jpg"],
 ]);
 
+const submissionTemplates = [
+  {
+    title: "AI-Driven Knowledge Graphs for Open Science",
+    topics: ["Computer science"],
+    fileKey: "S1",
+  },
+  {
+    title: "Graph-Based Peer Review Systems",
+    topics: ["Work (physics)"],
+    fileKey: "S2",
+  },
+  {
+    title: "Observability-Driven Editorial Pipelines",
+    topics: ["Context (archaeology)"],
+    fileKey: "S3",
+  },
+];
+
+const userSubmissionData = {
+  user1: [
+    { templateIdx: 0, conferenceIdx: 0, titleSuffix: " — Delft Perspective" },
+    { templateIdx: 1, conferenceIdx: 1, titleSuffix: " — Delft Perspective" },
+    { templateIdx: 2, conferenceIdx: 2, titleSuffix: " — Delft Perspective" },
+  ],
+  user2: [
+    { templateIdx: 0, conferenceIdx: 1, titleSuffix: " — ETH Perspective" },
+    { templateIdx: 1, conferenceIdx: 2, titleSuffix: " — ETH Perspective" },
+    { templateIdx: 2, conferenceIdx: 0, titleSuffix: " — ETH Perspective" },
+  ],
+  user3: [
+    { templateIdx: 0, conferenceIdx: 2, titleSuffix: " — Lisbon Perspective" },
+    { templateIdx: 1, conferenceIdx: 0, titleSuffix: " — Lisbon Perspective" },
+    { templateIdx: 2, conferenceIdx: 1, titleSuffix: " — Lisbon Perspective" },
+  ],
+  userreviewer: [
+    { templateIdx: 0, conferenceIdx: 0, titleSuffix: " — KAIST Perspective" },
+    { templateIdx: 1, conferenceIdx: 1, titleSuffix: " — KAIST Perspective" },
+    { templateIdx: 2, conferenceIdx: 2, titleSuffix: " — KAIST Perspective" },
+  ],
+};
+
+const messageTemplatesBySubmission = [
+  [
+    {
+      senderKey: "owner",
+      senderUsrType: USER_ROLE.USER,
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "I have submitted my paper. Please let me know if you need any clarifications on the methodology section.",
+    },
+    {
+      senderKey: "admin",
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverKey: "owner",
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Thank you for your submission. We have received it and will begin the review process shortly.",
+    },
+    {
+      senderKey: "owner",
+      senderUsrType: USER_ROLE.USER,
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Could you provide an estimated timeline for the review? I have a conference deadline approaching.",
+    },
+    {
+      senderKey: "admin",
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverKey: "reviewer",
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
+      message: "Reviewers have been assigned to this submission. Please complete your reviews within two weeks.",
+    },
+    {
+      senderKey: "admin",
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverKey: "owner",
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Reviewers have been assigned. You can expect feedback within 2-3 weeks.",
+    },
+  ],
+  [
+    {
+      senderKey: "owner",
+      senderUsrType: USER_ROLE.USER,
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Paper submitted. I have included supplementary material as appendices within the document.",
+    },
+    {
+      senderKey: "admin",
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverKey: "owner",
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Submission received. We noticed the document is quite long — please confirm the appendices are essential.",
+    },
+    {
+      senderKey: "owner",
+      senderUsrType: USER_ROLE.USER,
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Yes, the appendices contain proofs and benchmark data that support the core claims. They are necessary for a thorough review.",
+    },
+    {
+      senderKey: "admin",
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverKey: "reviewer",
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
+      message: "This submission includes appendices with proofs and benchmarks. Please consider these during your evaluation.",
+    },
+  ],
+  [
+    {
+      senderKey: "owner",
+      senderUsrType: USER_ROLE.USER,
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Submitted my paper on editorial pipelines. Happy to provide additional experiment logs if needed.",
+    },
+    {
+      senderKey: "admin",
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverKey: "owner",
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Thank you. Your submission is now in the review queue.",
+    },
+    {
+      senderKey: "admin",
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverKey: "reviewer",
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
+      message: "New submission assigned for review. The author is responsive — feel free to request clarifications via admin.",
+    },
+    {
+      senderKey: "owner",
+      senderUsrType: USER_ROLE.USER,
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Just wanted to follow up — any update on whether reviewers have been assigned?",
+    },
+    {
+      senderKey: "admin",
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverKey: "owner",
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
+      message: "Yes, reviewers are assigned and evaluating your paper. We will update you once reviews are complete.",
+    },
+    {
+      senderKey: "admin",
+      senderUsrType: USER_ROLE.ADMIN,
+      receiverKey: "reviewer",
+      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
+      message: "Gentle reminder: please submit your reviews for this paper by end of this week.",
+    },
+  ],
+];
+
 async function destroyData() {
   try {
     await sequelize.query(`
@@ -337,7 +559,6 @@ async function saveFileToStorageAndDb({ sourcePath, uploadedBy }) {
 
   await fs.writeFile(targetAbsPath, fileBuffer);
 
-  // Keep storageKey aligned with upload API behavior (multer req.file.path style).
   const relToProject = path.relative(projectRoot, targetAbsPath).replace(/\\/g, "/").replace(/^\/+/, "");
   const storageRelPath = relToProject || `${normalizedStorageBase}/${visibility}/${bucket}/${baseName}`;
 
@@ -392,107 +613,83 @@ async function createResourcesWithMetadata({
   return created;
 }
 
-async function createSubmissionBundle({
+// ---------------------------------------------------------------------------
+// Submission bundle creator (PENDING_APPROVAL — no reviews)
+// ---------------------------------------------------------------------------
+
+async function createPendingSubmissionBundle({
   ownerUser,
   adminUser,
-  reviewerUser,
+  reviewerUsers,
   conference,
   title,
   topics,
-  currentStatus,
-  doi,
-  statusUpdateNotes,
-  paymentProviderPaymentId,
   fileInitial,
-  fileAdminEdited,
-  fileReviewer,
-  versionNoStart = 1,
-  reviewRecommendation,
-  reviewComment,
-  reviewerMessage,
+  paymentProviderPaymentId,
+  messages,
 }) {
+  // Create submission with PENDING_APPROVAL status
   const submission = await ContentSubmission.create({
     ownerUsrId: ownerUser.id,
     title,
     topics,
     conferenceId: conference.id,
-    currentStatus,
-    doi: doi ?? null,
-    statusUpdateNotes: statusUpdateNotes ?? null,
+    currentStatus: CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL,
+    doi: null,
+    statusUpdateNotes: null,
   });
 
+  // Create single initial version (v1 by author)
   const v1 = await ContentSubmissionVersion.create({
     contentSubmissionId: submission.id,
     uploaderUsrId: ownerUser.id,
     uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.USER,
     changeLog: "Initial submission uploaded by author.",
     fileId: fileInitial.id,
-    versionNo: versionNoStart,
+    versionNo: 1,
   });
 
-  const v2 = await ContentSubmissionVersion.create({
-    contentSubmissionId: submission.id,
-    uploaderUsrId: adminUser.id,
-    uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.ADMIN,
-    changeLog: "Editorial cleanup and structure adjustments.",
-    fileId: fileAdminEdited.id,
-    versionNo: versionNoStart + 1,
-  });
-
-  const reviewerVersion = await ContentSubmissionVersion.create({
-    contentSubmissionId: submission.id,
-    uploaderUsrId: reviewerUser.id,
-    uploaderUsrType: CONTENT_SUBMISSION_UPLOADER_USER_TYPE.REVIEWER,
-    changeLog: "Reviewer annotated version with inline comments.",
-    fileId: fileReviewer.id,
-    versionNo: versionNoStart + 2,
-  });
-
-  submission.currentContentSubmissionVersionId = v2.id;
+  submission.currentContentSubmissionVersionId = v1.id;
   await submission.save();
 
-  const assignment = await ContentReviewAssignment.create({
-    contentSubmissionId: submission.id,
-    reviewerUsrId: reviewerUser.id,
-    assignedByUsrId: adminUser.id,
-    assignedByNotes: "Please focus on methodology and evaluation rigor.",
-    status: REVIEW_ASSIGNMENT_STATUS.COMPLETED,
-    statusUpdateNotes: "Review completed with actionable feedback.",
-  });
+  const assignmentNotes = [
+    "Please evaluate methodology rigor and experimental design.",
+    "Focus on novelty, clarity of contribution, and related work coverage.",
+    "Assess technical soundness, reproducibility, and presentation quality.",
+    "Evaluate overall contribution significance and practical applicability.",
+  ];
 
-  await ContentSubmissionMessage.create({
-    contentSubmissionId: submission.id,
-    senderUsrId: ownerUser.id,
-    senderUsrType: USER_ROLE.USER,
-    visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
-    message: "Please let me know if any additional clarifications are needed.",
-  });
+  for (let i = 0; i < reviewerUsers.length; i++) {
+    await ContentReviewAssignment.create({
+      contentSubmissionId: submission.id,
+      reviewerUsrId: reviewerUsers[i].id,
+      assignedByUsrId: adminUser.id,
+      assignedByNotes: assignmentNotes[i % assignmentNotes.length],
+      status: REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
+      statusUpdateNotes: null,
+    });
+  }
 
-  await ContentSubmissionMessage.create({
-    contentSubmissionId: submission.id,
-    senderUsrId: adminUser.id,
-    senderUsrType: USER_ROLE.ADMIN,
-    receiverUsrId: reviewerUser.id,
-    visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
-    message: "Reviewer assignment created. Kindly submit findings by end of week.",
-  });
+  const resolveUser = (key) => {
+    if (key === "owner") return ownerUser;
+    if (key === "admin") return adminUser;
+    if (key === "reviewer") return reviewerUsers[0];
+    return null;
+  };
 
-  await ContentSubmissionMessage.create({
-    contentSubmissionId: submission.id,
-    senderUsrId: reviewerUser.id,
-    senderUsrType: USER_ROLE.REVIEWER,
-    receiverUsrId: adminUser.id,
-    visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
-    message: reviewerMessage,
-  });
+  for (const msg of messages) {
+    const sender = resolveUser(msg.senderKey);
+    const receiver = msg.receiverKey ? resolveUser(msg.receiverKey) : null;
 
-  await ContentReview.create({
-    contentReviewAssignmentId: assignment.id,
-    contentSubmissionVersionId: v2.id,
-    reviewerContentSubmissionVersionId: reviewerVersion.id,
-    comment: reviewComment,
-    recommendation: reviewRecommendation,
-  });
+    await ContentSubmissionMessage.create({
+      contentSubmissionId: submission.id,
+      senderUsrId: sender.id,
+      senderUsrType: msg.senderUsrType,
+      receiverUsrId: receiver ? receiver.id : null,
+      visibilityScope: msg.visibilityScope,
+      message: msg.message,
+    });
+  }
 
   await ContentSubmissionPayment.create({
     contentSubmissionId: submission.id,
@@ -504,26 +701,37 @@ async function createSubmissionBundle({
     status: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
   });
 
-  return {
-    submission,
-    assignment,
-    versions: { v1, v2, reviewerVersion },
-  };
+  return submission;
 }
 
 async function importData() {
   try {
-    const admin = await createAdminUser();
-    const [user, reviewer] = await User.bulkCreate(users, {
+    const admin = await initializeBaseData();
+
+    const createdUsers = await User.bulkCreate(users, {
       individualHooks: true,
       returning: true,
     });
+
+    const userMap = {};
+    for (const u of createdUsers) {
+      const prefix = u.email.split("@")[0];
+      userMap[prefix] = u;
+    }
+
+    const user1 = userMap["user1"];
+    const user2 = userMap["user2"];
+    const user3 = userMap["user3"];
+    const reviewer1 = userMap["reviewer1"];
+    const reviewer2 = userMap["reviewer2"];
+    const reviewer3 = userMap["reviewer3"];
+    const userreviewer = userMap["userreviewer"];
 
     const allSeederFiles = await walkFiles(seederDataDir);
     const uploadedFiles = [];
 
     for (const filePath of allSeederFiles) {
-      const uploadedBy = filePath.includes(`${path.sep}profile_photos${path.sep}`) ? user.id : admin.id;
+      const uploadedBy = filePath.includes(`${path.sep}profile_photos${path.sep}`) ? user1.id : admin.id;
       uploadedFiles.push(await saveFileToStorageAndDb({ sourcePath: filePath, uploadedBy }));
     }
 
@@ -548,15 +756,23 @@ async function importData() {
 
     const profilePhoto = filesByBaseName.get("PP_M_TAHSIN_ANWAR_OCT_2025.JPG");
     const cvFile = filesByBaseName.get("CV_M_TAHSIN_ANWAR_OCT_2025.PDF");
+
     if (profilePhoto) {
-      user.photoFileId = profilePhoto.id;
-      reviewer.photoFileId = profilePhoto.id;
+      user1.photoFileId = profilePhoto.id;
+      reviewer1.photoFileId = profilePhoto.id;
+      userreviewer.photoFileId = profilePhoto.id;
     }
     if (cvFile) {
-      reviewer.cvFileId = cvFile.id;
+      reviewer1.cvFileId = cvFile.id;
+      reviewer2.cvFileId = cvFile.id;
+      reviewer3.cvFileId = cvFile.id;
+      userreviewer.cvFileId = cvFile.id;
     }
-    await user.save();
-    await reviewer.save();
+    await user1.save();
+    await reviewer1.save();
+    await reviewer2.save();
+    await reviewer3.save();
+    await userreviewer.save();
 
     const conferences = await createResourcesWithMetadata({
       Model: Conference,
@@ -590,93 +806,49 @@ async function importData() {
       metadataFilesById,
     });
 
-    const s1 = {
-      initial: filesByBaseName.get("S1.DOCX"),
-      adminEdited: filesByBaseName.get("S1_EDITED_EDITOR.DOCX"),
-      reviewer: filesByBaseName.get("S1_REVIEWED_R1.DOCX"),
-    };
-    const s2 = {
-      initial: filesByBaseName.get("S2.DOCX"),
-      adminEdited: filesByBaseName.get("S2_EDITED_EDITOR.DOCX"),
-      reviewer: filesByBaseName.get("S2_REVIEWED_R2.DOCX"),
-    };
-    const s3 = {
-      initial: filesByBaseName.get("S3.DOCX"),
-      adminEdited: filesByBaseName.get("S3_EDITED_EDITOR.DOCX"),
-      reviewer: filesByBaseName.get("S3_REVIEWED_R3.DOCX"),
-    };
-
-    if (!s1.initial || !s1.adminEdited || !s1.reviewer) {
-      throw new Error("Missing one or more S1 submission files.");
-    }
-    if (!s2.initial || !s2.adminEdited || !s2.reviewer) {
-      throw new Error("Missing one or more S2 submission files.");
-    }
-    if (!s3.initial || !s3.adminEdited || !s3.reviewer) {
-      throw new Error("Missing one or more S3 submission files.");
+    const submissionFiles = {};
+    for (const key of ["S1", "S2", "S3"]) {
+      const initial = filesByBaseName.get(`${key}.DOCX`);
+      if (!initial) {
+        throw new Error(`Missing submission file: ${key}.docx`);
+      }
+      submissionFiles[key] = initial;
     }
 
-    await createSubmissionBundle({
-      ownerUser: user,
-      adminUser: admin,
-      reviewerUser: reviewer,
-      conference: conferences[2],
-      title: "AI-Driven Knowledge Graphs for Open Science",
-      topics: ["AI", "Open Science", "Knowledge Graphs"],
-      currentStatus: CONTENT_SUBMISSION_STATUS.APPROVED,
-      doi: "10.5555/episteme.2026.001",
-      statusUpdateNotes: "Accepted for publication after final review.",
-      paymentProviderPaymentId: "pi_seed_s1_captured",
-      fileInitial: s1.initial,
-      fileAdminEdited: s1.adminEdited,
-      fileReviewer: s1.reviewer,
-      versionNoStart: 1,
-      reviewRecommendation: REVIEW_RECOMMENDATION.ACCEPTED,
-      reviewComment: "Strong contribution with clear methodology and reproducible setup.",
-      reviewerMessage: "Review submitted. This paper is ready for acceptance.",
-    });
+    const allReviewers = [reviewer1, reviewer2, reviewer3, userreviewer];
+    const externalReviewers = [reviewer1, reviewer2, reviewer3];
 
-    await createSubmissionBundle({
-      ownerUser: user,
-      adminUser: admin,
-      reviewerUser: reviewer,
-      conference: conferences[1],
-      title: "Graph-Based Peer Review Systems",
-      topics: ["Graphs", "Peer Review", "Distributed Systems"],
-      currentStatus: CONTENT_SUBMISSION_STATUS.RETURNED,
-      doi: null,
-      statusUpdateNotes: "Revision requested for experiments and evaluation details.",
-      paymentProviderPaymentId: "pi_seed_s2_captured",
-      fileInitial: s2.initial,
-      fileAdminEdited: s2.adminEdited,
-      fileReviewer: s2.reviewer,
-      versionNoStart: 1,
-      reviewRecommendation: REVIEW_RECOMMENDATION.NEEDS_REVISION,
-      reviewComment: "Promising idea. Requires stronger benchmarking and clearer threat analysis.",
-      reviewerMessage: "Submitted detailed revision notes and suggestions.",
-    });
+    const submittingUsers = {
+      user1: { user: user1, reviewers: allReviewers },
+      user2: { user: user2, reviewers: allReviewers },
+      user3: { user: user3, reviewers: allReviewers },
+      userreviewer: { user: userreviewer, reviewers: externalReviewers },
+    };
 
-    await createSubmissionBundle({
-      ownerUser: user,
-      adminUser: admin,
-      reviewerUser: reviewer,
-      conference: conferences[2],
-      title: "Observability-Driven Editorial Pipelines",
-      topics: ["Observability", "Workflow Automation", "Editorial Systems"],
-      currentStatus: CONTENT_SUBMISSION_STATUS.REJECTED,
-      doi: null,
-      statusUpdateNotes: "Rejected due to insufficient empirical evidence.",
-      paymentProviderPaymentId: "pi_seed_s3_captured",
-      fileInitial: s3.initial,
-      fileAdminEdited: s3.adminEdited,
-      fileReviewer: s3.reviewer,
-      versionNoStart: 1,
-      reviewRecommendation: REVIEW_RECOMMENDATION.REJECTED,
-      reviewComment: "Interesting framing, but evaluation depth does not meet acceptance bar.",
-      reviewerMessage: "Review completed. Recommendation is reject with encouragement to resubmit.",
-    });
+    let submissionCounter = 0;
+    for (const [userKey, config] of Object.entries(submittingUsers)) {
+      const subData = userSubmissionData[userKey];
 
-    console.log("Data Imported".green.inverse);
+      for (let i = 0; i < subData.length; i++) {
+        submissionCounter++;
+        const { templateIdx, conferenceIdx, titleSuffix } = subData[i];
+        const template = submissionTemplates[templateIdx];
+
+        await createPendingSubmissionBundle({
+          ownerUser: config.user,
+          adminUser: admin,
+          reviewerUsers: config.reviewers,
+          conference: conferences[conferenceIdx],
+          title: `${template.title}${titleSuffix}`,
+          topics: template.topics,
+          fileInitial: submissionFiles[template.fileKey],
+          paymentProviderPaymentId: `pi_seed_${userKey}_s${i + 1}_pending`,
+          messages: messageTemplatesBySubmission[templateIdx],
+        });
+      }
+    }
+
+    console.log(`Data Imported (${createdUsers.length + 1} users, ${submissionCounter} submissions)`.green.inverse);
     await sequelize.close();
     process.exit(0);
   } catch (err) {
