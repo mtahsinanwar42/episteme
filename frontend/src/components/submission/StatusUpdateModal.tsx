@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ContentSubmissionStatus, type Submission } from "@/models/submission";
+import { SubmissionStatus, type Submission } from "@/models/submission";
 import {
   Dialog,
   DialogBody,
@@ -28,21 +28,21 @@ interface StatusUpdateModalProps {
 }
 
 const STATUS_OPTIONS = [
-  ContentSubmissionStatus.DRAFT,
-  ContentSubmissionStatus.PENDING_APPROVAL,
-  ContentSubmissionStatus.RETURNED,
-  ContentSubmissionStatus.APPROVED,
-  ContentSubmissionStatus.REJECTED,
-  ContentSubmissionStatus.DELETED,
+  SubmissionStatus.DRAFT,
+  SubmissionStatus.PENDING_APPROVAL,
+  SubmissionStatus.RETURNED,
+  SubmissionStatus.APPROVED,
+  SubmissionStatus.REJECTED,
+  SubmissionStatus.DELETED,
 ];
 
 const STATUS_LABELS: Record<number, string> = {
-  [ContentSubmissionStatus.DRAFT]: "Draft",
-  [ContentSubmissionStatus.PENDING_APPROVAL]: "Pending Approval",
-  [ContentSubmissionStatus.RETURNED]: "Returned",
-  [ContentSubmissionStatus.APPROVED]: "Approved",
-  [ContentSubmissionStatus.REJECTED]: "Rejected",
-  [ContentSubmissionStatus.DELETED]: "Deleted",
+  [SubmissionStatus.DRAFT]: "Draft",
+  [SubmissionStatus.PENDING_APPROVAL]: "Pending Approval",
+  [SubmissionStatus.RETURNED]: "Returned",
+  [SubmissionStatus.APPROVED]: "Approved",
+  [SubmissionStatus.REJECTED]: "Rejected",
+  [SubmissionStatus.DELETED]: "Deleted",
 };
 
 export function StatusUpdateModal({
@@ -52,7 +52,7 @@ export function StatusUpdateModal({
   onClose,
 }: StatusUpdateModalProps) {
   const [selectedStatus, setSelectedStatus] = useState<number>(
-    ContentSubmissionStatus.PENDING_APPROVAL,
+    SubmissionStatus.PENDING_APPROVAL,
   );
   const [statusUpdateNotes, setStatusUpdateNotes] = useState<string>("");
   const { showSuccessToast } = useSuccessToast();
@@ -63,9 +63,7 @@ export function StatusUpdateModal({
 
   useEffect(() => {
     if (selectedSubmission) {
-      setSelectedStatus(
-        selectedSubmission.status ?? ContentSubmissionStatus.DRAFT,
-      );
+      setSelectedStatus(selectedSubmission.status ?? SubmissionStatus.DRAFT);
       setStatusUpdateNotes(selectedSubmission.statusUpdateNotes ?? "");
     }
   }, [selectedSubmission]);
@@ -106,7 +104,7 @@ export function StatusUpdateModal({
                 Current status:{" "}
                 {
                   STATUS_LABELS[
-                    selectedSubmission?.status ?? ContentSubmissionStatus.DRAFT
+                    selectedSubmission?.status ?? SubmissionStatus.DRAFT
                   ]
                 }
               </p>

@@ -56,7 +56,7 @@ export interface CreateSubmissionRequest {
   message?: string;
 }
 
-export enum ContentSubmissionStatus {
+export enum SubmissionStatus {
   DRAFT = 0,
   PENDING_APPROVAL = 1,
   RETURNED = 2,
@@ -68,4 +68,42 @@ export enum ContentSubmissionStatus {
 export interface UpdateSubmissionStatusRequest {
   status: number;
   statusUpdateNotes?: string;
+}
+
+export interface SubmissionVersionUploader {
+  id?: string | number;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  userType?: string;
+}
+
+export interface SubmissionVersionFile {
+  id?: string | number;
+  name?: string;
+  storageKey?: string;
+}
+
+export interface SubmissionVersion {
+  versionId?: string | number;
+  versionNo?: number | string;
+  changeLog?: string | null;
+  createdAt?: string;
+  uploader?: SubmissionVersionUploader | null;
+  file?: SubmissionVersionFile | null;
+}
+
+export interface SubmissionVersionsResponse {
+  data: SubmissionVersion[];
+  success: boolean;
+}
+
+export interface SubmissionVersionDetailsResponse {
+  data: SubmissionVersion;
+  success: boolean;
+}
+
+export interface CreateSubmissionVersionRequest {
+  contentFilePath: string;
+  message?: string;
 }

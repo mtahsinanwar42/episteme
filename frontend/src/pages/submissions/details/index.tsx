@@ -126,6 +126,7 @@ export default function SubmissionDetails() {
             >
               Versions
             </NavLink>
+
             {isAdmin || isReviewer ? (
               <NavLink
                 to={`/submissions/${submission.submissionId}/reviews`}

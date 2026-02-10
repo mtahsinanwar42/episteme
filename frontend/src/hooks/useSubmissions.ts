@@ -6,6 +6,7 @@ import {
 import type {
   CreateSubmissionRequest,
   UpdateSubmissionStatusRequest,
+  CreateSubmissionVersionRequest,
 } from "@/models/submission";
 
 export function useSubmissions(params?: GetSubmissionsParams) {
@@ -46,6 +47,31 @@ export function useUpdateSubmissionStatusMutation(
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["submission", submissionId] });
       queryClient.invalidateQueries({ queryKey: ["submissions"] });
+    },
+  });
+}
+
+export function useSubmissionVersions(submissionId?: string | number) {
+  return useQuery({
+    queryKey: ["submissionVersions", submissionId],
+    queryFn: () => submissionService.getSubmissionVersions(submissionId!),
+    enabled: !!submissionId,
+  });
+}
+
+export function useCreateSubmissionVersionMutation(
+  submissionId: string | number,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateSubmissionVersionRequest) =>
+      submissionService.createSubmissionVersion(submissionId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["submissionVersions", submissionId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["submission", submissionId] });
     },
   });
 }

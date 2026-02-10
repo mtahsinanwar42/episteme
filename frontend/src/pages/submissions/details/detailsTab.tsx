@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusUpdateModal } from "@/components/submission/StatusUpdateModal";
-import { ContentSubmissionStatus, type Submission } from "@/models/submission";
+import { SubmissionStatus, type Submission } from "@/models/submission";
 import { formatDateTime } from "@/utils/dateFormatter";
 import type { SubmissionOutletContext } from "@/pages/submissions/details";
 import {
@@ -25,9 +25,9 @@ export default function SubmissionDetailsTab() {
     isAdmin &&
     submission.status !== undefined &&
     [
-      ContentSubmissionStatus.DRAFT,
-      ContentSubmissionStatus.PENDING_APPROVAL,
-      ContentSubmissionStatus.RETURNED,
+      SubmissionStatus.DRAFT,
+      SubmissionStatus.PENDING_APPROVAL,
+      SubmissionStatus.RETURNED,
     ].includes(submission.status);
 
   const shouldShowOwner =
@@ -40,7 +40,9 @@ export default function SubmissionDetailsTab() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div className="lg:col-span-2 rounded-lg shadow-small border border-border">
+      <div
+        className={`${isAdmin ? "lg:col-span-2" : "lg:col-span-3"} rounded-lg shadow-small border border-border`}
+      >
         <div className="p-4 gradient-card shadow-sm flex justify-between items-center">
           <h3 className="font-semibold">Submission Information</h3>
           {canUpdateStatus && (
@@ -54,6 +56,7 @@ export default function SubmissionDetailsTab() {
             </Button>
           )}
         </div>
+
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           {submission.doi && (
             <div className="flex items-start gap-3">
