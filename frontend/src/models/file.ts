@@ -44,7 +44,7 @@ export interface FileDetailsResponse {
 export enum FileTypeEnum {
   PROFILE_PHOTOS = "profile_photos",
   CVS = "cvs",
-  PAPERS = "papers",
+  SUBMISSIONS = "submissions",
   ASSETS = "assets",
 }
 

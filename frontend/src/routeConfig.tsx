@@ -39,6 +39,12 @@ import BlogDetails from "@/pages/blogs/details";
 import NewBlog from "@/pages/blogs/new";
 import EditBlog from "@/pages/blogs/edit";
 import BlogSearch from "@/pages/blogs/search";
+import Submissions from "@/pages/submissions";
+import SubmissionDetails from "@/pages/submissions/details";
+import SubmissionDetailsTab from "@/pages/submissions/details/detailsTab";
+import SubmissionMessages from "@/pages/submissions/details/messages";
+import SubmissionVersions from "@/pages/submissions/details/versions";
+import SubmissionReviews from "@/pages/submissions/details/reviews";
 import ConferenceDetails from "@/pages/conferences/details";
 import NewConference from "@/pages/conferences/new";
 import EditConference from "@/pages/conferences/edit";
@@ -48,11 +54,13 @@ import Unauthorized from "@/pages/misc/unauthorized";
 import NotFound from "@/pages/misc/notFound";
 import UpdatePassword from "@/pages/me/updatePassword";
 import MyProfile from "@/pages/me/myProfile";
-import ForgotPassword from "./pages/me/forgotPassword";
-import ResetPassword from "./pages/me/resetPassword";
+import ForgotPassword from "@/pages/me/forgotPassword";
+import ResetPassword from "@/pages/me/resetPassword";
 import { UserRole } from "@/models/user";
 import AllReviewAssignments from "@/pages/review-assignments";
 import MyReviewAssignments from "@/pages/reviewer/review-assignments";
+import NewSubmission from "@/pages/submissions/new";
+import ReviewerSubmissions from "./pages/submissions/ReviewerSubmissions";
 
 export default function RouteConfig() {
   return (
@@ -101,7 +109,7 @@ export default function RouteConfig() {
       <Route
         path="/users/search"
         element={
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+          <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
             <UserSearch />
           </ProtectedRoute>
         }
@@ -110,8 +118,86 @@ export default function RouteConfig() {
       <Route
         path="/users/:userId"
         element={
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+          <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
             <UserDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/submissions"
+        element={
+          <ProtectedRoute
+            allowedRoles={[UserRole.USER, UserRole.REVIEWER, UserRole.ADMIN]}
+          >
+            <Submissions />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/submissions/new"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.USER]}>
+            <NewSubmission />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/submissions/:submissionId"
+        element={
+          <ProtectedRoute
+            allowedRoles={[UserRole.USER, UserRole.REVIEWER, UserRole.ADMIN]}
+          >
+            <SubmissionDetails />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="details" replace />} />
+        <Route
+          path="details"
+          element={
+            <ProtectedRoute
+              allowedRoles={[UserRole.USER, UserRole.REVIEWER, UserRole.ADMIN]}
+            >
+              <SubmissionDetailsTab />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="messages"
+          element={
+            <ProtectedRoute
+              allowedRoles={[UserRole.USER, UserRole.REVIEWER, UserRole.ADMIN]}
+            >
+              <SubmissionMessages />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="versions"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+              <SubmissionVersions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="reviews"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.REVIEWER]}>
+              <SubmissionReviews />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      <Route
+        path="/reviewer/submissions"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.REVIEWER, UserRole.ADMIN]}>
+            <ReviewerSubmissions />
           </ProtectedRoute>
         }
       />

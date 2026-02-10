@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { validateStoredToken } from "@/utils/tokenValidator";
-import { setToken, logout } from "@/stores/authSlice";
+import { setToken, logout, setUser } from "@/stores/authSlice";
 import { api } from "@/services/api";
 import type { AppDispatch } from "@/stores/store";
 
@@ -29,6 +29,7 @@ export const useAuthInitialization = () => {
           // Token is invalid or expired
           console.warn("Token is invalid or expired");
           dispatch(logout());
+          dispatch(setUser(null));
           return;
         }
 
