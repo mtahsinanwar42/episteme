@@ -7,6 +7,7 @@ import type {
   CreateSubmissionRequest,
   UpdateSubmissionStatusRequest,
   CreateSubmissionVersionRequest,
+  CreateSubmissionMessageRequest,
 } from "@/models/submission";
 
 export function useSubmissions(params?: GetSubmissionsParams) {
@@ -73,5 +74,50 @@ export function useCreateSubmissionVersionMutation(
       });
       queryClient.invalidateQueries({ queryKey: ["submission", submissionId] });
     },
+  });
+}
+
+export function useSubmissionMessages(submissionId?: string | number) {
+  return useQuery({
+    queryKey: ["submissionMessages", submissionId],
+    queryFn: () => submissionService.getSubmissionMessages(submissionId!),
+    enabled: !!submissionId,
+  });
+}
+
+export function useCreateSubmissionMessageMutation(
+  submissionId: string | number,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateSubmissionMessageRequest) =>
+      submissionService.createSubmissionMessage(submissionId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["submissionMessages", submissionId],
+      });
+    },
+  });
+}
+
+export function useSubmissionReviewers(
+  submissionId?: string | number,
+  options?: { enabled?: boolean },
+) {
+  return useQuery({
+    queryKey: ["submissionReviewers", submissionId],
+    queryFn: () => submissionService.getSubmissionReviewers(submissionId!),
+    enabled:
+      options?.enabled !== undefined
+        ? options.enabled && !!submissionId
+        : !!submissionId,
+  });
+}
+
+export function useReviewAssignments(params?: GetSubmissionsParams) {
+  return useQuery({
+    queryKey: ["reviewssignments", params],
+    queryFn: () => submissionService.getReviewAssignments(params),
   });
 }

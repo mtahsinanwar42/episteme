@@ -107,3 +107,65 @@ export interface CreateSubmissionVersionRequest {
   contentFilePath: string;
   message?: string;
 }
+
+export enum MessageScope {
+  USER_ADMIN = "USER_ADMIN",
+  ADMIN_REVIEWER = "ADMIN_REVIEWER",
+}
+
+export interface SubmissionMessageSender {
+  id?: string | number;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  userType?: string;
+}
+
+export interface SubmissionMessage {
+  messageId?: string | number;
+  id?: string | number;
+  message: string;
+  content?: string;
+  visibilityScope?: string;
+  scope?: string;
+  sender?: SubmissionMessageSender | null;
+  receiver?: SubmissionMessageSender | null;
+  senderUserId?: string | number;
+  receiverUserId?: string | number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SubmissionMessagesResponse {
+  data: SubmissionMessage[];
+  success: boolean;
+}
+
+export interface CreateSubmissionMessageRequest {
+  message: string;
+  scope: string;
+  receiverUsrId?: string | number;
+}
+
+export interface SubmissionReviewer {
+  id?: string | number;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  status?: string;
+}
+
+export interface SubmissionReviewersResponse {
+  data: SubmissionReviewer[];
+  success: boolean;
+}
+
+export interface MessageGroup {
+  recipient: SubmissionReviewer | null;
+  messages: SubmissionMessage[];
+  scope: string;
+}
+
+export interface MessageGroups {
+  [key: string | number]: MessageGroup;
+}

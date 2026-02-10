@@ -199,10 +199,10 @@ const reviewerNavItems: NavItemConfig[] = [
   aboutNavItem,
   {
     label: "Submissions",
-    href: "/user/submissions",
+    href: "/reviewer/submissions",
     children: [
-      { label: "New", href: "/user/submissions/new" },
-      { label: "My Submissions", href: "/user/submissions" },
+      { label: "New", href: "/reviewer/submissions/new" },
+      { label: "My Submissions", href: "/reviewer/submissions" },
       {
         label: "Assigned Reviews",
         href: "/reviewer/review-assignments",

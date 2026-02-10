@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { useSubmissions } from "@/hooks/useSubmissions";
+import { useReviewAssignments } from "@/hooks/useSubmissions";
 import { DataTable } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -8,7 +8,6 @@ import { ArrowUpDown, Eye } from "lucide-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import PageTitle from "@/components/common/PageTitle";
-import type { Submission } from "@/models/submission";
 import { formatDate } from "@/utils/dateFormatter";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/store";
@@ -19,7 +18,7 @@ import {
   getSubmissionStatusBadge,
 } from "@/components/common/ResourceStatusBadge";
 
-export default function Submissions() {
+export default function ReviewerSubmissions() {
   const navigate = useNavigate();
   const currentRoles = useSelector(
     (state: RootState) => state?.auth?.user?.roles,
@@ -33,7 +32,7 @@ export default function Submissions() {
     data: response,
     isLoading,
     error,
-  } = useSubmissions({
+  } = useReviewAssignments({
     page,
     limit: pageSize,
     sort: "-createdAt",
@@ -56,8 +55,8 @@ export default function Submissions() {
     setPage(1);
   }, []);
 
-  const columns: ColumnDef<Submission>[] = useMemo(() => {
-    const ownerColumn: ColumnDef<Submission> = {
+  const columns: ColumnDef<any>[] = useMemo(() => {
+    const ownerColumn: ColumnDef<any> = {
       accessorKey: "owner",
       header: "Owner",
       cell: ({ row }) => (
@@ -71,7 +70,7 @@ export default function Submissions() {
       enableSorting: false,
     };
 
-    const paymentColumn: ColumnDef<Submission> = {
+    const paymentColumn: ColumnDef<any> = {
       accessorKey: "paymentStatus",
       header: "Payment",
       cell: ({ row }) => {
@@ -102,7 +101,9 @@ export default function Submissions() {
           );
         },
         cell: ({ row }) => (
-          <span className="text-sm font-medium">{row.getValue("title")}</span>
+          <span className="text-sm font-medium">
+            {row.original.submissionTitle}
+          </span>
         ),
         sortingFn: (rowA, rowB, columnId) => {
           const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
@@ -114,7 +115,7 @@ export default function Submissions() {
         accessorKey: "conferenceTitle",
         header: "Conference",
         cell: ({ row }) => (
-          <span className="text-sm">{row.getValue("conferenceTitle")}</span>
+          <span className="text-sm">{row.original.conferenceTitle}</span>
         ),
         enableSorting: false,
       },
@@ -146,7 +147,7 @@ export default function Submissions() {
           );
         },
         cell: ({ row }) => {
-          const status = row.getValue("status") as number;
+          const status = row.original?.submissionStatus;
           return (
             <div className="flex place-self-center">
               {getSubmissionStatusBadge(status)}
@@ -173,7 +174,7 @@ export default function Submissions() {
         },
         cell: ({ row }) => (
           <span className="text-sm">
-            {formatDate(row.getValue("createdAt") as string)}
+            {formatDate(row.original?.submissionCreatedAt)}
           </span>
         ),
       },
@@ -185,7 +186,7 @@ export default function Submissions() {
         cell: ({ row }) => {
           return (
             <div className="flex gap-4 place-self-center">
-              <Link to={`/submissions/${row?.original?.submissionId}`}>
+              <Link to={`/submissions/${Number(row?.original?.submissionId)}`}>
                 <Eye className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
               </Link>
             </div>
@@ -198,7 +199,9 @@ export default function Submissions() {
 
   return (
     <div>
-      <Breadcrumb items={[{ label: "Submissions", href: "/submissions" }]} />
+      <Breadcrumb
+        items={[{ label: "Submissions", href: "/reviewer/submissions" }]}
+      />
       <div className="mb-6 flex justify-between items-end">
         <div>
           <PageTitle title="Submissions" />

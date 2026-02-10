@@ -58,6 +58,7 @@ import ForgotPassword from "@/pages/me/forgotPassword";
 import ResetPassword from "@/pages/me/resetPassword";
 import { UserRole } from "@/models/user";
 import NewSubmission from "@/pages/submissions/new";
+import ReviewerSubmissions from "./pages/submissions/ReviewerSubmissions";
 
 export default function RouteConfig() {
   return (
@@ -155,7 +156,9 @@ export default function RouteConfig() {
         <Route
           path="details"
           element={
-            <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+            <ProtectedRoute
+              allowedRoles={[UserRole.USER, UserRole.REVIEWER, UserRole.ADMIN]}
+            >
               <SubmissionDetailsTab />
             </ProtectedRoute>
           }
@@ -163,7 +166,9 @@ export default function RouteConfig() {
         <Route
           path="messages"
           element={
-            <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+            <ProtectedRoute
+              allowedRoles={[UserRole.USER, UserRole.REVIEWER, UserRole.ADMIN]}
+            >
               <SubmissionMessages />
             </ProtectedRoute>
           }
@@ -185,6 +190,15 @@ export default function RouteConfig() {
           }
         />
       </Route>
+
+      <Route
+        path="/reviewer/submissions"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.REVIEWER, UserRole.ADMIN]}>
+            <ReviewerSubmissions />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/assets"
