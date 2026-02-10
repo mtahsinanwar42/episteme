@@ -92,6 +92,11 @@ class BaseApiService {
         headers,
       });
 
+      if (response.status === 401) {
+        Cookies.remove("token");
+        this.onUnauthorized?.();
+      }
+
       if (!response.ok) {
         const error = await response.json().catch(() => ({
           message: `HTTP error! status: ${response.status}`,
@@ -181,6 +186,11 @@ class BaseApiService {
         headers,
       });
 
+      if (response.status === 401) {
+        Cookies.remove("token");
+        this.onUnauthorized?.();
+      }
+
       if (!response.ok) {
         throw new Error(`Request failed with status ${response.status}`);
       }
@@ -215,6 +225,11 @@ class BaseApiService {
         headers,
         body: formData,
       });
+
+      if (response.status === 401) {
+        Cookies.remove("token");
+        this.onUnauthorized?.();
+      }
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({
@@ -253,6 +268,11 @@ class BaseApiService {
         method: "GET",
         headers,
       });
+
+      if (response.status === 401) {
+        Cookies.remove("token");
+        this.onUnauthorized?.();
+      }
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({
