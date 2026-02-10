@@ -312,17 +312,17 @@ const metadataHeroImageMap = new Map([
 const submissionTemplates = [
   {
     title: "AI-Driven Knowledge Graphs for Open Science",
-    topics: ["Computer science"],
+    topics: ["Computer science", "Context (archaeology)"],
     fileKey: "S1",
   },
   {
     title: "Graph-Based Peer Review Systems",
-    topics: ["Work (physics)"],
+    topics: ["Work (physics)", "Context (archaeology)"],
     fileKey: "S2",
   },
   {
     title: "Observability-Driven Editorial Pipelines",
-    topics: ["Context (archaeology)"],
+    topics: ["Context (archaeology)", "Work (physics)"],
     fileKey: "S3",
   },
 ];
@@ -331,22 +331,22 @@ const userSubmissionData = {
   user1: [
     { templateIdx: 0, conferenceIdx: 0, titleSuffix: " — Delft Perspective" },
     { templateIdx: 1, conferenceIdx: 1, titleSuffix: " — Delft Perspective" },
-    { templateIdx: 2, conferenceIdx: 2, titleSuffix: " — Delft Perspective" },
+    { templateIdx: 2, conferenceIdx: 0, titleSuffix: " — Delft Perspective" },
   ],
   user2: [
     { templateIdx: 0, conferenceIdx: 1, titleSuffix: " — ETH Perspective" },
-    { templateIdx: 1, conferenceIdx: 2, titleSuffix: " — ETH Perspective" },
+    { templateIdx: 1, conferenceIdx: 0, titleSuffix: " — ETH Perspective" },
     { templateIdx: 2, conferenceIdx: 0, titleSuffix: " — ETH Perspective" },
   ],
   user3: [
-    { templateIdx: 0, conferenceIdx: 2, titleSuffix: " — Lisbon Perspective" },
+    { templateIdx: 0, conferenceIdx: 1, titleSuffix: " — Lisbon Perspective" },
     { templateIdx: 1, conferenceIdx: 0, titleSuffix: " — Lisbon Perspective" },
     { templateIdx: 2, conferenceIdx: 1, titleSuffix: " — Lisbon Perspective" },
   ],
   userreviewer: [
     { templateIdx: 0, conferenceIdx: 0, titleSuffix: " — KAIST Perspective" },
     { templateIdx: 1, conferenceIdx: 1, titleSuffix: " — KAIST Perspective" },
-    { templateIdx: 2, conferenceIdx: 2, titleSuffix: " — KAIST Perspective" },
+    { templateIdx: 2, conferenceIdx: 1, titleSuffix: " — KAIST Perspective" },
   ],
 };
 

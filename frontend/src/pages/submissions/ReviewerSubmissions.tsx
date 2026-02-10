@@ -8,6 +8,7 @@ import { ArrowUpDown, Eye } from "lucide-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import PageTitle from "@/components/common/PageTitle";
+import { SubmissionStatus } from "@/models/submission";
 import { formatDate } from "@/utils/dateFormatter";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/store";
@@ -17,6 +18,25 @@ import {
   getPaymentStatusBadge,
   getSubmissionStatusBadge,
 } from "@/components/common/ResourceStatusBadge";
+
+const getSubmissionStatusLabel = (status: number | undefined) => {
+  switch (status) {
+    case SubmissionStatus.DRAFT:
+      return "Draft";
+    case SubmissionStatus.PENDING_APPROVAL:
+      return "Pending Approval";
+    case SubmissionStatus.RETURNED:
+      return "Returned";
+    case SubmissionStatus.APPROVED:
+      return "Approved";
+    case SubmissionStatus.REJECTED:
+      return "Rejected";
+    case SubmissionStatus.DELETED:
+      return "Deleted";
+    default:
+      return `${status}`;
+  }
+};
 
 export default function ReviewerSubmissions() {
   const navigate = useNavigate();
@@ -57,7 +77,9 @@ export default function ReviewerSubmissions() {
 
   const columns: ColumnDef<any>[] = useMemo(() => {
     const ownerColumn: ColumnDef<any> = {
-      accessorKey: "owner",
+      id: "owner",
+      accessorFn: (row) =>
+        `${row.ownerFirstName ?? ""} ${row.ownerLastName ?? ""} ${row.ownerEmail ?? ""}`,
       header: "Owner",
       cell: ({ row }) => (
         <div>
@@ -86,30 +108,15 @@ export default function ReviewerSubmissions() {
 
     return [
       {
-        accessorKey: "title",
-        header: ({ column }) => {
-          return (
-            <div
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="flex items-center gap-4 justify-center w-full"
-            >
-              Title
-              <ArrowUpDown className="size-4 text-muted-foreground" />
-            </div>
-          );
-        },
+        id: "title",
+        accessorFn: (row) => row.submissionTitle ?? row.title ?? "",
+        header: "Title",
         cell: ({ row }) => (
           <span className="text-sm font-medium">
             {row.original.submissionTitle}
           </span>
         ),
-        sortingFn: (rowA, rowB, columnId) => {
-          const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
-          const b = String(rowB.getValue(columnId) ?? "").toLowerCase();
-          return a.localeCompare(b);
-        },
+        enableSorting: false,
       },
       {
         accessorKey: "conferenceTitle",
@@ -121,10 +128,11 @@ export default function ReviewerSubmissions() {
       },
       ...(isAdmin ? [ownerColumn] : []),
       {
-        accessorKey: "topics",
+        id: "topics",
+        accessorFn: (row) => (row.topics ?? []).join(", "),
         header: "Topics",
         cell: ({ row }) => {
-          const topics = row.getValue("topics") as string[];
+          const topics = row.original.topics ?? [];
           return (
             <div className="flex gap-1 flex-wrap">{topics?.join(", ")}</div>
           );
@@ -132,7 +140,9 @@ export default function ReviewerSubmissions() {
         enableSorting: false,
       },
       {
-        accessorKey: "status",
+        id: "status",
+        accessorFn: (row) =>
+          getSubmissionStatusLabel(row.submissionStatus ?? row.status),
         header: ({ column }) => {
           return (
             <div
@@ -159,24 +169,13 @@ export default function ReviewerSubmissions() {
       ...(isAdmin ? [paymentColumn] : []),
       {
         accessorKey: "createdAt",
-        header: ({ column }) => {
-          return (
-            <div
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="flex items-center gap-4 justify-center w-full"
-            >
-              Created At
-              <ArrowUpDown className="size-4 text-muted-foreground" />
-            </div>
-          );
-        },
+        header: "Created At",
         cell: ({ row }) => (
           <span className="text-sm">
             {formatDate(row.original?.submissionCreatedAt)}
           </span>
         ),
+        enableSorting: false,
       },
       {
         accessorKey: "actions",
@@ -229,6 +228,13 @@ export default function ReviewerSubmissions() {
           pageSize={pageSize}
           enableSearch
           searchPlaceholder="Filter Submissions"
+          searchableColumnIds={[
+            "title",
+            "status",
+            "conferenceTitle",
+            "owner",
+            "topics",
+          ]}
         />
 
         {!isLoading && !error && total > 0 && (

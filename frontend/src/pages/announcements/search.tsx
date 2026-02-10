@@ -43,6 +43,21 @@ const getStatusBadge = (status: number) => {
   }
 };
 
+const getStatusLabel = (status: number) => {
+  switch (status) {
+    case AnnouncementStatus.UPCOMING:
+      return "Upcoming";
+    case AnnouncementStatus.ONGOING:
+      return "Ongoing";
+    case AnnouncementStatus.COMPLETED:
+      return "Completed";
+    case AnnouncementStatus.DELETED:
+      return "Deleted";
+    default:
+      return `${status}`;
+  }
+};
+
 export default function AnnouncementSearch() {
   const navigate = useNavigate();
   const currentRoles = useSelector(
@@ -94,7 +109,17 @@ export default function AnnouncementSearch() {
   const columns: ColumnDef<Announcement>[] = [
     {
       accessorKey: "title",
-      header: "Title",
+      header: ({ column }) => {
+        return (
+          <div
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex items-center gap-4 justify-center w-full"
+          >
+            Title
+            <ArrowUpDown className="size-4 text-muted-foreground" />
+          </div>
+        );
+      },
       cell: ({ row }) => {
         const title = row.getValue("title") as string;
         return (
@@ -103,29 +128,30 @@ export default function AnnouncementSearch() {
       },
     },
     {
-      accessorKey: "status",
-      header: () => <div className="text-center">Status</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="flex justify-center w-full text-sm">
-            {getStatusBadge(row.getValue("status") as number)}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "createdAt",
+      id: "status",
+      accessorFn: (row) => getStatusLabel(row.status),
       header: ({ column }) => {
         return (
           <div
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="flex items-center gap-4 justify-center w-full"
           >
-            Created At
+            Status
             <ArrowUpDown className="size-4 text-muted-foreground" />
           </div>
         );
       },
+      cell: ({ row }) => {
+        return (
+          <div className="flex justify-center w-full text-sm">
+            {getStatusBadge(row.original.status)}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created At",
       cell: ({ row }) => {
         return (
           <div className="text-sm text-center">
@@ -133,6 +159,7 @@ export default function AnnouncementSearch() {
           </div>
         );
       },
+      enableSorting: false,
     },
     {
       accessorKey: "actions",
@@ -154,6 +181,7 @@ export default function AnnouncementSearch() {
           </div>
         );
       },
+      enableSorting: false,
     },
   ];
 
@@ -378,6 +406,7 @@ export default function AnnouncementSearch() {
             pageSize={pageSize}
             enableSearch
             searchPlaceholder="Filter Announcements"
+            searchableColumnIds={["title", "status"]}
           />
 
           {!isLoading && !error && total > 0 && (

@@ -48,10 +48,6 @@ If unauthenticated, show a simplified version.
 #### REVIEWER Header
 
 - About
-- Submissions
-  - New
-  - My Submissions
-  - Assigned Reviews
 - Conferences
 - Trainings
 - Announcements
@@ -74,7 +70,7 @@ If unauthenticated, show a simplified version.
 - Submissions
   - New
   - All
-- Reviewer Assignments
+- Review Assignments
 - Conferences
   - New
   - All

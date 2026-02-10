@@ -1,18 +1,18 @@
-# Review Assignments — All Assignments
+# Review Assignments - All Assignments
 
 ## Route
 
 - Path: `/review-assignments`
 - Access: ADMIN
-- Mode: View + partial update (assignment status)
+- Mode: View + update assignment status (via modal)
 
 ---
 
 ## Purpose
 
-- Display a list of all review assignments across submissions.
-- Allow ADMIN to monitor and manage reviewer assignment status.
-- Allow ADMIN to navigate to submission detail pages.
+- Display all review assignments.
+- Let ADMIN view assignment details and update assignment status.
+- Let ADMIN navigate to submission detail pages.
 
 ---
 
@@ -21,93 +21,117 @@
 ### Fetch Review Assignments
 
 - `GET /api/v1/review-assignments`
-- Trigger: Page load + pagination / filter / sort changes
-- Query params: As defined in Reviewer Assignment API spec
+- Trigger: initial load and pagination changes
+- Query params used by FE: `page`, `limit`
 
-### Update Assignment Status
+### Update Review Assignment Status
 
 - `PUT /api/v1/review-assignments/:id/status`
-- Trigger: Assignment status update action (assign/complete/cancel/delete)
-- Request body: As defined in Reviewer Assignment API spec
+- Trigger: save action in Assignment Details modal
+- Request body:
+  - `status` (number, required)
+  - `statusUpdateNotes` (string, optional)
 
 ---
 
 ## UI Requirements
 
-- Layout: **table view**
-- Columns (minimum; dev may add more from API response):
-  - Submission Title (text)
-  - Submission Status (badge)
-  - Conference (text)
-  - Reviewer (name + email)
-  - Assignment Status (badge)
-  - Assignment Status Update Notes (Text)
-  - Assigned By (name + email)
-  - Assigned At (date/time)
-  - Submitter (name + email)
-  - **Action**: View
-  - **Action**: Update Status
+- Layout: table view + modal
+- Search:
+  - Client-side table search input with placeholder `Filter assignments`
 
-- **View** action navigates to:
-  - `/submissions/:id`
+### Table Columns
+
+- Submission Title
+- Submission Status (badge)
+- Conference
+- Conference Status (badge)
+- Reviewer (name + email)
+- Assignment Status (badge)
+- Assigned By (name + email)
+- Assigned At (formatted datetime)
+- Submitter (name + email)
+- Actions
+
+### Row Actions
+
+- View Submission: navigate to `/submissions/:submissionId`
+- Assignment Details: open `Review Assignment Details` modal
 
 ---
 
-## Assignment Status Update
+## Assignment Details Modal (ADMIN)
 
-- Provide a status update control (maybe a modal) per row:
-  - Assignment Status — single select
-    - Allowed values: as defined in Review Assignment API spec
-  - Status Update Notes (Optional) - Text
-    - Shown for ADMIN only
-- Updating status triggers:
-  - `PUT /api/v1/review-assignments/:id/status`
+### Read-Only Details
 
-### Status Update Behavior
+- Submission
+- Submission Status
+- Conference
+- Conference Status
+- Reviewer
+- Assigned By
+- Assigned At
+- Assignment Notes (shown only when `assignedByNotes` exists; displayed in italic style)
+- Submitter
+- Assignment Status
+- Status Update Notes (shown only when `assignmentStatusUpdateNotes` is non-empty)
 
-- While updating:
-  - Disable the status control for that row
-  - Show loading indicator
+### Update Controls
+
+- Controls appear only when `canUpdateStatus` is true.
+- Fields:
+  - `Select new status *` (single select)
+  - `Status Update Notes` (text input, optional)
+- Allowed statuses in select:
+  - `ASSIGNED`
+  - `CANCELLED`
+  - `DELETED`
+
+### Update Eligibility (`canUpdateStatus`)
+
+- Assignment status is not `CANCELLED` and not `DELETED`
+- Submission status is `PENDING_APPROVAL` or `RETURNED`
+- Conference status is `ACTIVE`
+
+### Modal Actions
+
+- If updatable:
+  - `Cancel`
+  - `Save` (disabled until a new status is selected)
+- If not updatable:
+  - `Close`
+
+### Update Result
+
 - On success:
-  - Update the status badge in the table
-  - Show success message: “Assignment status updated.”
+  - Modal closes
+  - Success toast: `Assignment status updated.`
+  - Assignment lists are refreshed via query invalidation
 - On error:
-  - Revert to previous status
-  - Show error message: “Failed to update assignment status.”
+  - Error is logged to console
 
 ---
 
 ## Pagination Requirements
 
-- Pagination is required (page / limit)
-- Provide navigation controls:
-  - previous / next
-  - current page indicator
-
----
-
-## Navigation Behavior
-
-- Clicking **View** opens:
-  - `/submissions/:id`
+- Server pagination with `page` and `limit`
+- Pagination component is shown only when:
+  - not loading
+  - no error
+  - `total > 0`
 
 ---
 
 ## States
 
-- Loading (initial load)
-- Loading (pagination / filter / sort change)
-- Loading (assignment status update)
-- Empty:
-  - Message: “No review assignments found.”
-- Error (API failure)
-- Forbidden:
-  - Non-ADMIN attempting to access this page
+- Loading: loading overlay in table area
+- Error: inline text `Error: <message>`
+- Empty: text `No data available`
+- Forbidden: non-ADMIN cannot access route
 
 ---
 
 ## Access Control Rules
 
 - Only ADMIN can access this page.
-- ADMIN can view and update all review assignments.
-- REVIEWER and USER must not see navigation entry or access this route.
+- REVIEWER and USER must not access this route.
