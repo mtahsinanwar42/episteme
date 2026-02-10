@@ -106,6 +106,7 @@ export default function Assets() {
     limit: pageSize,
     sort: "-createdAt",
     paginate: true,
+    storageKey: "storage/public/assets",
   });
 
   const files = response?.data || [];
