@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, Info } from "lucide-react";
+import { ArrowUpDown, Eye, Info } from "lucide-react";
 import { useMyReviewAssignments } from "@/hooks/useReviewAssignments";
 import type { ReviewAssignment } from "@/models/reviewAssignment";
 import {
@@ -15,10 +15,14 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import { getReviewAssignmentStatusBadge } from "@/components/common/ReviewAssignmentStatusBadge";
-import { getSubmissionStatusBadge } from "@/components/common/SubmissionStatusBadge";
-import { getConferenceStatusBadge } from "@/components/common/ConferenceStatusBadge";
+import {
+  getSubmissionStatusBadge,
+  getSubmissionStatusLabel,
+} from "@/components/common/SubmissionStatusBadge";
 import { formatDateTime } from "@/utils/dateFormatter";
 import { ReviewAssignmentStatusUpdateModal } from "@/components/reviewAssignment/ReviewAssignmentStatusUpdateModal";
+import { getReviewAssignmentStatusLabel } from "@/components/common/ReviewAssignmentStatusBadge";
+import { Button } from "@/components/ui/button";
 
 const REVIEWER_ALLOWED_STATUSES = [
   ReviewAssignmentStatus.ACCEPTED,
@@ -42,6 +46,7 @@ function canReviewerUpdateStatus(assignment: ReviewAssignment): boolean {
 }
 
 export default function MyReviewAssignments() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -95,12 +100,13 @@ export default function MyReviewAssignments() {
         enableSorting: false,
       },
       {
-        accessorKey: "submissionStatus",
+        id: "submissionStatus",
+        accessorFn: (row) => getSubmissionStatusLabel(row.submissionStatus),
         header: "Submission Status",
         cell: ({ row }) => (
           <div className="flex place-self-center">
             {getSubmissionStatusBadge(
-              row.getValue("submissionStatus") as number,
+              row.original.submissionStatus,
             )}
           </div>
         ),
@@ -117,16 +123,45 @@ export default function MyReviewAssignments() {
         enableSorting: false,
       },
       {
-        accessorKey: "conferenceStatus",
-        header: "Conference Status",
+        id: "submitter",
+        accessorFn: (row) =>
+          `${row.ownerFirstName} ${row.ownerLastName} ${row.ownerEmail}`,
+        header: "Submission Owner",
         cell: ({ row }) => (
-          <div className="flex place-self-center">
-            {getConferenceStatusBadge(
-              row.getValue("conferenceStatus") as number,
-            )}
+          <div className="text-sm">
+            <div>
+              {row.original.ownerFirstName} {row.original.ownerLastName}
+            </div>
+            <div className="text-muted-foreground text-xs">
+              {row.original.ownerEmail}
+            </div>
           </div>
         ),
         enableSorting: false,
+      },
+      {
+        id: "assignmentStatus",
+        accessorFn: (row) => getReviewAssignmentStatusLabel(row.assignmentStatus),
+        header: ({ column }) => {
+          return (
+            <div
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="flex items-center gap-4 justify-center w-full"
+            >
+              Assignment Status
+              <ArrowUpDown className="size-4 text-muted-foreground" />
+            </div>
+          );
+        },
+        cell: ({ row }) => (
+          <div className="flex place-self-center">
+            {getReviewAssignmentStatusBadge(
+              row.original.assignmentStatus,
+            )}
+          </div>
+        ),
       },
       {
         id: "assignedBy",
@@ -145,39 +180,12 @@ export default function MyReviewAssignments() {
         enableSorting: false,
       },
       {
-        accessorKey: "assignmentStatus",
-        header: "Assignment Status",
-        cell: ({ row }) => (
-          <div className="flex place-self-center">
-            {getReviewAssignmentStatusBadge(
-              row.getValue("assignmentStatus") as number,
-            )}
-          </div>
-        ),
-        enableSorting: false,
-      },
-      {
         accessorKey: "assignedAt",
         header: "Assigned At",
         cell: ({ row }) => (
           <span className="text-sm">
             {formatDateTime(row.getValue("assignedAt") as string)}
           </span>
-        ),
-        enableSorting: false,
-      },
-      {
-        id: "submitter",
-        header: "Submitter",
-        cell: ({ row }) => (
-          <div className="text-sm">
-            <div>
-              {row.original.ownerFirstName} {row.original.ownerLastName}
-            </div>
-            <div className="text-muted-foreground text-xs">
-              {row.original.ownerEmail}
-            </div>
-          </div>
         ),
         enableSorting: false,
       },
@@ -218,9 +226,18 @@ export default function MyReviewAssignments() {
           { label: "My Review Assignments", href: "/review-assignments/me" },
         ]}
       />
-      <div className="mb-6">
-        <PageTitle title="My Review Assignments" />
-        <PageSubTitle text="View submissions assigned to you for review" />
+      <div className="mb-6 flex justify-between items-end">
+        <div>
+          <PageTitle title="My Review Assignments" />
+          <PageSubTitle text="View submissions assigned to you for review" />
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => navigate("/review-assignments/search")}
+          className="mb-4"
+        >
+          Advanced Search
+        </Button>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -232,6 +249,13 @@ export default function MyReviewAssignments() {
           pageSize={pageSize}
           enableSearch
           searchPlaceholder="Filter assignments"
+          searchableColumnIds={[
+            "submissionTitle",
+            "submissionStatus",
+            "conferenceTitle",
+            "assignmentStatus",
+            "submitter",
+          ]}
         />
 
         {!isLoading && !error && total > 0 && (

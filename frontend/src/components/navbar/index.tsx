@@ -225,12 +225,36 @@ const userNavItems: NavItemConfig[] = [
   { label: "Activities", href: "/activities" },
 ];
 
+const userReviewerNavItems: NavItemConfig[] = [
+  aboutNavItem,
+  {
+    label: "Submissions",
+    href: "/submissions",
+    children: [
+      { label: "New", href: "/submissions/new" },
+      { label: "My Submissions", href: "/submissions" },
+    ],
+  },
+  {
+    label: "Review Assignments",
+    href: "/review-assignments/me",
+  },
+  { label: "Conferences", href: "/conferences" },
+  { label: "Trainings", href: "/trainings" },
+  { label: "Announcements", href: "/announcements" },
+  { label: "Blogs", href: "/blogs" },
+  { label: "Activities", href: "/activities" },
+];
+
 const getNavItemsForUser = (
   roles: UserRole[] | undefined,
   isLoggedIn: boolean,
 ): NavItemConfig[] => {
   if (!isLoggedIn) return publicNavItems;
   if (roles?.includes(UserRole.ADMIN)) return adminNavItems;
+  if (roles?.includes(UserRole.USER) && roles?.includes(UserRole.REVIEWER)) {
+    return userReviewerNavItems;
+  }
   if (roles?.includes(UserRole.REVIEWER)) return reviewerNavItems;
   return userNavItems;
 };

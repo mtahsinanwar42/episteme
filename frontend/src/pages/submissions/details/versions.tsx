@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
-import { Pagination } from "@/components/ui/pagination";
 import { FileUploadField } from "@/components/common/FileUploadField";
 import type { SubmissionOutletContext } from "@/pages/submissions/details";
 import { SubmissionStatus, type SubmissionVersion } from "@/models/submission";
@@ -44,8 +43,6 @@ export default function SubmissionVersions() {
   const [submissionFile, setSubmissionFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [uploadedSubmissionFile, setUploadedSubmissionFile] = useState<{
     name: string;
     size: number;
@@ -65,20 +62,6 @@ export default function SubmissionVersions() {
       (a, b) => toNumber(b.versionNo) - toNumber(a.versionNo),
     );
   }, [data]);
-
-  const totalItems = versions.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-
-  useEffect(() => {
-    if (page > totalPages) {
-      setPage(totalPages);
-    }
-  }, [page, totalPages]);
-
-  const pagedVersions = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return versions.slice(startIndex, startIndex + pageSize);
-  }, [versions, page, pageSize]);
 
   const canUploadByRole = isAdmin || !isReviewer;
   const isAllowedStatus =
@@ -272,26 +255,10 @@ export default function SubmissionVersions() {
           <div>
             <DataTable
               columns={columns}
-              data={pagedVersions}
+              data={versions}
               isLoading={isLoading}
               error={error ? (error as Error).message : null}
-              enableSearch
-              searchPlaceholder="Filter versions"
             />
-
-            {!isLoading && totalItems > 0 && (
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                pageSize={pageSize}
-                totalItems={totalItems}
-                onPageChange={setPage}
-                onPageSizeChange={(newPageSize) => {
-                  setPageSize(newPageSize);
-                  setPage(1);
-                }}
-              />
-            )}
           </div>
         )}
 

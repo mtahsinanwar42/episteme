@@ -22,6 +22,19 @@ export interface GetSubmissionsParams {
   status?: number;
 }
 
+export interface SearchSubmissionsParams {
+  page?: number;
+  limit?: number;
+  title?: string;
+  topics?: string[];
+  doi?: string;
+  conferenceId?: number;
+  status?: number[];
+  ownerUsrIds?: number[];
+  createdDateFrom?: string;
+  createdDateTo?: string;
+}
+
 export const submissionService = {
   getSubmissions: async (
     params?: GetSubmissionsParams,
@@ -128,6 +141,42 @@ export const submissionService = {
     const endpoint = queryString
       ? `/review-assignments/me?${queryString}`
       : "/review-assignments/me";
+
+    return api.get<SubmissionResponse>(endpoint, true);
+  },
+
+  searchSubmissions: async (
+    params?: SearchSubmissionsParams,
+  ): Promise<SubmissionResponse> => {
+    const queryParams = new URLSearchParams();
+
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.title) queryParams.append("title", params.title);
+    if (params?.doi) queryParams.append("doi", params.doi);
+    if (params?.conferenceId !== undefined) {
+      queryParams.append("conferenceId", params.conferenceId.toString());
+    }
+    if (params?.topics?.length) {
+      queryParams.append("topics", JSON.stringify(params.topics));
+    }
+    if (params?.status?.length) {
+      queryParams.append("status", params.status.join(","));
+    }
+    if (params?.ownerUsrIds?.length) {
+      queryParams.append("ownerUsrIds", params.ownerUsrIds.join(","));
+    }
+    if (params?.createdDateFrom) {
+      queryParams.append("createdDateFrom", params.createdDateFrom);
+    }
+    if (params?.createdDateTo) {
+      queryParams.append("createdDateTo", params.createdDateTo);
+    }
+
+    const queryString = queryParams.toString();
+    const endpoint = queryString
+      ? `/submissions/search?${queryString}`
+      : "/submissions/search";
 
     return api.get<SubmissionResponse>(endpoint, true);
   },

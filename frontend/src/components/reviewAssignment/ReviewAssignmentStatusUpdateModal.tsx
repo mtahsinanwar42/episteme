@@ -123,6 +123,7 @@ export function ReviewAssignmentStatusUpdateModal({
         <DialogBody>
           <div className="space-y-4">
             <div className="space-y-3">
+              <h3 className="text-sm font-semibold">Submission Information</h3>
               <div className="grid grid-cols-[140px_1fr] gap-x-3 gap-y-2 text-sm">
                 <span className="font-medium text-muted-foreground">Submission</span>
                 <span>{selectedAssignment?.submissionTitle}</span>
@@ -141,10 +142,17 @@ export function ReviewAssignmentStatusUpdateModal({
                   {selectedAssignment &&
                     getConferenceStatusBadge(selectedAssignment.conferenceStatus)}
                 </span>
+
+                <span className="font-medium text-muted-foreground">Submission Owner</span>
+                <div>
+                  <div>{selectedAssignment?.ownerFirstName} {selectedAssignment?.ownerLastName}</div>
+                  <div className="text-xs text-muted-foreground">{selectedAssignment?.ownerEmail}</div>
+                </div>
               </div>
 
               <hr className="border-border" />
 
+              <h3 className="text-sm font-semibold">Assignment Information</h3>
               <div className="grid grid-cols-[140px_1fr] gap-x-3 gap-y-2 text-sm">
                 {mode === "admin" && (
                   <>
@@ -176,17 +184,6 @@ export function ReviewAssignmentStatusUpdateModal({
                     </span>
                   </>
                 )}
-
-                <span className="font-medium text-muted-foreground">Submitter</span>
-                <div>
-                  <div>{selectedAssignment?.ownerFirstName} {selectedAssignment?.ownerLastName}</div>
-                  <div className="text-xs text-muted-foreground">{selectedAssignment?.ownerEmail}</div>
-                </div>
-              </div>
-
-              <hr className="border-border" />
-
-              <div className="grid grid-cols-[140px_1fr] gap-x-3 gap-y-2 text-sm">
                 <span className="font-medium text-muted-foreground">Assignment Status</span>
                 <span className="flex items-center">
                   {selectedAssignment &&

@@ -33,6 +33,8 @@ export function useUpdateReviewAssignmentStatusMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reviewAssignments"] });
       queryClient.invalidateQueries({ queryKey: ["myReviewAssignments"] });
+      queryClient.invalidateQueries({ queryKey: ["review-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["review-assignments", "search"] });
     },
   });
 }

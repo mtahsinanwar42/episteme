@@ -49,10 +49,10 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     }
 
     const safeConferenceId = toOptionalInteger(filters.conferenceId, { fieldName: "conferenceId" });
-    const ownerUsrIdFromInput = toOptionalInteger(filters.ownerUsrId, { fieldName: "ownerUsrId" });
+    const safeOwnerUsrIds = normalizeNumberArray(filters.ownerUsrIds, { fieldName: "ownerUsrIds" });
 
-    if (!isAdmin && ownerUsrIdFromInput != null) {
-      throw new ErrorResponse(400, "ownerUsrId can only be provided by admin");
+    if (!isAdmin && safeOwnerUsrIds != null) {
+      throw new ErrorResponse(400, "ownerUsrIds can only be provided by admin");
     }
 
     const safeCreatedDateFrom = toOptionalDateText(filters.createdDateFrom, { fieldName: "createdDateFrom" });
@@ -72,7 +72,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       doi: safeDoi,
       conferenceId: safeConferenceId,
       statuses: safeStatuses,
-      ownerUsrId: isAdmin ? ownerUsrIdFromInput : user.id,
+      ownerUsrIds: isAdmin ? safeOwnerUsrIds : [user.id],
       createdDateFrom: safeCreatedDateFrom,
       createdDateTo: safeCreatedDateTo,
       excludeDeleted: !isAdmin,

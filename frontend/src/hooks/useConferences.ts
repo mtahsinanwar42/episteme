@@ -55,6 +55,7 @@ export function useUpdateConferenceMutation(conferenceId: string | number) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conferences"] });
       queryClient.invalidateQueries({ queryKey: ["conference", conferenceId] });
+      queryClient.invalidateQueries({ queryKey: ["conferences", "search"] });
     },
   });
 }
