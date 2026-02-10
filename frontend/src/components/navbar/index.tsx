@@ -190,16 +190,8 @@ const adminNavItems: NavItemConfig[] = [
 const reviewerNavItems: NavItemConfig[] = [
   aboutNavItem,
   {
-    label: "Submissions",
-    href: "/user/submissions",
-    children: [
-      { label: "New", href: "/user/submissions/new" },
-      { label: "My Submissions", href: "/user/submissions" },
-      {
-        label: "Assigned Reviews",
-        href: "/reviewer/review-assignments",
-      },
-    ],
+    label: "Review Assignments",
+    href: "/review-assignments/me",
   },
   { label: "Conferences", href: "/conferences" },
   { label: "Trainings", href: "/trainings" },

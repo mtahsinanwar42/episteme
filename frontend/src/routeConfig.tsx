@@ -51,6 +51,8 @@ import MyProfile from "@/pages/me/myProfile";
 import ForgotPassword from "./pages/me/forgotPassword";
 import ResetPassword from "./pages/me/resetPassword";
 import { UserRole } from "@/models/user";
+import AllReviewAssignments from "@/pages/review-assignments";
+import MyReviewAssignments from "@/pages/reviewer/review-assignments";
 
 export default function RouteConfig() {
   return (
@@ -276,6 +278,24 @@ export default function RouteConfig() {
       {aboutPageFlags.contact && (
         <Route path="/about/contact" element={<Contact />} />
       )}
+
+      <Route
+        path="/review-assignments"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+            <AllReviewAssignments />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/review-assignments/me"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.REVIEWER]}>
+            <MyReviewAssignments />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/404-not-found" element={<NotFound />} />

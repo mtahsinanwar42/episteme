@@ -20,6 +20,9 @@ const GET_REVIEW_ASSIGNMENTS_BASE_SELECT = `
     CS.created_at             AS "submissionCreatedAt",
     CS.updated_at             AS "submissionUpdatedAt",
 
+    CONF.title                AS "conferenceTitle",
+    CONF.status               AS "conferenceStatus",
+
     REV.email                 AS "reviewerEmail",
     REV.first_name            AS "reviewerFirstName",
     REV.last_name             AS "reviewerLastName",
@@ -46,6 +49,9 @@ const GET_REVIEW_ASSIGNMENTS_BASE_FROM_JOINS = `
 
   JOIN episteme.user OW
     ON OW.id = CS.owner_usr_id
+
+  JOIN episteme.conference CONF
+    ON CONF.id = CS.conference_id
 `;
 
 export async function findReviewAssignmentsByUserId({
