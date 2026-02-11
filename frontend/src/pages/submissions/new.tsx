@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ import { useSuccessToast } from "@/hooks/useSuccessToast";
 import { fileService } from "@/services/fileService";
 import { miscService } from "@/services/miscService";
 import { FileTypeEnum } from "@/models/file";
+import { ConferenceStatus } from "@/models/conference";
 
 export default function NewSubmission() {
   const navigate = useNavigate();
@@ -44,12 +45,19 @@ export default function NewSubmission() {
     size: number;
     storageKey: string;
   } | null>(null);
+  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   const {
     data: conferencesResponse,
     isLoading: conferencesLoading,
     error: conferencesError,
-  } = useConferences({ paginate: false, sort: "title" });
+  } = useConferences({
+    paginate: false,
+    sort: "title",
+    status: ConferenceStatus.ACTIVE,
+    submissionStartAtTo: today,
+    submissionEndAtFrom: today,
+  });
 
   const {
     data: topicsResponse,

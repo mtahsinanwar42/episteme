@@ -42,6 +42,15 @@ export function createRefDataService({ }) {
     return writeLines(topicsPath, extracted);
   }
 
+  async function refreshCountries() {
+    const assetsDir = getPublicAssetsDiskDir();
+    ensureDirSync(assetsDir);
+
+    const countriesPath = resolveInDir(assetsDir, REFERENCE_FILES.COUNTRIES);
+    const extracted = await extractCountriesFromApi();
+    return writeLines(countriesPath, extracted);
+  }
+
   function buildTopicsUrl(page) {
     const params = new URLSearchParams({
       page: String(page),
@@ -80,5 +89,6 @@ export function createRefDataService({ }) {
     getTopics,
     getCountries,
     refreshTopics,
+    refreshCountries,
   }
 }
