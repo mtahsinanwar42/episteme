@@ -92,10 +92,10 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
   }
 
   async function saveSubmission(user, payload) {
-    const { title, topics, conferenceId, contentFilePath, message, } = payload;
+    const { title, abstract, topics, conferenceId, contentFilePath, message, } = payload;
 
-    if (isEmpty(title) || !conferenceId || isEmpty(contentFilePath)) {
-      throw new ErrorResponse(400, "title, conferenceId, contentFilePath are required");
+    if (isEmpty(title) || isEmpty(abstract) || !conferenceId || isEmpty(contentFilePath)) {
+      throw new ErrorResponse(400, "title, abstract, conferenceId, contentFilePath are required");
     }
 
     if (!Array.isArray(topics) || topics.length === 0 || topics.some((t) => t == null)) {
@@ -114,6 +114,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       const submission = await ContentSubmission.create(
         {
           title,
+          abstract,
           topics,
           conferenceId,
           currentStatus: CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, // TODO: change it to DRAFT after real payment integration

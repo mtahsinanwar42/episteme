@@ -312,16 +312,19 @@ const metadataHeroImageMap = new Map([
 const submissionTemplates = [
   {
     title: "AI-Driven Knowledge Graphs for Open Science",
+    abstract: "This paper presents a graph-native framework for integrating heterogeneous scholarly metadata to improve discovery, traceability, and reproducibility in open-science workflows.",
     topics: ["Computer science", "Context (archaeology)"],
     fileKey: "S1",
   },
   {
     title: "Graph-Based Peer Review Systems",
+    abstract: "We propose a reviewer-assignment and conflict-detection model based on graph structure, reducing bias and improving expertise matching across interdisciplinary submissions.",
     topics: ["Work (physics)", "Context (archaeology)"],
     fileKey: "S2",
   },
   {
     title: "Observability-Driven Editorial Pipelines",
+    abstract: "This work introduces observability metrics and alerting patterns for editorial pipelines, enabling faster issue detection and more reliable submission processing.",
     topics: ["Context (archaeology)", "Work (physics)"],
     fileKey: "S3",
   },
@@ -623,6 +626,7 @@ async function createPendingSubmissionBundle({
   reviewerUsers,
   conference,
   title,
+  abstract,
   topics,
   fileInitial,
   paymentProviderPaymentId,
@@ -632,6 +636,7 @@ async function createPendingSubmissionBundle({
   const submission = await ContentSubmission.create({
     ownerUsrId: ownerUser.id,
     title,
+    abstract,
     topics,
     conferenceId: conference.id,
     currentStatus: CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL,
@@ -840,6 +845,7 @@ async function importData() {
           reviewerUsers: config.reviewers,
           conference: conferences[conferenceIdx],
           title: `${template.title}${titleSuffix}`,
+          abstract: `${template.abstract} ${titleSuffix.replace(/^ â€” /, "")}.`,
           topics: template.topics,
           fileInitial: submissionFiles[template.fileKey],
           paymentProviderPaymentId: `pi_seed_${userKey}_s${i + 1}_pending`,

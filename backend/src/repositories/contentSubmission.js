@@ -238,6 +238,7 @@ export async function findSubmissionByIdAndUserDetails({
     SELECT
       CS.id              AS "submissionId",
       CS.title           AS "title",
+      CS.abstract        AS "abstract",
       CS.topics          AS "topics",
       CS.doi             AS "doi",
       CS.current_status  AS "status",
