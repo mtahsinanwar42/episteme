@@ -115,17 +115,19 @@ export default function SubmissionDetails() {
             >
               Messages
             </NavLink>
-            <NavLink
-              to={`/submissions/${submission.submissionId}/versions`}
-              className={({ isActive }) =>
-                cn(
-                  "block px-4 py-3 bg-slate-900 text-sm hover:bg-accent/70 border-b border-white/20",
-                  isActive ? "bg-accent/70 text-foreground" : "",
-                )
-              }
-            >
-              Versions
-            </NavLink>
+            {!isReviewer && (
+              <NavLink
+                to={`/submissions/${submission.submissionId}/versions`}
+                className={({ isActive }) =>
+                  cn(
+                    "block px-4 py-3 bg-slate-900 text-sm hover:bg-accent/70 border-b border-white/20",
+                    isActive ? "bg-accent/70 text-foreground" : "",
+                  )
+                }
+              >
+                Versions
+              </NavLink>
+            )}
 
             {isAdmin || isReviewer ? (
               <NavLink

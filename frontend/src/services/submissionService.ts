@@ -10,6 +10,8 @@ import type {
   SubmissionMessagesResponse,
   CreateSubmissionMessageRequest,
   SubmissionReviewersResponse,
+  SubmissionReviewsResponse,
+  CreateSubmissionReviewRequest,
   SubmissionMessage,
 } from "@/models/submission";
 
@@ -124,6 +126,26 @@ export const submissionService = {
   ): Promise<SubmissionReviewersResponse> => {
     return api.get<SubmissionReviewersResponse>(
       `/submissions/${submissionId}/reviewers`,
+      true,
+    );
+  },
+
+  getSubmissionReviews: async (
+    submissionId: string | number,
+  ): Promise<SubmissionReviewsResponse> => {
+    return api.get<SubmissionReviewsResponse>(
+      `/submissions/${submissionId}/reviews`,
+      true,
+    );
+  },
+
+  createSubmissionReview: async (
+    submissionId: string | number,
+    data: CreateSubmissionReviewRequest,
+  ): Promise<{ success: boolean; data: unknown }> => {
+    return api.post<{ success: boolean; data: unknown }>(
+      `/submissions/${submissionId}/reviews`,
+      data,
       true,
     );
   },

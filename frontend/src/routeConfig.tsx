@@ -194,7 +194,7 @@ export default function RouteConfig() {
         <Route
           path="reviews"
           element={
-            <ProtectedRoute allowedRoles={[UserRole.REVIEWER]}>
+            <ProtectedRoute allowedRoles={[UserRole.REVIEWER, UserRole.ADMIN]}>
               <SubmissionReviews />
             </ProtectedRoute>
           }
