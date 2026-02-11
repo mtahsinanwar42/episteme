@@ -132,8 +132,9 @@ export const DEFAULT_PAGE_NO = 1;
 export const DEFAULT_PAGE_LIMIT = 10;
 
 export const UPDATE_SCHEDULER_TIME_PATTERN = Object.freeze({
-  TOPICS: "0 0 0 * * 0",
-  COUNTRIES: "0 0 0 * * 0",
+  TOPICS: "0 0 2 * * 0",
+  COUNTRIES: "0 30 2 * * 0",
+  CONFERENCE_STATUS_TRANSITION: "0 0 3 * * 0",
 });
 
 export const KAFKA_EVENT_TYPES = Object.freeze({

@@ -4,6 +4,7 @@ import { findSubmissionByIdAndUserDetails, findSubmissionsBySearchFilters, findS
 import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { serializeContentSubmission } from "../utils/serializers.js";
+import { toDate } from "../utils/dateTime.js";
 import { isEmpty } from "../utils/string.js";
 import { normalizeNumberArray, normalizeTextArray, toOptionalDateText, toOptionalInteger } from "../utils/search.js";
 
@@ -106,6 +107,17 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
 
     if (!conference || conference.status !== CONFERENCE_STATUS.ACTIVE) {
       throw new ErrorResponse(400, "Invalid Conference ID");
+    }
+
+    const now = new Date();
+    const submissionPeriodStartAt = toDate(conference.submissionPeriodStartAt);
+    const submissionPeriodEndAt = toDate(conference.submissionPeriodEndAt);
+
+    if (now < submissionPeriodStartAt || now > submissionPeriodEndAt) {
+      throw new ErrorResponse(
+        400,
+        `Submission is not allowed outside the conference submission period. Valid range: ${submissionPeriodStartAt.toISOString()} to ${submissionPeriodEndAt.toISOString()}`
+      );
     }
 
     const contentFileId = await fileService.getFileIdByPath(contentFilePath, { fieldName: "contentFilePath" });
