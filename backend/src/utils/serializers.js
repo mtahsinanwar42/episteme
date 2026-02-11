@@ -83,6 +83,7 @@ export const serializeContentSubmission = (submission, version, contentFilePath)
   return {
     id: submission.id,
     title: submission.title,
+    abstract: submission.abstract,
     topics: submission.topics,
     status: submission.currentStatus,
     createdAt: submission.createdAt,
