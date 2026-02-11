@@ -17,6 +17,7 @@ import type { RootState } from "@/stores/store";
 import { UserRole } from "@/models/user";
 import type { Submission } from "@/models/submission";
 import { getConferenceStatusBadge } from "@/components/common/ConferenceStatusBadge";
+import { RichTextDisplay } from "@/components/common/RichTextDisplay";
 
 export type SubmissionOutletContext = {
   submission: Submission;
@@ -160,7 +161,7 @@ export default function SubmissionDetails() {
               {getConferenceStatusBadge(submission.conferenceStatus!)}
             </div>
 
-            <div className="text-sm text-foreground/80">
+            <div className="text-sm text-foreground/80 mb-4">
               Topics:{" "}
               {submission.topics && submission.topics.length > 0 ? (
                 submission.topics.join(", ")
@@ -168,6 +169,15 @@ export default function SubmissionDetails() {
                 <p className="text-sm text-muted-foreground">-</p>
               )}
             </div>
+
+            {submission?.abstract && (
+              <div>
+                <div className="font-medium mb-2">Abstract</div>
+                {submission?.abstract && (
+                  <RichTextDisplay content={submission.abstract} />
+                )}
+              </div>
+            )}
           </div>
 
           <div>

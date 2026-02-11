@@ -16,6 +16,7 @@ import PageSubTitle from "@/components/common/PageSubTitle";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import { FileUploadField } from "@/components/common/FileUploadField";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useConferences } from "@/hooks/useConferences";
 import { useCreateSubmissionMutation } from "@/hooks/useSubmissions";
 import { useSuccessToast } from "@/hooks/useSuccessToast";
@@ -33,6 +34,7 @@ export default function NewSubmission() {
     title: "",
     conferenceId: "",
     topics: [] as string[],
+    abstract: "",
     contentFilePath: "",
     message: "",
   });
@@ -75,6 +77,7 @@ export default function NewSubmission() {
     formData.title.trim() !== "" &&
     formData.conferenceId !== "" &&
     formData.topics.length > 0 &&
+    formData.abstract.replace(/<[^>]*>/g, "").trim() !== "" &&
     formData.contentFilePath !== "";
 
   const isLoading =
@@ -169,6 +172,11 @@ export default function NewSubmission() {
       return;
     }
 
+    if (!formData.abstract.replace(/<[^>]*>/g, "").trim()) {
+      setError("Abstract is required");
+      return;
+    }
+
     setError(null);
 
     const parsedConferenceId = Number(formData.conferenceId);
@@ -181,6 +189,7 @@ export default function NewSubmission() {
         title: formData.title.trim(),
         conferenceId,
         topics: formData.topics,
+        abstract: formData.abstract,
         contentFilePath: formData.contentFilePath,
         message: formData.message.trim() || undefined,
       },
@@ -295,6 +304,20 @@ export default function NewSubmission() {
               searchable
               hideSelectAll
               emptyIndicator="No topics available."
+            />
+          </div>
+
+          <div className="lg:col-span-2">
+            <label className="block text-sm font-medium mb-2 text-heading">
+              Abstract *
+            </label>
+            <RichTextEditor
+              value={formData.abstract}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, abstract: value }))
+              }
+              placeholder="Enter your paper abstract..."
+              disabled={isLoading}
             />
           </div>
 

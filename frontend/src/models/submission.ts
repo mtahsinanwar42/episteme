@@ -4,6 +4,7 @@ export interface Submission {
   id?: string | number;
   title: string;
   topics?: string[];
+  abstract?: string | null;
   doi?: string | null;
   status?: number;
   statusUpdateNotes?: string | null;
@@ -52,6 +53,7 @@ export interface CreateSubmissionRequest {
   title: string;
   conferenceId: string | number;
   topics?: string[];
+  abstract: string;
   contentFilePath: string;
   message?: string;
 }
