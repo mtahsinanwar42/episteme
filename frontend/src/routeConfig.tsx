@@ -62,7 +62,7 @@ import AllReviewAssignments from "@/pages/review-assignments";
 import ReviewAssignmentSearch from "@/pages/review-assignments/search";
 import MyReviewAssignments from "@/pages/reviewer/review-assignments";
 import NewSubmission from "@/pages/submissions/new";
-import ReviewerSubmissions from "./pages/submissions/ReviewerSubmissions";
+import ReviewerSubmissionDetails from "@/pages/reviewer/submission-details";
 
 export default function RouteConfig() {
   return (
@@ -200,15 +200,6 @@ export default function RouteConfig() {
           }
         />
       </Route>
-
-      <Route
-        path="/reviewer/submissions"
-        element={
-          <ProtectedRoute allowedRoles={[UserRole.REVIEWER, UserRole.ADMIN]}>
-            <ReviewerSubmissions />
-          </ProtectedRoute>
-        }
-      />
 
       <Route
         path="/assets"
@@ -398,6 +389,43 @@ export default function RouteConfig() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/reviewer/submissions/:submissionId"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.REVIEWER, UserRole.ADMIN]}>
+            <ReviewerSubmissionDetails />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="details" replace />} />
+
+        <Route
+          path="details"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.REVIEWER, UserRole.ADMIN]}>
+              <SubmissionDetailsTab />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="messages"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.REVIEWER, UserRole.ADMIN]}>
+              <SubmissionMessages />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="reviews"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.REVIEWER, UserRole.ADMIN]}>
+              <SubmissionReviews />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
 
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/404-not-found" element={<NotFound />} />
