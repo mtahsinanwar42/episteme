@@ -10,6 +10,13 @@ import type {
 } from "@/models/conference";
 
 export const conferenceService = {
+  getActiveAndFinishedConferences: async (): Promise<ConferenceResponse> => {
+    return api.get<ConferenceResponse>(
+      "/conferences?status[in]=1,2&paginate=false&sort=title",
+      false,
+    );
+  },
+
   getConferences: async (
     params?: GetConferencesParams,
   ): Promise<ConferenceResponse> => {

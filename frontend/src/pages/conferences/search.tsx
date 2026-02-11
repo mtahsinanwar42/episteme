@@ -259,7 +259,17 @@ export default function ConferenceSearch() {
   const columns: ColumnDef<Conference>[] = [
     {
       accessorKey: "title",
-      header: "Title",
+      header: ({ column }) => {
+        return (
+          <div
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex items-center gap-4 justify-center w-full"
+          >
+            Title
+            <ArrowUpDown className="size-4 text-muted-foreground" />
+          </div>
+        );
+      },
       cell: ({ row }) => {
         const title = row.getValue("title") as string;
         return <div className="font-medium max-w-96 wrap-break-word">{title}</div>;
@@ -267,69 +277,53 @@ export default function ConferenceSearch() {
     },
     {
       accessorKey: "startAt",
-      header: ({ column }) => {
-        return (
-          <div
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-4 justify-center w-full"
-          >
-            Start Date
-            <ArrowUpDown className="size-4 text-muted-foreground" />
-          </div>
-        );
-      },
+      header: "Start Date",
       cell: ({ row }) => (
         <div className="text-sm text-center">
           {formatDateTime(row.getValue("startAt") as string)}
         </div>
       ),
+      enableSorting: false,
     },
     {
       accessorKey: "endAt",
-      header: ({ column }) => {
-        return (
-          <div
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-4 justify-center w-full"
-          >
-            End Date
-            <ArrowUpDown className="size-4 text-muted-foreground" />
-          </div>
-        );
-      },
+      header: "End Date",
       cell: ({ row }) => (
         <div className="text-sm text-center">
           {formatDateTime(row.getValue("endAt") as string)}
         </div>
       ),
+      enableSorting: false,
     },
     {
-      accessorKey: "status",
-      header: () => <div className="text-center">Status</div>,
-      cell: ({ row }) => (
-        <div className="flex justify-center w-full text-sm">
-          {getConferenceStatusBadge(row.getValue("status") as number)}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "createdAt",
+      id: "status",
+      accessorFn: (row) => getConferenceStatusLabel(row.status),
       header: ({ column }) => {
         return (
           <div
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="flex items-center gap-4 justify-center w-full"
           >
-            Created At
+            Status
             <ArrowUpDown className="size-4 text-muted-foreground" />
           </div>
         );
       },
       cell: ({ row }) => (
+        <div className="flex justify-center w-full text-sm">
+          {getConferenceStatusBadge(row.original.status)}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created At",
+      cell: ({ row }) => (
         <div className="text-sm text-center">
           {formatDateTime(row.getValue("createdAt") as string)}
         </div>
       ),
+      enableSorting: false,
     },
     {
       accessorKey: "actions",
@@ -534,6 +528,7 @@ export default function ConferenceSearch() {
             pageSize={pageSize}
             enableSearch
             searchPlaceholder="Filter Conferences"
+            searchableColumnIds={["title", "status"]}
           />
           {!isLoading && !error && total > 0 && (
             <Pagination

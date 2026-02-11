@@ -66,6 +66,7 @@ export default function NewSubmission() {
   const isFormValid =
     formData.title.trim() !== "" &&
     formData.conferenceId !== "" &&
+    formData.topics.length > 0 &&
     formData.contentFilePath !== "";
 
   const isLoading =
@@ -155,6 +156,11 @@ export default function NewSubmission() {
       return;
     }
 
+    if (formData.topics.length === 0) {
+      setError("At least one topic is required");
+      return;
+    }
+
     setError(null);
 
     const parsedConferenceId = Number(formData.conferenceId);
@@ -172,7 +178,7 @@ export default function NewSubmission() {
       },
       {
         onSuccess: (response) => {
-          showSuccessToast("Submission created successfully.");
+          showSuccessToast("New submission added successfully.");
           const created = response?.data;
           const submissionId = created?.id ?? created?.submissionId;
           if (submissionId) {
@@ -263,7 +269,7 @@ export default function NewSubmission() {
 
           <div>
             <label className="block text-sm font-medium mb-2 text-heading">
-              Topics
+              Topics *
             </label>
             <MultiSelect
               options={topics.map((topic) => ({
@@ -279,6 +285,7 @@ export default function NewSubmission() {
               }
               disabled={isLoading || topicsLoading}
               searchable
+              hideSelectAll
               emptyIndicator="No topics available."
             />
           </div>
@@ -306,12 +313,12 @@ export default function NewSubmission() {
               onChange={handleInputChange}
               rows={4}
               className="w-full ps-3 pe-3 py-2.5 text-heading text-sm rounded-lg border border-accent focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 placeholder:text-body"
-              placeholder="Add a short note for the organizers"
+              placeholder="Add a short note for the editors"
               disabled={isLoading}
             ></textarea>
           </div>
 
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 lg:col-span-2">
             <Button
               type="button"
               variant="outline"

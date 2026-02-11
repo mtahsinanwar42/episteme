@@ -40,6 +40,7 @@ import NewBlog from "@/pages/blogs/new";
 import EditBlog from "@/pages/blogs/edit";
 import BlogSearch from "@/pages/blogs/search";
 import Submissions from "@/pages/submissions";
+import SubmissionSearch from "@/pages/submissions/search";
 import SubmissionDetails from "@/pages/submissions/details";
 import SubmissionDetailsTab from "@/pages/submissions/details/detailsTab";
 import SubmissionMessages from "@/pages/submissions/details/messages";
@@ -57,6 +58,9 @@ import MyProfile from "@/pages/me/myProfile";
 import ForgotPassword from "@/pages/me/forgotPassword";
 import ResetPassword from "@/pages/me/resetPassword";
 import { UserRole } from "@/models/user";
+import AllReviewAssignments from "@/pages/review-assignments";
+import ReviewAssignmentSearch from "@/pages/review-assignments/search";
+import MyReviewAssignments from "@/pages/reviewer/review-assignments";
 import NewSubmission from "@/pages/submissions/new";
 import ReviewerSubmissions from "./pages/submissions/ReviewerSubmissions";
 
@@ -125,9 +129,7 @@ export default function RouteConfig() {
       <Route
         path="/submissions"
         element={
-          <ProtectedRoute
-            allowedRoles={[UserRole.USER, UserRole.REVIEWER, UserRole.ADMIN]}
-          >
+          <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
             <Submissions />
           </ProtectedRoute>
         }
@@ -138,6 +140,14 @@ export default function RouteConfig() {
         element={
           <ProtectedRoute allowedRoles={[UserRole.USER]}>
             <NewSubmission />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/submissions/search"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+            <SubmissionSearch />
           </ProtectedRoute>
         }
       />
@@ -362,6 +372,32 @@ export default function RouteConfig() {
       {aboutPageFlags.contact && (
         <Route path="/about/contact" element={<Contact />} />
       )}
+
+      <Route
+        path="/review-assignments"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+            <AllReviewAssignments />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/review-assignments/search"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.REVIEWER]}>
+            <ReviewAssignmentSearch />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/review-assignments/me"
+        element={
+          <ProtectedRoute allowedRoles={[UserRole.REVIEWER]}>
+            <MyReviewAssignments />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/404-not-found" element={<NotFound />} />

@@ -8,8 +8,8 @@ import { ArrowUpDown, Eye } from "lucide-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageSubTitle from "@/components/common/PageSubTitle";
 import PageTitle from "@/components/common/PageTitle";
-import type { Submission } from "@/models/submission";
-import { formatDate } from "@/utils/dateFormatter";
+import { SubmissionStatus, type Submission } from "@/models/submission";
+import { formatDateTime } from "@/utils/dateFormatter";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/stores/store";
 import { UserRole } from "@/models/user";
@@ -18,6 +18,25 @@ import {
   getPaymentStatusBadge,
   getSubmissionStatusBadge,
 } from "@/components/common/ResourceStatusBadge";
+
+const getSubmissionStatusLabel = (status: number | undefined) => {
+  switch (status) {
+    case SubmissionStatus.DRAFT:
+      return "Draft";
+    case SubmissionStatus.PENDING_APPROVAL:
+      return "Pending Approval";
+    case SubmissionStatus.RETURNED:
+      return "Returned";
+    case SubmissionStatus.APPROVED:
+      return "Approved";
+    case SubmissionStatus.REJECTED:
+      return "Rejected";
+    case SubmissionStatus.DELETED:
+      return "Deleted";
+    default:
+      return `${status}`;
+  }
+};
 
 export default function Submissions() {
   const navigate = useNavigate();
@@ -58,7 +77,9 @@ export default function Submissions() {
 
   const columns: ColumnDef<Submission>[] = useMemo(() => {
     const ownerColumn: ColumnDef<Submission> = {
-      accessorKey: "owner",
+      id: "owner",
+      accessorFn: (row) =>
+        `${row.ownerFirstName ?? ""} ${row.ownerLastName ?? ""} ${row.ownerEmail ?? ""}`,
       header: "Owner",
       cell: ({ row }) => (
         <div>
@@ -88,27 +109,23 @@ export default function Submissions() {
     return [
       {
         accessorKey: "title",
-        header: ({ column }) => {
-          return (
-            <div
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="flex items-center gap-4 justify-center w-full"
-            >
-              Title
-              <ArrowUpDown className="size-4 text-muted-foreground" />
-            </div>
-          );
-        },
+        header: "Title",
         cell: ({ row }) => (
           <span className="text-sm font-medium">{row.getValue("title")}</span>
         ),
-        sortingFn: (rowA, rowB, columnId) => {
-          const a = String(rowA.getValue(columnId) ?? "").toLowerCase();
-          const b = String(rowB.getValue(columnId) ?? "").toLowerCase();
-          return a.localeCompare(b);
+        enableSorting: false,
+      },
+      {
+        id: "topics",
+        accessorFn: (row) => (row.topics ?? []).join(", "),
+        header: "Topics",
+        cell: ({ row }) => {
+          const topics = row.original.topics ?? [];
+          return (
+            <div className="flex gap-1 flex-wrap">{topics?.join(", ")}</div>
+          );
         },
+        enableSorting: false,
       },
       {
         accessorKey: "conferenceTitle",
@@ -118,20 +135,9 @@ export default function Submissions() {
         ),
         enableSorting: false,
       },
-      ...(isAdmin ? [ownerColumn] : []),
       {
-        accessorKey: "topics",
-        header: "Topics",
-        cell: ({ row }) => {
-          const topics = row.getValue("topics") as string[];
-          return (
-            <div className="flex gap-1 flex-wrap">{topics?.join(", ")}</div>
-          );
-        },
-        enableSorting: false,
-      },
-      {
-        accessorKey: "status",
+        id: "status",
+        accessorFn: (row) => getSubmissionStatusLabel(row.status),
         header: ({ column }) => {
           return (
             <div
@@ -146,7 +152,7 @@ export default function Submissions() {
           );
         },
         cell: ({ row }) => {
-          const status = row.getValue("status") as number;
+          const status = row.original.status;
           return (
             <div className="flex place-self-center">
               {getSubmissionStatusBadge(status)}
@@ -155,27 +161,17 @@ export default function Submissions() {
         },
         enableSorting: true,
       },
+      ...(isAdmin ? [ownerColumn] : []),
       ...(isAdmin ? [paymentColumn] : []),
       {
         accessorKey: "createdAt",
-        header: ({ column }) => {
-          return (
-            <div
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="flex items-center gap-4 justify-center w-full"
-            >
-              Created At
-              <ArrowUpDown className="size-4 text-muted-foreground" />
-            </div>
-          );
-        },
+        header: "Created At",
         cell: ({ row }) => (
           <span className="text-sm">
-            {formatDate(row.getValue("createdAt") as string)}
+            {formatDateTime(row.original.createdAt || "")}
           </span>
         ),
+        enableSorting: false,
       },
       {
         accessorKey: "actions",
@@ -205,14 +201,24 @@ export default function Submissions() {
           <PageSubTitle text="View and manage content submissions" />
         </div>
 
-        {currentRoles?.includes(UserRole.USER) && (
+        {(currentRoles?.includes(UserRole.USER) ||
+          currentRoles?.includes(UserRole.ADMIN)) && (
           <div className="flex justify-end gap-3">
             <Button
-              onClick={() => navigate("/submissions/new")}
-              className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+              variant="outline"
+              onClick={() => navigate("/submissions/search")}
+              className="mb-4"
             >
-              Add New Submission
+              Advanced Search
             </Button>
+            {currentRoles?.includes(UserRole.USER) && (
+              <Button
+                onClick={() => navigate("/submissions/new")}
+                className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Add New Submission
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -226,6 +232,13 @@ export default function Submissions() {
           pageSize={pageSize}
           enableSearch
           searchPlaceholder="Filter Submissions"
+          searchableColumnIds={[
+            "title",
+            "status",
+            "conferenceTitle",
+            "owner",
+            "topics",
+          ]}
         />
 
         {!isLoading && !error && total > 0 && (

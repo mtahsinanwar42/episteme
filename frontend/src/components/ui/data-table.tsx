@@ -27,6 +27,7 @@ interface DataTableProps<TData, TValue = unknown> {
   pageSize?: number;
   enableSearch?: boolean;
   searchPlaceholder?: string;
+  searchableColumnIds?: string[];
 }
 
 export function DataTable<TData, TValue = unknown>({
@@ -36,13 +37,34 @@ export function DataTable<TData, TValue = unknown>({
   error = null,
   enableSearch = false,
   searchPlaceholder = "Search",
+  searchableColumnIds,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
+  const tableColumns = React.useMemo(() => {
+    if (!searchableColumnIds || searchableColumnIds.length === 0) {
+      return columns;
+    }
+
+    const searchableSet = new Set(searchableColumnIds);
+    return columns.map((column) => {
+      const columnId =
+        "id" in column && typeof column.id === "string"
+          ? column.id
+          : "accessorKey" in column && typeof column.accessorKey === "string"
+            ? column.accessorKey
+            : undefined;
+
+      return {
+        ...column,
+        enableGlobalFilter: columnId ? searchableSet.has(columnId) : false,
+      } satisfies ColumnDef<TData, TValue>;
+    });
+  }, [columns, searchableColumnIds]);
 
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     // getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -155,7 +177,7 @@ export function DataTable<TData, TValue = unknown>({
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={columns.length}
+                    colSpan={tableColumns.length}
                     className="h-24 text-center text-slate-500 dark:text-slate-400"
                   >
                     No results.

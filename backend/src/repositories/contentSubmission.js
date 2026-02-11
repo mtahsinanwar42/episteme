@@ -17,8 +17,7 @@ export async function findSubmissionsByUserDetails({
     ? `CS.owner_usr_id <> :loggedInUserId`
     : `CS.owner_usr_id = :loggedInUserId`;
   const ownerJoin = isAdmin ? `JOIN episteme.user U ON U.id = CS.owner_usr_id` : ``;
-
-  const paymentJoin = `LEFT JOIN episteme.content_submission_payment CSP ON CSP.content_submission_id = CS.id`;
+  const paymentJoin = `JOIN episteme.content_submission_payment CSP ON CSP.content_submission_id = CS.id`;
   const paymentWhere = isAdmin ? `` : `AND CSP.status = :capturedPaymentStatus`;
 
   const baseWhere = `
@@ -95,7 +94,7 @@ export async function findSubmissionsBySearchFilters({
   doi,
   conferenceId,
   statuses,
-  ownerUsrId,
+  ownerUsrIds,
   createdDateFrom,
   createdDateTo,
   excludeDeleted = false,
@@ -106,6 +105,7 @@ export async function findSubmissionsBySearchFilters({
 
   const isAdmin = Array.isArray(loggedInUserRoles) && loggedInUserRoles.includes(USER_ROLE.ADMIN);
   const ownerJoin = isAdmin ? `JOIN episteme.user U ON U.id = CS.owner_usr_id` : ``;
+  const paymentJoin = `LEFT JOIN episteme.content_submission_payment CSP ON CSP.content_submission_id = CS.id`;
 
   const replacements = {
     loggedInUserId,
@@ -121,9 +121,9 @@ export async function findSubmissionsBySearchFilters({
     where.push(`CS.owner_usr_id = :loggedInUserId`);
   }
 
-  if (ownerUsrId != null) {
-    where.push(`CS.owner_usr_id = :ownerUsrId`);
-    replacements.ownerUsrId = ownerUsrId;
+  if (ownerUsrIds != null) {
+    where.push(`CS.owner_usr_id IN (:ownerUsrIds)`);
+    replacements.ownerUsrIds = ownerUsrIds;
   }
 
   if (excludeDeleted) {
@@ -137,7 +137,7 @@ export async function findSubmissionsBySearchFilters({
   }
 
   if (topics != null) {
-    where.push(`CS.topics && :topics`);
+    where.push(`CS.topics && ARRAY[:topics]::text[]`);
     replacements.topics = topics;
   }
 
@@ -182,6 +182,7 @@ export async function findSubmissionsBySearchFilters({
       C.slug             AS "conferenceSlug",
       C.status           AS "conferenceStatus"
       ${isAdmin ? `,
+      CSP.status         AS "paymentStatus",
       U.id               AS "ownerUserId",
       U.email            AS "ownerEmail",
       U.first_name       AS "ownerFirstName",
@@ -193,6 +194,7 @@ export async function findSubmissionsBySearchFilters({
     }
     FROM episteme.content_submission CS
     JOIN episteme.conference C ON (C.id = CS.conference_id)
+    ${paymentJoin}
     ${ownerJoin}
     WHERE ${where.join("\n      AND ")}
     ORDER BY CS.updated_at DESC

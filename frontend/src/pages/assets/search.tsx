@@ -74,7 +74,17 @@ export default function AssetSearch() {
   const columns: ColumnDef<File>[] = [
     {
       accessorKey: "name",
-      header: "Name",
+      header: ({ column }) => {
+        return (
+          <div
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex items-center gap-4 justify-center w-full"
+          >
+            Name
+            <ArrowUpDown className="size-4 text-muted-foreground" />
+          </div>
+        );
+      },
       cell: ({ row }) => {
         const name = row.getValue("name") as string;
         return (
@@ -108,17 +118,7 @@ export default function AssetSearch() {
     },
     {
       accessorKey: "createdAt",
-      header: ({ column }) => {
-        return (
-          <div
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex items-center gap-4 justify-center w-full"
-          >
-            Created At
-            <ArrowUpDown className="size-4 text-muted-foreground" />
-          </div>
-        );
-      },
+      header: "Created At",
       cell: ({ row }) => {
         return (
           <div className="text-sm text-center">
@@ -126,6 +126,7 @@ export default function AssetSearch() {
           </div>
         );
       },
+      enableSorting: false,
     },
     {
       accessorKey: "actions",
@@ -141,6 +142,7 @@ export default function AssetSearch() {
           </div>
         );
       },
+      enableSorting: false,
     },
   ];
 
@@ -339,6 +341,7 @@ export default function AssetSearch() {
             pageSize={pageSize}
             enableSearch
             searchPlaceholder="Filter Assets"
+            searchableColumnIds={["name", "storageKey"]}
           />
 
           {!isLoading && !error && total > 0 && (

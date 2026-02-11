@@ -67,8 +67,8 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
     const safeSubmissionOwnerUsrIds = normalizeNumberArray(filters.submissionOwnerUsrIds, { fieldName: "submissionOwnerUsrIds" });
     const safeReviewerUsrIds = normalizeNumberArray(filters.reviewerUsrIds, { fieldName: "reviewerUsrIds" });
 
-    if (isReviewer && (safeSubmissionOwnerUsrIds != null || safeReviewerUsrIds != null)) {
-      throw new ErrorResponse(400, "submissionOwnerUsrIds and reviewerUsrIds are admin-only filters");
+    if (isReviewer && (safeSubmissionOwnerUsrIds != null || safeReviewerUsrIds != null || safeAssignedByUsrIds != null)) {
+      throw new ErrorResponse(400, "submissionOwnerUsrIds, reviewerUsrIds and assignedByUsrIds are admin-only filters");
     }
 
     const safeAssignedDateFrom = toOptionalDateText(filters.assignedDateFrom, { fieldName: "assignedDateFrom" });
