@@ -45,7 +45,7 @@ import SubmissionDetails from "@/pages/submissions/details";
 import SubmissionDetailsTab from "@/pages/submissions/details/detailsTab";
 import SubmissionMessages from "@/pages/submissions/details/messages";
 import SubmissionVersions from "@/pages/submissions/details/versions";
-import SubmissionReviews from "@/pages/submissions/details/reviews";
+import SubmissionReviews from "@/pages/reviewer/submission-details/reviews";
 import ConferenceDetails from "@/pages/conferences/details";
 import NewConference from "@/pages/conferences/new";
 import EditConference from "@/pages/conferences/edit";

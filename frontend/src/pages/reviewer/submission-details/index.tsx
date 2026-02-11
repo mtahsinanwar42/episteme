@@ -118,7 +118,7 @@ export default function ReviewerSubmissionDetails() {
 
             {isAdmin || isReviewer ? (
               <NavLink
-                to={`/submissions/${submission.submissionId}/reviews`}
+                to={`/reviewer/submissions/${submission.submissionId}/reviews`}
                 className={({ isActive }) =>
                   cn(
                     "block px-4 py-3 bg-slate-900 text-sm hover:bg-accent/70",
