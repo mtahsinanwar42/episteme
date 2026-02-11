@@ -8,7 +8,7 @@ import App from "@/App";
 import { store, persistor } from "@/stores/store";
 import "@/styles/globals.css";
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
