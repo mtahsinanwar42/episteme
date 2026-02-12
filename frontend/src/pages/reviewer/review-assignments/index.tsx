@@ -115,23 +115,7 @@ export default function MyReviewAssignments() {
         ),
         enableSorting: false,
       },
-      {
-        id: "submitter",
-        accessorFn: (row) =>
-          `${row.ownerFirstName} ${row.ownerLastName} ${row.ownerEmail}`,
-        header: "Submission Owner",
-        cell: ({ row }) => (
-          <div className="text-sm">
-            <div>
-              {row.original.ownerFirstName} {row.original.ownerLastName}
-            </div>
-            <div className="text-muted-foreground text-xs">
-              {row.original.ownerEmail}
-            </div>
-          </div>
-        ),
-        enableSorting: false,
-      },
+
       {
         id: "assignmentStatus",
         accessorFn: (row) =>

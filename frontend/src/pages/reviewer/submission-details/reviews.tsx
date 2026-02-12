@@ -399,32 +399,6 @@ export default function SubmissionReviews() {
                 <div className="text-sm text-orange-700">{errorMessage}</div>
               )}
 
-              <FileUploadField
-                label="Submission File (optional)"
-                selectedFile={submissionFile}
-                onFileSelect={handleSubmissionFileChange}
-                disabled={isSubmitting}
-                helperText="Upload the reviewed submission file"
-                uploadedFile={uploadedSubmissionFile}
-                accept=".docx,.pdf"
-              />
-
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="changeLog" className="text-sm font-medium">
-                  Change Log / Notes (optional)
-                </label>
-                <textarea
-                  id="changeLog"
-                  name="changeLog"
-                  value={changeLog}
-                  onChange={(event) => setChangeLog(event.target.value)}
-                  rows={4}
-                  className="w-full ps-3 pe-3 py-2.5 text-heading text-sm rounded-lg border border-accent focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 placeholder:text-body"
-                  placeholder="Summarize the edits or review notes"
-                  disabled={isSubmitting}
-                ></textarea>
-              </div>
-
               <div className="flex flex-col space-y-2">
                 <label className="text-sm font-medium">Recommendation *</label>
                 <Select
@@ -463,6 +437,32 @@ export default function SubmissionReviews() {
                   rows={4}
                   className="w-full ps-3 pe-3 py-2.5 text-heading text-sm rounded-lg border border-accent focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 placeholder:text-body"
                   placeholder="Add reviewer comments"
+                  disabled={isSubmitting}
+                ></textarea>
+              </div>
+
+              <FileUploadField
+                label="Submission File (optional)"
+                selectedFile={submissionFile}
+                onFileSelect={handleSubmissionFileChange}
+                disabled={isSubmitting}
+                helperText="Upload the reviewed submission file"
+                uploadedFile={uploadedSubmissionFile}
+                accept=".docx,.pdf"
+              />
+
+              <div className="flex flex-col space-y-2">
+                <label htmlFor="changeLog" className="text-sm font-medium">
+                  Change Log / Notes (optional)
+                </label>
+                <textarea
+                  id="changeLog"
+                  name="changeLog"
+                  value={changeLog}
+                  onChange={(event) => setChangeLog(event.target.value)}
+                  rows={4}
+                  className="w-full ps-3 pe-3 py-2.5 text-heading text-sm rounded-lg border border-accent focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 placeholder:text-body"
+                  placeholder="Summarize the edits or review notes"
                   disabled={isSubmitting}
                 ></textarea>
               </div>
