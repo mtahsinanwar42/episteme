@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
@@ -16,12 +16,14 @@ import PageSubTitle from "@/components/common/PageSubTitle";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import { FileUploadField } from "@/components/common/FileUploadField";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useConferences } from "@/hooks/useConferences";
 import { useCreateSubmissionMutation } from "@/hooks/useSubmissions";
 import { useSuccessToast } from "@/hooks/useSuccessToast";
 import { fileService } from "@/services/fileService";
 import { miscService } from "@/services/miscService";
 import { FileTypeEnum } from "@/models/file";
+import { ConferenceStatus } from "@/models/conference";
 
 export default function NewSubmission() {
   const navigate = useNavigate();
@@ -32,6 +34,7 @@ export default function NewSubmission() {
     title: "",
     conferenceId: "",
     topics: [] as string[],
+    abstract: "",
     contentFilePath: "",
     message: "",
   });
@@ -44,12 +47,19 @@ export default function NewSubmission() {
     size: number;
     storageKey: string;
   } | null>(null);
+  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   const {
     data: conferencesResponse,
     isLoading: conferencesLoading,
     error: conferencesError,
-  } = useConferences({ paginate: false, sort: "title" });
+  } = useConferences({
+    paginate: false,
+    sort: "title",
+    status: ConferenceStatus.ACTIVE,
+    submissionStartAtTo: today,
+    submissionEndAtFrom: today,
+  });
 
   const {
     data: topicsResponse,
@@ -66,6 +76,8 @@ export default function NewSubmission() {
   const isFormValid =
     formData.title.trim() !== "" &&
     formData.conferenceId !== "" &&
+    formData.topics.length > 0 &&
+    formData.abstract.replace(/<[^>]*>/g, "").trim() !== "" &&
     formData.contentFilePath !== "";
 
   const isLoading =
@@ -155,6 +167,16 @@ export default function NewSubmission() {
       return;
     }
 
+    if (formData.topics.length === 0) {
+      setError("At least one topic is required");
+      return;
+    }
+
+    if (!formData.abstract.replace(/<[^>]*>/g, "").trim()) {
+      setError("Abstract is required");
+      return;
+    }
+
     setError(null);
 
     const parsedConferenceId = Number(formData.conferenceId);
@@ -167,12 +189,13 @@ export default function NewSubmission() {
         title: formData.title.trim(),
         conferenceId,
         topics: formData.topics,
+        abstract: formData.abstract,
         contentFilePath: formData.contentFilePath,
         message: formData.message.trim() || undefined,
       },
       {
         onSuccess: (response) => {
-          showSuccessToast("Submission created successfully.");
+          showSuccessToast("New submission added successfully.");
           const created = response?.data;
           const submissionId = created?.id ?? created?.submissionId;
           if (submissionId) {
@@ -263,7 +286,7 @@ export default function NewSubmission() {
 
           <div>
             <label className="block text-sm font-medium mb-2 text-heading">
-              Topics
+              Topics *
             </label>
             <MultiSelect
               options={topics.map((topic) => ({
@@ -279,7 +302,22 @@ export default function NewSubmission() {
               }
               disabled={isLoading || topicsLoading}
               searchable
+              hideSelectAll
               emptyIndicator="No topics available."
+            />
+          </div>
+
+          <div className="lg:col-span-2">
+            <label className="block text-sm font-medium mb-2 text-heading">
+              Abstract *
+            </label>
+            <RichTextEditor
+              value={formData.abstract}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, abstract: value }))
+              }
+              placeholder="Enter your paper abstract..."
+              disabled={isLoading}
             />
           </div>
 
@@ -306,12 +344,12 @@ export default function NewSubmission() {
               onChange={handleInputChange}
               rows={4}
               className="w-full ps-3 pe-3 py-2.5 text-heading text-sm rounded-lg border border-accent focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 placeholder:text-body"
-              placeholder="Add a short note for the organizers"
+              placeholder="Add a short note for the editors"
               disabled={isLoading}
             ></textarea>
           </div>
 
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 lg:col-span-2">
             <Button
               type="button"
               variant="outline"

@@ -10,6 +10,8 @@ import type {
   SubmissionMessagesResponse,
   CreateSubmissionMessageRequest,
   SubmissionReviewersResponse,
+  SubmissionReviewsResponse,
+  CreateSubmissionReviewRequest,
   SubmissionMessage,
 } from "@/models/submission";
 
@@ -20,6 +22,19 @@ export interface GetSubmissionsParams {
   search?: string;
   paginate?: boolean;
   status?: number;
+}
+
+export interface SearchSubmissionsParams {
+  page?: number;
+  limit?: number;
+  title?: string;
+  topics?: string[];
+  doi?: string;
+  conferenceId?: number;
+  status?: number[];
+  ownerUsrIds?: number[];
+  createdDateFrom?: string;
+  createdDateTo?: string;
 }
 
 export const submissionService = {
@@ -61,6 +76,17 @@ export const submissionService = {
   ): Promise<SubmissionDetailsResponse> => {
     return api.put<SubmissionDetailsResponse>(
       `/submissions/${submissionId}/status`,
+      data,
+      true,
+    );
+  },
+
+  updateSubmissionDoi: async (
+    submissionId: string | number,
+    data: { doi: string },
+  ): Promise<SubmissionDetailsResponse> => {
+    return api.put<SubmissionDetailsResponse>(
+      `/submissions/${submissionId}/doi`,
       data,
       true,
     );
@@ -115,6 +141,26 @@ export const submissionService = {
     );
   },
 
+  getSubmissionReviews: async (
+    submissionId: string | number,
+  ): Promise<SubmissionReviewsResponse> => {
+    return api.get<SubmissionReviewsResponse>(
+      `/submissions/${submissionId}/reviews`,
+      true,
+    );
+  },
+
+  createSubmissionReview: async (
+    submissionId: string | number,
+    data: CreateSubmissionReviewRequest,
+  ): Promise<{ success: boolean; data: unknown }> => {
+    return api.post<{ success: boolean; data: unknown }>(
+      `/submissions/${submissionId}/reviews`,
+      data,
+      true,
+    );
+  },
+
   getReviewAssignments: async (
     params?: GetSubmissionsParams,
   ): Promise<SubmissionResponse> => {
@@ -128,6 +174,42 @@ export const submissionService = {
     const endpoint = queryString
       ? `/review-assignments/me?${queryString}`
       : "/review-assignments/me";
+
+    return api.get<SubmissionResponse>(endpoint, true);
+  },
+
+  searchSubmissions: async (
+    params?: SearchSubmissionsParams,
+  ): Promise<SubmissionResponse> => {
+    const queryParams = new URLSearchParams();
+
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.title) queryParams.append("title", params.title);
+    if (params?.doi) queryParams.append("doi", params.doi);
+    if (params?.conferenceId !== undefined) {
+      queryParams.append("conferenceId", params.conferenceId.toString());
+    }
+    if (params?.topics?.length) {
+      queryParams.append("topics", JSON.stringify(params.topics));
+    }
+    if (params?.status?.length) {
+      queryParams.append("status", params.status.join(","));
+    }
+    if (params?.ownerUsrIds?.length) {
+      queryParams.append("ownerUsrIds", params.ownerUsrIds.join(","));
+    }
+    if (params?.createdDateFrom) {
+      queryParams.append("createdDateFrom", params.createdDateFrom);
+    }
+    if (params?.createdDateTo) {
+      queryParams.append("createdDateTo", params.createdDateTo);
+    }
+
+    const queryString = queryParams.toString();
+    const endpoint = queryString
+      ? `/submissions/search?${queryString}`
+      : "/submissions/search";
 
     return api.get<SubmissionResponse>(endpoint, true);
   },

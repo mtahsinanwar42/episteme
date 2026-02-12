@@ -18,6 +18,21 @@ export const getBlogActivityResourceStatusEnum = (
   }
 };
 
+export const getBlogActivityResourceStatusBadge = (
+  status: ResourceStatus | undefined,
+) => {
+  switch (status) {
+    case ResourceStatus.DRAFT:
+      return <Badge variant="secondary">Draft</Badge>;
+    case ResourceStatus.PUBLISHED:
+      return <Badge variant="default">Published</Badge>;
+    case ResourceStatus.DELETED:
+      return <Badge variant="destructive">Deleted</Badge>;
+    default:
+      return <Badge variant="outline">{status}</Badge>;
+  }
+};
+
 export const getAnnouncementTrainingResourceStatusEnum = (
   status: TrainingStatus | undefined,
 ) => {
@@ -32,21 +47,6 @@ export const getAnnouncementTrainingResourceStatusEnum = (
       return "Deleted";
     default:
       return `${status}`;
-  }
-};
-
-export const getBlogActivityResourceStatusBadge = (
-  status: ResourceStatus | undefined,
-) => {
-  switch (status) {
-    case ResourceStatus.DRAFT:
-      return <Badge variant="secondary">Draft</Badge>;
-    case ResourceStatus.PUBLISHED:
-      return <Badge variant="default">Published</Badge>;
-    case ResourceStatus.DELETED:
-      return <Badge variant="destructive">Deleted</Badge>;
-    default:
-      return <Badge variant="outline">{status}</Badge>;
   }
 };
 

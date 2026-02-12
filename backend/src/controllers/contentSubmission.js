@@ -42,7 +42,7 @@ export const searchSubmissions = asyncHandler(async (req, res) => {
     doi,
     conferenceId,
     status,
-    ownerUsrId,
+    ownerUsrIds,
     createdDateFrom,
     createdDateTo,
   } = req.query;
@@ -55,7 +55,7 @@ export const searchSubmissions = asyncHandler(async (req, res) => {
     doi,
     conferenceId,
     status,
-    ownerUsrId,
+    ownerUsrIds,
     createdDateFrom,
     createdDateTo,
   });

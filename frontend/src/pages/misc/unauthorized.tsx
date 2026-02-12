@@ -1,14 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { logout } from "@/stores/authSlice";
+import { handleLogout } from "@/utils/logoutHandler";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import type { AppDispatch } from "@/stores/store";
 
 export default function Unauthorized() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const handleGoToLogin = () => {
-    dispatch(logout());
+  const handleGoToLogin = async () => {
+    await handleLogout(dispatch);
     navigate("/login", {
       state: { fromLogout: true },
     });

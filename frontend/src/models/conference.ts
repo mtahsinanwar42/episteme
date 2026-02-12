@@ -93,6 +93,8 @@ export interface GetConferencesParams {
   startAtTo?: string;
   submissionStartAtFrom?: string;
   submissionStartAtTo?: string;
+  submissionEndAtFrom?: string;
+  submissionEndAtTo?: string;
   createdAtFrom?: string;
   createdAtTo?: string;
 }

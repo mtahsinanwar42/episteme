@@ -4,6 +4,7 @@ import { findSubmissionByIdAndUserDetails, findSubmissionsBySearchFilters, findS
 import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { serializeContentSubmission } from "../utils/serializers.js";
+import { toDate } from "../utils/dateTime.js";
 import { isEmpty } from "../utils/string.js";
 import { normalizeNumberArray, normalizeTextArray, toOptionalDateText, toOptionalInteger } from "../utils/search.js";
 
@@ -49,10 +50,10 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     }
 
     const safeConferenceId = toOptionalInteger(filters.conferenceId, { fieldName: "conferenceId" });
-    const ownerUsrIdFromInput = toOptionalInteger(filters.ownerUsrId, { fieldName: "ownerUsrId" });
+    const safeOwnerUsrIds = normalizeNumberArray(filters.ownerUsrIds, { fieldName: "ownerUsrIds" });
 
-    if (!isAdmin && ownerUsrIdFromInput != null) {
-      throw new ErrorResponse(400, "ownerUsrId can only be provided by admin");
+    if (!isAdmin && safeOwnerUsrIds != null) {
+      throw new ErrorResponse(400, "ownerUsrIds can only be provided by admin");
     }
 
     const safeCreatedDateFrom = toOptionalDateText(filters.createdDateFrom, { fieldName: "createdDateFrom" });
@@ -72,7 +73,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       doi: safeDoi,
       conferenceId: safeConferenceId,
       statuses: safeStatuses,
-      ownerUsrId: isAdmin ? ownerUsrIdFromInput : user.id,
+      ownerUsrIds: isAdmin ? safeOwnerUsrIds : [user.id],
       createdDateFrom: safeCreatedDateFrom,
       createdDateTo: safeCreatedDateTo,
       excludeDeleted: !isAdmin,
@@ -92,10 +93,10 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
   }
 
   async function saveSubmission(user, payload) {
-    const { title, topics, conferenceId, contentFilePath, message, } = payload;
+    const { title, abstract, topics, conferenceId, contentFilePath, message, } = payload;
 
-    if (isEmpty(title) || !conferenceId || isEmpty(contentFilePath)) {
-      throw new ErrorResponse(400, "title, conferenceId, contentFilePath are required");
+    if (isEmpty(title) || isEmpty(abstract) || !conferenceId || isEmpty(contentFilePath)) {
+      throw new ErrorResponse(400, "title, abstract, conferenceId, contentFilePath are required");
     }
 
     if (!Array.isArray(topics) || topics.length === 0 || topics.some((t) => t == null)) {
@@ -108,12 +109,24 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       throw new ErrorResponse(400, "Invalid Conference ID");
     }
 
+    const now = new Date();
+    const submissionPeriodStartAt = toDate(conference.submissionPeriodStartAt);
+    const submissionPeriodEndAt = toDate(conference.submissionPeriodEndAt);
+
+    if (now < submissionPeriodStartAt || now > submissionPeriodEndAt) {
+      throw new ErrorResponse(
+        400,
+        `Submission is not allowed outside the conference submission period. Valid range: ${submissionPeriodStartAt.toISOString()} to ${submissionPeriodEndAt.toISOString()}`
+      );
+    }
+
     const contentFileId = await fileService.getFileIdByPath(contentFilePath, { fieldName: "contentFilePath" });
 
     return sequelize.transaction(async (t) => {
       const submission = await ContentSubmission.create(
         {
           title,
+          abstract,
           topics,
           conferenceId,
           currentStatus: CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, // TODO: change it to DRAFT after real payment integration

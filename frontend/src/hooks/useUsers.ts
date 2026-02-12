@@ -32,6 +32,7 @@ export function useUserDetailsMutation() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["user", variables.userId] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["users", "search"] });
     },
   });
 }

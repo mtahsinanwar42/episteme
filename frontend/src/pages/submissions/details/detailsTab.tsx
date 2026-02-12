@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import {
   Calendar,
@@ -7,9 +6,6 @@ import {
   ShieldCheck,
   FileText,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { StatusUpdateModal } from "@/components/submission/StatusUpdateModal";
-import { SubmissionStatus, type Submission } from "@/models/submission";
 import { formatDateTime } from "@/utils/dateFormatter";
 import type { SubmissionOutletContext } from "@/pages/submissions/details";
 import {
@@ -19,16 +15,6 @@ import {
 
 export default function SubmissionDetailsTab() {
   const { submission, isAdmin } = useOutletContext<SubmissionOutletContext>();
-  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-
-  const canUpdateStatus =
-    isAdmin &&
-    submission.status !== undefined &&
-    [
-      SubmissionStatus.DRAFT,
-      SubmissionStatus.PENDING_APPROVAL,
-      SubmissionStatus.RETURNED,
-    ].includes(submission.status);
 
   const shouldShowOwner =
     isAdmin &&
@@ -43,18 +29,8 @@ export default function SubmissionDetailsTab() {
       <div
         className={`${isAdmin ? "lg:col-span-2" : "lg:col-span-3"} rounded-lg shadow-small border border-border`}
       >
-        <div className="p-4 gradient-card shadow-sm flex justify-between items-center">
+        <div className="p-4 gradient-card shadow-sm">
           <h3 className="font-semibold">Submission Information</h3>
-          {canUpdateStatus && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setIsStatusModalOpen(true)}
-            >
-              Update Status
-            </Button>
-          )}
         </div>
 
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -171,13 +147,6 @@ export default function SubmissionDetailsTab() {
           </div>
         </div>
       )}
-
-      <StatusUpdateModal
-        open={isStatusModalOpen}
-        onOpenChange={setIsStatusModalOpen}
-        selectedSubmission={submission as Submission}
-        onClose={() => setIsStatusModalOpen(false)}
-      />
     </div>
   );
 }

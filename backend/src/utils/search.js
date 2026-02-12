@@ -5,7 +5,27 @@ export function normalizeTextArray(value, { fieldName }) {
     return null;
   }
 
-  const raw = Array.isArray(value) ? value : String(value).split(",");
+  let raw;
+  if (Array.isArray(value)) {
+    raw = value;
+  } else if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (!Array.isArray(parsed)) {
+          throw new ErrorResponse(400, `${fieldName} must be an array`);
+        }
+        raw = parsed;
+      } catch {
+        throw new ErrorResponse(400, `${fieldName} must be a valid JSON array`);
+      }
+    } else {
+      raw = trimmed.split(",");
+    }
+  } else {
+    raw = String(value).split(",");
+  }
   const items = raw.map((item) => String(item).trim()).filter((item) => item.length > 0);
 
   if (items.length === 0) {

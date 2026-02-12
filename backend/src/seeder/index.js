@@ -192,7 +192,7 @@ const conferenceSeedData = [
     slug: "episteme-systems-engineering-summit-2026",
     startAt: "2026-06-10",
     endAt: "2026-06-13",
-    submissionPeriodStartAt: "2026-03-01",
+    submissionPeriodStartAt: "2026-01-10",
     submissionPeriodEndAt: "2026-04-20",
     status: CONFERENCE_STATUS.ACTIVE,
     metadataFileName: "CONFERENCE_1.json",
@@ -202,7 +202,7 @@ const conferenceSeedData = [
     slug: "episteme-event-driven-architecture-forum-2026",
     startAt: "2026-07-22",
     endAt: "2026-07-24",
-    submissionPeriodStartAt: "2026-03-15",
+    submissionPeriodStartAt: "2026-01-20",
     submissionPeriodEndAt: "2026-05-05",
     status: CONFERENCE_STATUS.ACTIVE,
     metadataFileName: "CONFERENCE_2.json",
@@ -210,10 +210,10 @@ const conferenceSeedData = [
   {
     title: "Episteme Secure Platforms Congress 2026",
     slug: "episteme-secure-platforms-congress-2026",
-    startAt: "2026-09-08",
-    endAt: "2026-09-11",
-    submissionPeriodStartAt: "2026-04-10",
-    submissionPeriodEndAt: "2026-06-01",
+    startAt: "2025-10-08",
+    endAt: "2025-10-11",
+    submissionPeriodStartAt: "2025-06-10",
+    submissionPeriodEndAt: "2025-08-01",
     status: CONFERENCE_STATUS.FINISHED,
     metadataFileName: "CONFERENCE_3.json",
   },
@@ -312,17 +312,20 @@ const metadataHeroImageMap = new Map([
 const submissionTemplates = [
   {
     title: "AI-Driven Knowledge Graphs for Open Science",
-    topics: ["Computer science"],
+    abstract: "This paper presents a graph-native framework for integrating heterogeneous scholarly metadata to improve discovery, traceability, and reproducibility in open-science workflows.",
+    topics: ["Computer science", "Context (archaeology)"],
     fileKey: "S1",
   },
   {
     title: "Graph-Based Peer Review Systems",
-    topics: ["Work (physics)"],
+    abstract: "We propose a reviewer-assignment and conflict-detection model based on graph structure, reducing bias and improving expertise matching across interdisciplinary submissions.",
+    topics: ["Work (physics)", "Context (archaeology)"],
     fileKey: "S2",
   },
   {
     title: "Observability-Driven Editorial Pipelines",
-    topics: ["Context (archaeology)"],
+    abstract: "This work introduces observability metrics and alerting patterns for editorial pipelines, enabling faster issue detection and more reliable submission processing.",
+    topics: ["Context (archaeology)", "Work (physics)"],
     fileKey: "S3",
   },
 ];
@@ -331,22 +334,22 @@ const userSubmissionData = {
   user1: [
     { templateIdx: 0, conferenceIdx: 0, titleSuffix: " — Delft Perspective" },
     { templateIdx: 1, conferenceIdx: 1, titleSuffix: " — Delft Perspective" },
-    { templateIdx: 2, conferenceIdx: 2, titleSuffix: " — Delft Perspective" },
+    { templateIdx: 2, conferenceIdx: 0, titleSuffix: " — Delft Perspective" },
   ],
   user2: [
     { templateIdx: 0, conferenceIdx: 1, titleSuffix: " — ETH Perspective" },
-    { templateIdx: 1, conferenceIdx: 2, titleSuffix: " — ETH Perspective" },
+    { templateIdx: 1, conferenceIdx: 0, titleSuffix: " — ETH Perspective" },
     { templateIdx: 2, conferenceIdx: 0, titleSuffix: " — ETH Perspective" },
   ],
   user3: [
-    { templateIdx: 0, conferenceIdx: 2, titleSuffix: " — Lisbon Perspective" },
+    { templateIdx: 0, conferenceIdx: 1, titleSuffix: " — Lisbon Perspective" },
     { templateIdx: 1, conferenceIdx: 0, titleSuffix: " — Lisbon Perspective" },
     { templateIdx: 2, conferenceIdx: 1, titleSuffix: " — Lisbon Perspective" },
   ],
   userreviewer: [
     { templateIdx: 0, conferenceIdx: 0, titleSuffix: " — KAIST Perspective" },
     { templateIdx: 1, conferenceIdx: 1, titleSuffix: " — KAIST Perspective" },
-    { templateIdx: 2, conferenceIdx: 2, titleSuffix: " — KAIST Perspective" },
+    { templateIdx: 2, conferenceIdx: 1, titleSuffix: " — KAIST Perspective" },
   ],
 };
 
@@ -623,6 +626,7 @@ async function createPendingSubmissionBundle({
   reviewerUsers,
   conference,
   title,
+  abstract,
   topics,
   fileInitial,
   paymentProviderPaymentId,
@@ -632,6 +636,7 @@ async function createPendingSubmissionBundle({
   const submission = await ContentSubmission.create({
     ownerUsrId: ownerUser.id,
     title,
+    abstract,
     topics,
     conferenceId: conference.id,
     currentStatus: CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL,
@@ -840,6 +845,7 @@ async function importData() {
           reviewerUsers: config.reviewers,
           conference: conferences[conferenceIdx],
           title: `${template.title}${titleSuffix}`,
+          abstract: `${template.abstract} ${titleSuffix.replace(/^ â€” /, "")}.`,
           topics: template.topics,
           fileInitial: submissionFiles[template.fileKey],
           paymentProviderPaymentId: `pi_seed_${userKey}_s${i + 1}_pending`,
