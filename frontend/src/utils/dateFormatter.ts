@@ -10,7 +10,7 @@ function getTimezoneOffsetHours(): number {
 
 /**
  * Formats a date string to the user's local timezone
- * @param dateString - ISO date string from the backend
+ * @param dateString - ISO date string from the backend (UTC)
  * @param options - Intl.DateTimeFormat options
  * @returns Formatted date string in user's local timezone
  */
@@ -20,9 +20,7 @@ export function formatDate(
 ): string {
   if (!dateString) return "";
 
-  // Remove 'Z' suffix if present - backend stores times in local timezone
-  const cleanedDateString = dateString.trim().replace(/Z$/, "");
-  const date = new Date(cleanedDateString);
+  const date = new Date(dateString.trim());
 
   // Check if date is valid
   if (isNaN(date.getTime())) {
@@ -34,6 +32,7 @@ export function formatDate(
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     ...options,
   };
 
@@ -42,7 +41,7 @@ export function formatDate(
 
 /**
  * Formats a date and time string to the user's local timezone
- * @param dateString - ISO date string from the backend
+ * @param dateString - ISO date string from the backend (UTC)
  * @param options - Intl.DateTimeFormat options
  * @returns Formatted date and time string in user's local timezone
  */
@@ -52,9 +51,7 @@ export function formatDateTime(
 ): string {
   if (!dateString) return "";
 
-  // Remove 'Z' suffix if present - backend stores times in local timezone
-  const cleanedDateString = dateString.trim().replace(/Z$/, "");
-  const date = new Date(cleanedDateString);
+  const date = new Date(dateString.trim());
 
   // Check if date is valid
   if (isNaN(date.getTime())) {
@@ -62,16 +59,14 @@ export function formatDateTime(
     return "";
   }
 
-  // Add 12 hours to fix backend time storage issue (backend stores times 12 hours behind)
-  date.setHours(date.getHours() + 12);
-
   const defaultOptions: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false,
+    hour12: true,
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     ...options,
   };
 

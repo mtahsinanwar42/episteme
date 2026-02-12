@@ -2,10 +2,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { userService, type GetUsersParams } from "@/services/userService";
 
 // Get all users with optional pagination and filtering
-export function useUsers(params?: GetUsersParams) {
+export function useUsers(
+  params?: GetUsersParams,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: ["users", params],
     queryFn: () => userService.getUsers(params),
+    enabled: options?.enabled ?? true,
   });
 }
 

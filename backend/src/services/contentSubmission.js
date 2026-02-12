@@ -51,6 +51,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
 
     const safeConferenceId = toOptionalInteger(filters.conferenceId, { fieldName: "conferenceId" });
     const safeOwnerUsrIds = normalizeNumberArray(filters.ownerUsrIds, { fieldName: "ownerUsrIds" });
+    const shouldPaginate = filters.paginate !== false;
 
     if (!isAdmin && safeOwnerUsrIds != null) {
       throw new ErrorResponse(400, "ownerUsrIds can only be provided by admin");
@@ -68,6 +69,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       loggedInUserRoles: roles,
       page: filters.page,
       limit: filters.limit,
+      paginate: shouldPaginate,
       title: safeTitle,
       topics: safeTopics,
       doi: safeDoi,

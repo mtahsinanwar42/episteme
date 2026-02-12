@@ -102,10 +102,12 @@ export async function findSubmissionReviewersById({
   submissionId,
   page,
   limit,
+  paginate = true,
 }) {
   const pageNum = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
   const limitNum = Math.max(1, Math.max(1, Number(limit) || DEFAULT_PAGE_LIMIT));
   const offset = (pageNum - 1) * limitNum;
+  const paginationSql = paginate ? `LIMIT :limit OFFSET :offset` : ``;
 
   const sql = `
     SELECT
@@ -132,7 +134,7 @@ export async function findSubmissionReviewersById({
       CRA.content_submission_id = :submissionId
       AND CRA.status <> :deletedAssignmentStatus
     ORDER BY CRA.assigned_at DESC, U.last_name ASC, U.first_name ASC
-    LIMIT :limit OFFSET :offset;
+    ${paginationSql};
   `;
 
   const rows = await sequelize.query(sql, {
@@ -140,8 +142,7 @@ export async function findSubmissionReviewersById({
     replacements: {
       submissionId: Number(submissionId),
       deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
-      limit: limitNum,
-      offset,
+      ...(paginate ? { limit: limitNum, offset } : {}),
     },
   });
 

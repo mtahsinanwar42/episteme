@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,6 +13,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { FileUploadField } from "@/components/common/FileUploadField";
 import type { SubmissionOutletContext } from "@/pages/submissions/details";
 import { SubmissionStatus, type SubmissionVersion } from "@/models/submission";
+import { UserRole } from "@/models/user";
 import { FileTypeEnum } from "@/models/file";
 import { useSuccessToast } from "@/hooks/useSuccessToast";
 import {
@@ -23,11 +25,20 @@ import { formatDateTime } from "@/utils/dateFormatter";
 import type { ColumnDef } from "@tanstack/react-table";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import { DownloadCloud } from "lucide-react";
+import type { RootState } from "@/stores/store";
 
 export default function SubmissionVersions() {
-  const { submission, isAdmin, isReviewer } =
+  const { submission, isAdmin } =
     useOutletContext<SubmissionOutletContext>();
   const { showSuccessToast } = useSuccessToast();
+  const currentUser = useSelector((state: RootState) => state?.auth?.user);
+  const currentRoles = currentUser?.roles ?? [];
+  const isUser = currentRoles.includes(UserRole.USER);
+  const submissionOwnerId = (submission as typeof submission & { ownerUsrId?: string | number })
+    ?.ownerUserId
+    ?? (submission as typeof submission & { ownerUsrId?: string | number })?.ownerUsrId;
+  const isSubmissionOwner =
+    submissionOwnerId != null && Number(submissionOwnerId) === Number(currentUser?.id);
 
   const submissionId = submission.submissionId ?? submission.id;
 
@@ -63,7 +74,7 @@ export default function SubmissionVersions() {
     );
   }, [data]);
 
-  const canUploadByRole = isAdmin || !isReviewer;
+  const canUploadByRole = isAdmin || (isUser && isSubmissionOwner);
   const isAllowedStatus =
     submission.status === SubmissionStatus.PENDING_APPROVAL ||
     submission.status === SubmissionStatus.RETURNED;
@@ -133,6 +144,11 @@ export default function SubmissionVersions() {
     event.preventDefault();
     setErrorMessage(null);
 
+    if (!canUpload) {
+      setErrorMessage("You do not have permission to add a new version.");
+      return;
+    }
+
     if (!uploadedSubmissionFile?.storageKey) {
       setErrorMessage("Submission file is required");
       return;
@@ -174,8 +190,8 @@ export default function SubmissionVersions() {
     );
   }, []);
 
-  const columns = useMemo<ColumnDef<SubmissionVersion>[]>(
-    () => [
+  const columns = useMemo<ColumnDef<SubmissionVersion>[]>(() => {
+    const baseColumns: ColumnDef<SubmissionVersion>[] = [
       {
         accessorKey: "versionNo",
         header: "Version No",
@@ -183,6 +199,9 @@ export default function SubmissionVersions() {
           <span className="font-medium">{row.original.versionNo ?? "-"}</span>
         ),
       },
+    ];
+
+    baseColumns.push(
       {
         accessorKey: "changeLog",
         header: "Change Log / Notes",
@@ -224,9 +243,10 @@ export default function SubmissionVersions() {
         header: "Created At",
         cell: ({ row }) => formatDateTime(row.original.createdAt),
       },
-    ],
-    [handleDownload, renderUploader],
-  );
+    );
+
+    return baseColumns;
+  }, [handleDownload, renderUploader]);
 
   return (
     <div className="relative rounded-lg shadow-small border border-border">

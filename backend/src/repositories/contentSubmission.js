@@ -89,6 +89,7 @@ export async function findSubmissionsBySearchFilters({
   loggedInUserRoles,
   page = DEFAULT_PAGE_NO,
   limit = DEFAULT_PAGE_LIMIT,
+  paginate = true,
   title,
   topics,
   doi,
@@ -102,6 +103,7 @@ export async function findSubmissionsBySearchFilters({
   const safePage = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
   const safeLimit = Math.max(1, Number(limit) || DEFAULT_PAGE_LIMIT);
   const offset = (safePage - 1) * safeLimit;
+  const paginationSql = paginate ? `LIMIT :limit OFFSET :offset` : ``;
 
   const isAdmin = Array.isArray(loggedInUserRoles) && loggedInUserRoles.includes(USER_ROLE.ADMIN);
   const ownerJoin = isAdmin ? `JOIN episteme.user U ON U.id = CS.owner_usr_id` : ``;
@@ -110,8 +112,7 @@ export async function findSubmissionsBySearchFilters({
   const replacements = {
     loggedInUserId,
     excludedConferenceStatus: [CONFERENCE_STATUS.INACTIVE, CONFERENCE_STATUS.DELETED],
-    limit: safeLimit,
-    offset,
+    ...(paginate ? { limit: safeLimit, offset } : {}),
   };
 
   const where = [];
@@ -198,7 +199,7 @@ export async function findSubmissionsBySearchFilters({
     ${ownerJoin}
     WHERE ${where.join("\n      AND ")}
     ORDER BY CS.updated_at DESC
-    LIMIT :limit OFFSET :offset
+    ${paginationSql}
   `;
 
   const rows = await sequelize.query(dataSql, {
@@ -243,8 +244,10 @@ export async function findSubmissionByIdAndUserDetails({
       CS.doi             AS "doi",
       CS.current_status  AS "status",
       CS.status_update_notes AS "statusUpdateNotes",
+      CS.current_content_submission_version_id AS "currentContentSubmissionVersionId",
       CS.created_at      AS "createdAt",
       CS.updated_at      AS "updatedAt",
+      CS.owner_usr_id    AS "ownerUserId",
 
       C.id               AS "conferenceId",
       C.title            AS "conferenceTitle",
@@ -252,8 +255,6 @@ export async function findSubmissionByIdAndUserDetails({
       C.status           AS "conferenceStatus"
       ${isAdmin ? `,
       CSP.status         AS "paymentStatus",
-
-      U.id               AS "ownerUserId",
       U.email            AS "ownerEmail",
       U.first_name       AS "ownerFirstName",
       U.last_name        AS "ownerLastName",

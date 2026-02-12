@@ -62,6 +62,8 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
     }
 
     const safeConferenceId = toOptionalInteger(filters.conferenceId, { fieldName: "conferenceId" });
+    const safeSubmissionId = toOptionalInteger(filters.submissionId, { fieldName: "submissionId" });
+    const shouldPaginate = filters.paginate !== false;
     const safeAssignedByUsrIds = normalizeNumberArray(filters.assignedByUsrIds, { fieldName: "assignedByUsrIds" });
 
     const safeSubmissionOwnerUsrIds = normalizeNumberArray(filters.submissionOwnerUsrIds, { fieldName: "submissionOwnerUsrIds" });
@@ -83,10 +85,12 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       loggedInUserRoles: roles,
       page: filters.page,
       limit: filters.limit,
+      paginate: shouldPaginate,
       submissionTitle: safeSubmissionTitle,
       submissionStatuses: safeSubmissionStatuses,
       submissionOwnerUsrIds: safeSubmissionOwnerUsrIds,
       conferenceId: safeConferenceId,
+      submissionId: safeSubmissionId,
       reviewerUsrIds: safeReviewerUsrIds,
       assignmentStatuses: safeAssignmentStatuses,
       assignedByUsrIds: safeAssignedByUsrIds,

@@ -29,16 +29,31 @@ export const getSubmissionReviews = asyncHandler(async (req, res, next) => {
 // @access  Private
 export const getSubmissionReviewers = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const { page = DEFAULT_PAGE_NO, limit = DEFAULT_PAGE_LIMIT } = req.query;
-  const reviewers = await submissionReviewService.getSubmissionReviewersById(id, page, limit);
+  const {
+    page = DEFAULT_PAGE_NO,
+    limit = DEFAULT_PAGE_LIMIT,
+    paginate = "true",
+  } = req.query;
+  const shouldPaginate = !/^(false|0|no)$/i.test(String(paginate));
+  const reviewers = await submissionReviewService.getSubmissionReviewersById(
+    id,
+    page,
+    limit,
+    shouldPaginate,
+  );
 
-  res.status(200).json({
+  const response = {
     success: true,
-    page: reviewers.page,
-    limit: reviewers.limit,
     total: reviewers.total,
     data: reviewers.data,
-  });
+  };
+
+  if (shouldPaginate) {
+    response.page = reviewers.page;
+    response.limit = reviewers.limit;
+  }
+
+  res.status(200).json(response);
 });
 
 // @desc    Save submission review

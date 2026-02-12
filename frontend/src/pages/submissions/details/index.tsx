@@ -1,14 +1,14 @@
 import { useState } from "react";
 import {
   Link,
+  Navigate,
   NavLink,
   Outlet,
-  useNavigate,
   useParams,
 } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
-import { FileText, Settings } from "lucide-react";
+import { EllipsisVertical, ExternalLink, Info } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,40 +17,71 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useSubmissionById } from "@/hooks/useSubmissions";
+import { useSearchReviewAssignments } from "@/hooks/useReviewAssignments";
 import PageTitle from "@/components/common/PageTitle";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import { cn } from "@/lib/utils";
 import type { RootState } from "@/stores/store";
 import { UserRole } from "@/models/user";
 import { SubmissionStatus, type Submission } from "@/models/submission";
+import {
+  ContentSubmissionStatus,
+  ReviewAssignmentStatus,
+  type ReviewAssignment,
+} from "@/models/reviewAssignment";
+import { ConferenceStatus } from "@/models/conference";
 import { getConferenceStatusBadge } from "@/components/common/ConferenceStatusBadge";
+import { getSubmissionStatusBadge } from "@/components/common/ResourceStatusBadge";
 import { RichTextDisplay } from "@/components/common/RichTextDisplay";
 import { StatusUpdateModal } from "@/components/submission/StatusUpdateModal";
 import { DoiUpdateModal } from "@/components/submission/DoiUpdateModal";
 import { AssignReviewerModal } from "@/components/submission/AssignReviewerModal";
+import { ReviewAssignmentStatusUpdateModal } from "@/components/reviewAssignment/ReviewAssignmentStatusUpdateModal";
+import { getReviewAssignmentStatusBadge } from "@/components/common/ReviewAssignmentStatusBadge";
 
 export type SubmissionOutletContext = {
   submission: Submission;
   isAdmin: boolean;
   isReviewer: boolean;
+  isReviewerNonOwner: boolean;
 };
 
 export default function SubmissionDetails() {
   const { submissionId } = useParams();
-  const navigate = useNavigate();
   const currentRoles = useSelector(
     (state: RootState) => state?.auth?.user?.roles,
   );
+  const currentUserId = useSelector((state: RootState) => state?.auth?.user?.id);
+  const isUser = Boolean(currentRoles?.includes(UserRole.USER));
   const isAdmin = Boolean(currentRoles?.includes(UserRole.ADMIN));
   const isReviewer = Boolean(currentRoles?.includes(UserRole.REVIEWER));
 
   const { data, isLoading, isError, error } = useSubmissionById(submissionId);
+  const submissionData = data?.data as Submission | undefined;
+  const submissionOwnerId = (submissionData as Submission & { ownerUsrId?: string | number })
+    ?.ownerUserId
+    ?? (submissionData as Submission & { ownerUsrId?: string | number })?.ownerUsrId;
+  const isSubmissionOwner =
+    submissionOwnerId != null && Number(submissionOwnerId) === Number(currentUserId);
+  const isReviewerNonOwner = isReviewer && !isAdmin && !isSubmissionOwner;
+  const { data: assignmentResponse, isLoading: assignmentLoading } =
+    useSearchReviewAssignments(
+      { submissionId: Number(submissionId), paginate: false },
+      { enabled: isReviewerNonOwner && !!submissionId && !!submissionData },
+    );
 
-  const submission = data?.data as Submission;
+  const submission = submissionData as Submission;
+  const shouldUseSubmissionsBreadcrumb = isAdmin || (isUser && isSubmissionOwner);
+  const hasReviewerAssignment = (assignmentResponse?.data?.length ?? 0) > 0;
+  const selectedAssignment = (assignmentResponse?.data?.[0] ??
+    null) as ReviewAssignment | null;
 
-  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [isSubmissionStatusModalOpen, setIsSubmissionStatusModalOpen] =
+    useState(false);
   const [isDoiModalOpen, setIsDoiModalOpen] = useState(false);
   const [isAssignReviewerModalOpen, setIsAssignReviewerModalOpen] =
+    useState(false);
+  const [isReviewerAssignmentModalOpen, setIsReviewerAssignmentModalOpen] =
     useState(false);
 
   const canUpdateStatus =
@@ -64,6 +95,41 @@ export default function SubmissionDetails() {
 
   const canUpdateDoi =
     isAdmin && submission?.status === SubmissionStatus.APPROVED;
+  const canAssignReviewer =
+    isAdmin &&
+    submission?.status !== undefined &&
+    [
+      SubmissionStatus.PENDING_APPROVAL,
+      SubmissionStatus.RETURNED,
+    ].includes(submission.status);
+  const canShowAdminActions =
+    isAdmin &&
+    submission?.status !== undefined &&
+    [
+      SubmissionStatus.PENDING_APPROVAL,
+      SubmissionStatus.RETURNED,
+      SubmissionStatus.APPROVED,
+    ].includes(submission.status);
+  const reviewerAllowedStatuses = [
+    ReviewAssignmentStatus.ACCEPTED,
+    ReviewAssignmentStatus.DECLINED,
+  ];
+
+  const canReviewerUpdateStatus = (assignment: ReviewAssignment): boolean => {
+    const isStatusUpdatable =
+      assignment.assignmentStatus === ReviewAssignmentStatus.ASSIGNED ||
+      assignment.assignmentStatus === ReviewAssignmentStatus.ACCEPTED ||
+      assignment.assignmentStatus === ReviewAssignmentStatus.DECLINED;
+
+    const isSubmissionEligible =
+      assignment.submissionStatus === ContentSubmissionStatus.PENDING_APPROVAL ||
+      assignment.submissionStatus === ContentSubmissionStatus.RETURNED;
+
+    const isConferenceActive =
+      assignment.conferenceStatus === ConferenceStatus.ACTIVE;
+
+    return isStatusUpdatable && isSubmissionEligible && isConferenceActive;
+  };
 
   if (isLoading) {
     return (
@@ -89,27 +155,16 @@ export default function SubmissionDetails() {
   }
 
   if (!data?.data) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Submission Not Found</h3>
-          <p className="text-muted-foreground mb-4">
-            The submission you're looking for doesn't exist.
-          </p>
-          <Button onClick={() => navigate("/submissions")}>
-            Back to Submissions
-          </Button>
-        </div>
-      </div>
-    );
+    return <Navigate to="/404-not-found" replace />;
   }
 
   return (
     <div>
       <Breadcrumb
         items={[
-          { label: "Submissions", href: "/submissions" },
+          shouldUseSubmissionsBreadcrumb
+            ? { label: "Submissions", href: "/submissions" }
+            : { label: "Review Assignments", href: "/review-assignments/me" },
           { label: submission.title },
         ]}
       />
@@ -143,21 +198,20 @@ export default function SubmissionDetails() {
             >
               Messages
             </NavLink>
-            {!isReviewer && (
-              <NavLink
-                to={`/submissions/${submission.submissionId}/versions`}
-                className={({ isActive }) =>
-                  cn(
-                    "block px-4 py-3 bg-slate-900 text-sm hover:bg-accent/70 border-b border-white/20",
-                    isActive ? "bg-accent/70 text-foreground" : "",
-                  )
-                }
-              >
-                Versions
-              </NavLink>
-            )}
+            <NavLink
+              to={`/submissions/${submission.submissionId}/versions`}
+              className={({ isActive }) =>
+                cn(
+                  "block px-4 py-3 bg-slate-900 text-sm hover:bg-accent/70 border-b border-white/20",
+                  isActive ? "bg-accent/70 text-foreground" : "",
+                )
+              }
+            >
+              Versions
+            </NavLink>
 
-            {isAdmin || isReviewer ? (
+            {isAdmin ||
+            (isReviewerNonOwner && !assignmentLoading && hasReviewerAssignment) ? (
               <NavLink
                 to={`/submissions/${submission.submissionId}/reviews`}
                 className={({ isActive }) =>
@@ -176,20 +230,23 @@ export default function SubmissionDetails() {
         <div>
           <div className="mb-6">
             <div className="flex items-start justify-between gap-4">
-              <h1 className="mb-2">{submission.title}</h1>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="mb-0">{submission.title}</h1>
+                {getSubmissionStatusBadge(submission.status)}
+              </div>
 
-              {isAdmin && (
+              {canShowAdminActions && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="shrink-0">
-                      <Settings className="h-5 w-5" />
+                      <EllipsisVertical className="h-5 w-5" />
                       <span className="sr-only">Submission actions</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     {canUpdateStatus && (
                       <DropdownMenuItem
-                        onClick={() => setIsStatusModalOpen(true)}
+                        onClick={() => setIsSubmissionStatusModalOpen(true)}
                       >
                         Update Status
                       </DropdownMenuItem>
@@ -199,23 +256,50 @@ export default function SubmissionDetails() {
                         Update DOI
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem
-                      onClick={() => setIsAssignReviewerModalOpen(true)}
-                    >
-                      Assign Reviewer
-                    </DropdownMenuItem>
+                    {canAssignReviewer && (
+                      <DropdownMenuItem
+                        onClick={() => setIsAssignReviewerModalOpen(true)}
+                      >
+                        Assign Reviewer
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              Conference:{" "}
+            {selectedAssignment && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-sm text-muted-foreground">
+                  Review Status:
+                </span>
+                {getReviewAssignmentStatusBadge(
+                  selectedAssignment.assignmentStatus,
+                )}
+                {isReviewerNonOwner && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => setIsReviewerAssignmentModalOpen(true)}
+                    title="Assignment Details"
+                  >
+                    <Info className="h-3.5 w-3.5" />
+                    <span className="sr-only">Assignment details</span>
+                  </Button>
+                )}
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-sm text-muted-foreground">Conference:</span>
               <Link
                 to={`/conferences/${submission.conferenceId}`}
-                className="underline"
+                target="_blank"
+                className="inline-flex items-center gap-1 text-sm text-accent hover:text-accent/80 hover:underline transition-colors"
               >
                 {submission.conferenceTitle || "-"}
+                <ExternalLink className="w-3.5 h-3.5" />
               </Link>
               {getConferenceStatusBadge(submission.conferenceStatus!)}
             </div>
@@ -245,31 +329,50 @@ export default function SubmissionDetails() {
                 submission,
                 isAdmin,
                 isReviewer,
+                isReviewerNonOwner,
               }}
             />
           </div>
         </div>
       </div>
 
-      <StatusUpdateModal
-        open={isStatusModalOpen}
-        onOpenChange={setIsStatusModalOpen}
-        selectedSubmission={submission}
-        onClose={() => setIsStatusModalOpen(false)}
-      />
+      {isAdmin && (
+        <>
+          <StatusUpdateModal
+            open={isSubmissionStatusModalOpen}
+            onOpenChange={setIsSubmissionStatusModalOpen}
+            selectedSubmission={submission}
+            onClose={() => setIsSubmissionStatusModalOpen(false)}
+          />
 
-      <DoiUpdateModal
-        open={isDoiModalOpen}
-        onOpenChange={setIsDoiModalOpen}
-        selectedSubmission={submission}
-        onClose={() => setIsDoiModalOpen(false)}
-      />
+          <DoiUpdateModal
+            open={isDoiModalOpen}
+            onOpenChange={setIsDoiModalOpen}
+            selectedSubmission={submission}
+            onClose={() => setIsDoiModalOpen(false)}
+          />
 
-      <AssignReviewerModal
-        open={isAssignReviewerModalOpen}
-        onOpenChange={setIsAssignReviewerModalOpen}
-        selectedSubmission={submission}
-        onClose={() => setIsAssignReviewerModalOpen(false)}
+          {canAssignReviewer && (
+            <AssignReviewerModal
+              open={isAssignReviewerModalOpen}
+              onOpenChange={setIsAssignReviewerModalOpen}
+              selectedSubmission={submission}
+              onClose={() => setIsAssignReviewerModalOpen(false)}
+            />
+          )}
+        </>
+      )}
+
+      <ReviewAssignmentStatusUpdateModal
+        open={isReviewerAssignmentModalOpen}
+        onOpenChange={setIsReviewerAssignmentModalOpen}
+        selectedAssignment={selectedAssignment}
+        onClose={() => setIsReviewerAssignmentModalOpen(false)}
+        allowedStatuses={reviewerAllowedStatuses}
+        canUpdateStatus={
+          selectedAssignment ? canReviewerUpdateStatus(selectedAssignment) : false
+        }
+        mode="reviewer"
       />
     </div>
   );

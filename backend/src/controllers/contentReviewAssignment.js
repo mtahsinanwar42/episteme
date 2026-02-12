@@ -50,6 +50,8 @@ export const searchReviewAssignments = asyncHandler(async (req, res) => {
   const {
     page = DEFAULT_PAGE_NO,
     limit = DEFAULT_PAGE_LIMIT,
+    paginate = "true",
+    submissionId,
     submissionTitle,
     submissionStatuses,
     submissionOwnerUsrIds,
@@ -61,9 +63,13 @@ export const searchReviewAssignments = asyncHandler(async (req, res) => {
     assignedDateTo,
   } = req.query;
 
+  const shouldPaginate = !/^(false|0|no)$/i.test(String(paginate));
+
   const assignments = await reviewAssignmentService.searchReviewAssignments(req.user, {
     page,
     limit,
+    paginate: shouldPaginate,
+    submissionId,
     submissionTitle,
     submissionStatuses,
     submissionOwnerUsrIds,
@@ -75,13 +81,18 @@ export const searchReviewAssignments = asyncHandler(async (req, res) => {
     assignedDateTo,
   });
 
-  return res.status(200).json({
+  const response = {
     success: true,
-    page: assignments.page,
-    limit: assignments.limit,
     total: assignments.total,
     data: assignments.data,
-  });
+  };
+
+  if (shouldPaginate) {
+    response.page = assignments.page;
+    response.limit = assignments.limit;
+  }
+
+  return res.status(200).json(response);
 });
 
 // @desc    Save review assignment status

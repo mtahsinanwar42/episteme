@@ -174,7 +174,7 @@ export default function MyReviewAssignments() {
           return (
             <div className="flex gap-4 place-self-center">
               <Link
-                to={`/reviewer/submissions/${assignment.submissionId}`}
+                to={`/submissions/${assignment.submissionId}`}
                 title="View Submission"
               >
                 <Eye className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />

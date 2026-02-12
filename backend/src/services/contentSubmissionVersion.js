@@ -42,6 +42,7 @@ export function createSubmissionVersionService({ ContentSubmissionVersion, Conte
       submissionId: Number(submissionId),
       loggedInUserId: Number(user.id),
     });
+    const isOwningUser = isUser && checks.isOwner;
 
     if (!checks?.submissionExists) {
       throw new ErrorResponse(404, "ContentSubmission not found");
@@ -49,15 +50,15 @@ export function createSubmissionVersionService({ ContentSubmissionVersion, Conte
 
     let submissionVersion;
 
-    if (isAdmin) {
-      submissionVersion = await saveSubmissionVersionForAdmin({ user, submissionId, payload, checks });
+    if (isOwningUser) {
+      submissionVersion = await saveSubmissionVersionForUser({ user, submissionId, payload, checks });
     } else if (isReviewer) {
       submissionVersion = await saveSubmissionVersionForReviewer({ user, submissionId, payload, checks });
-    } else {
-      submissionVersion = await saveSubmissionVersionForUser({ user, submissionId, payload, checks });
+    } else if (isAdmin) {
+      submissionVersion = await saveSubmissionVersionForAdmin({ user, submissionId, payload, checks });
     }
 
-    if (isAdmin || isUser) {
+    if (isAdmin || isOwningUser) {
       await publishSubmissionVersionCreateMail(user, { submissionVersion });
     }
 

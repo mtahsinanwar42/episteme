@@ -123,10 +123,12 @@ export async function findReviewAssignmentsBySearchFilters({
   loggedInUserRoles,
   page = DEFAULT_PAGE_NO,
   limit = DEFAULT_PAGE_LIMIT,
+  paginate = true,
   submissionTitle,
   submissionStatuses,
   submissionOwnerUsrIds,
   conferenceId,
+  submissionId,
   reviewerUsrIds,
   assignmentStatuses,
   assignedByUsrIds,
@@ -137,13 +139,13 @@ export async function findReviewAssignmentsBySearchFilters({
   const pageNum = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
   const limitNum = Math.min(100, Math.max(1, Number(limit) || DEFAULT_PAGE_LIMIT));
   const offset = (pageNum - 1) * limitNum;
+  const paginationSql = paginate ? `LIMIT :limit OFFSET :offset` : ``;
 
   const roles = Array.isArray(loggedInUserRoles) ? loggedInUserRoles : [];
   const adminMode = isAdmin || roles.includes(USER_ROLE.ADMIN);
 
   const replacements = {
-    limit: limitNum,
-    offset,
+    ...(paginate ? { limit: limitNum, offset } : {}),
   };
 
   const where = [];
@@ -177,6 +179,11 @@ export async function findReviewAssignmentsBySearchFilters({
     replacements.conferenceId = conferenceId;
   }
 
+  if (submissionId != null) {
+    where.push(`CS.id = :submissionId`);
+    replacements.submissionId = submissionId;
+  }
+
   if (reviewerUsrIds != null) {
     where.push(`REV.id IN (:reviewerUsrIds)`);
     replacements.reviewerUsrIds = reviewerUsrIds;
@@ -207,7 +214,7 @@ export async function findReviewAssignmentsBySearchFilters({
     ${GET_REVIEW_ASSIGNMENTS_BASE_FROM_JOINS}
     ${where.length ? `WHERE ${where.join("\n      AND ")}` : ``}
     ORDER BY CRA.assigned_at DESC
-    LIMIT :limit OFFSET :offset;
+    ${paginationSql};
   `;
 
   const rows = await sequelize.query(sql, {

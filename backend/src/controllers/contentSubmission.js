@@ -37,6 +37,7 @@ export const searchSubmissions = asyncHandler(async (req, res) => {
   const {
     page = DEFAULT_PAGE_NO,
     limit = DEFAULT_PAGE_LIMIT,
+    paginate = "true",
     title,
     topics,
     doi,
@@ -47,9 +48,12 @@ export const searchSubmissions = asyncHandler(async (req, res) => {
     createdDateTo,
   } = req.query;
 
+  const shouldPaginate = !/^(false|0|no)$/i.test(String(paginate));
+
   const submissions = await submissionService.searchSubmissions(req.user, {
     page,
     limit,
+    paginate: shouldPaginate,
     title,
     topics,
     doi,
@@ -60,13 +64,18 @@ export const searchSubmissions = asyncHandler(async (req, res) => {
     createdDateTo,
   });
 
-  return res.status(200).json({
+  const response = {
     success: true,
-    page: submissions.page,
-    limit: submissions.limit,
     total: submissions.total,
     data: submissions.data,
-  });
+  };
+
+  if (shouldPaginate) {
+    response.page = submissions.page;
+    response.limit = submissions.limit;
+  }
+
+  return res.status(200).json(response);
 });
 
 // @desc    Get submission by id

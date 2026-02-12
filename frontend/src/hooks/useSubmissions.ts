@@ -117,11 +117,14 @@ export function useCreateSubmissionMessageMutation(
 
 export function useSubmissionReviewers(
   submissionId?: string | number,
-  options?: { enabled?: boolean },
+  options?: { enabled?: boolean; paginate?: boolean },
 ) {
   return useQuery({
-    queryKey: ["submissionReviewers", submissionId],
-    queryFn: () => submissionService.getSubmissionReviewers(submissionId!),
+    queryKey: ["submissionReviewers", submissionId, options?.paginate],
+    queryFn: () =>
+      submissionService.getSubmissionReviewers(submissionId!, {
+        paginate: options?.paginate,
+      }),
     enabled:
       options?.enabled !== undefined
         ? options.enabled && !!submissionId
@@ -129,11 +132,17 @@ export function useSubmissionReviewers(
   });
 }
 
-export function useSubmissionReviews(submissionId?: string | number) {
+export function useSubmissionReviews(
+  submissionId?: string | number,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: ["submissionReviews", submissionId],
     queryFn: () => submissionService.getSubmissionReviews(submissionId!),
-    enabled: !!submissionId,
+    enabled:
+      options?.enabled !== undefined
+        ? options.enabled && !!submissionId
+        : !!submissionId,
   });
 }
 

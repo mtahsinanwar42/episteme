@@ -194,15 +194,9 @@ export default function NewSubmission() {
         message: formData.message.trim() || undefined,
       },
       {
-        onSuccess: (response) => {
+        onSuccess: () => {
           showSuccessToast("New submission added successfully.");
-          const created = response?.data;
-          const submissionId = created?.id ?? created?.submissionId;
-          if (submissionId) {
-            navigate(`/submissions/${submissionId}`);
-          } else {
-            navigate("/submissions");
-          }
+          navigate("/submissions");
         },
         onError: (err: unknown) => {
           setError(

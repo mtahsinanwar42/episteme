@@ -8,6 +8,8 @@ import type {
 export interface SearchReviewAssignmentsParams {
   page?: number;
   limit?: number;
+  paginate?: boolean;
+  submissionId?: number;
   submissionTitle?: string;
   submissionStatuses?: number[];
   submissionOwnerUsrIds?: number[];
@@ -74,6 +76,12 @@ export const reviewAssignmentService = {
 
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.paginate !== undefined) {
+      queryParams.append("paginate", params.paginate.toString());
+    }
+    if (params?.submissionId !== undefined) {
+      queryParams.append("submissionId", params.submissionId.toString());
+    }
     if (params?.submissionTitle) {
       queryParams.append("submissionTitle", params.submissionTitle);
     }

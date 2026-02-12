@@ -8,6 +8,7 @@ export interface Submission {
   doi?: string | null;
   status?: number;
   statusUpdateNotes?: string | null;
+  currentContentSubmissionVersionId?: string | number | null;
   createdAt?: string;
   updatedAt?: string;
   conferenceId?: string | number;
@@ -167,6 +168,14 @@ export interface SubmissionReviewer {
   firstName?: string;
   lastName?: string;
   status?: string;
+  institution?: string;
+  occupation?: string;
+  country?: string;
+  assignmentId?: string | number;
+  assignmentStatus?: number;
+  assignedAt?: string;
+  assignedByUserId?: string | number;
+  assignedByNotes?: string;
 }
 
 export interface SubmissionReviewersResponse {
@@ -200,7 +209,7 @@ export interface SubmissionReviewsResponse {
 export interface CreateSubmissionReviewRequest {
   reviewerContentSubmissionVersionId?: string | number;
   recommendation: number;
-  comment?: string;
+  comment?: string | null;
 }
 
 export interface MessageGroup {

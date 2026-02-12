@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { Info } from "lucide-react";
 import type { MessageGroup } from "@/models/submission";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
@@ -9,6 +10,9 @@ interface MessageThreadProps {
   isSubmitting: boolean;
   isAllowedStatus: boolean;
   onSendMessage: (content: string) => void;
+  sendError?: string | null;
+  infoMessage?: string | null;
+  disableSend?: boolean;
 }
 
 export function MessageThread({
@@ -17,6 +21,9 @@ export function MessageThread({
   isSubmitting,
   isAllowedStatus,
   onSendMessage,
+  sendError,
+  infoMessage,
+  disableSend,
 }: MessageThreadProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -26,6 +33,13 @@ export function MessageThread({
 
   return (
     <>
+      {infoMessage && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-950/50 border-b border-blue-800/50 text-blue-300 text-xs">
+          <Info className="w-3.5 h-3.5 shrink-0" />
+          <span>{infoMessage}</span>
+        </div>
+      )}
+
       <div className="flex-1 overflow-y-auto bg-linear-to-b from-slate-950 to-slate-900/50 p-4 flex flex-col gap-4">
         {group.messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
@@ -51,9 +65,15 @@ export function MessageThread({
         <div ref={messagesEndRef} />
       </div>
 
+      {sendError && (
+        <div className="px-4 py-2 bg-destructive/10 text-destructive text-sm border-t border-destructive/20">
+          {sendError}
+        </div>
+      )}
+
       <MessageInput
         isSubmitting={isSubmitting}
-        isAllowedStatus={isAllowedStatus}
+        isAllowedStatus={isAllowedStatus && !disableSend}
         onSendMessage={onSendMessage}
       />
     </>

@@ -134,9 +134,19 @@ export const submissionService = {
 
   getSubmissionReviewers: async (
     submissionId: string | number,
+    params?: { paginate?: boolean },
   ): Promise<SubmissionReviewersResponse> => {
+    const queryParams = new URLSearchParams();
+    if (params?.paginate !== undefined) {
+      queryParams.append("paginate", params.paginate.toString());
+    }
+    const queryString = queryParams.toString();
+    const endpoint = queryString
+      ? `/submissions/${submissionId}/reviewers?${queryString}`
+      : `/submissions/${submissionId}/reviewers`;
+
     return api.get<SubmissionReviewersResponse>(
-      `/submissions/${submissionId}/reviewers`,
+      endpoint,
       true,
     );
   },

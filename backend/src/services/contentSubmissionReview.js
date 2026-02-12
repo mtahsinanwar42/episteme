@@ -27,12 +27,17 @@ export function createSubmissionReviewService({ ContentReview, ContentSubmission
     });
   }
 
-  async function getSubmissionReviewersById(submissionId, page, limit) {
+  async function getSubmissionReviewersById(submissionId, page, limit, paginate = true) {
     if (!submissionId) {
       throw new ErrorResponse(400, "id cannot be empty");
     }
 
-    return findSubmissionReviewersById({ submissionId, page, limit });
+    return findSubmissionReviewersById({
+      submissionId,
+      page,
+      limit,
+      paginate,
+    });
   }
 
   async function saveSubmissionReview(user, submissionId, payload) {
