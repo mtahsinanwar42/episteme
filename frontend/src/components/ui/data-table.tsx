@@ -1,12 +1,19 @@
 import * as React from "react";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
+  getPaginationRowModel,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import {
+  ChevronsLeft,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsRight,
+} from "lucide-react";
 
 import {
   Table,
@@ -18,6 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
+import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[];
@@ -25,6 +33,7 @@ interface DataTableProps<TData, TValue = unknown> {
   isLoading?: boolean;
   error?: string | null;
   pageSize?: number;
+  enablePagination?: boolean;
   enableSearch?: boolean;
   searchPlaceholder?: string;
   searchableColumnIds?: string[];
@@ -35,6 +44,8 @@ export function DataTable<TData, TValue = unknown>({
   data,
   isLoading = false,
   error = null,
+  pageSize = 10,
+  enablePagination = false,
   enableSearch = false,
   searchPlaceholder = "Search",
   searchableColumnIds,
@@ -66,7 +77,7 @@ export function DataTable<TData, TValue = unknown>({
     data,
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
-    // getPaginationRowModel: getPaginationRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
@@ -78,9 +89,9 @@ export function DataTable<TData, TValue = unknown>({
       globalFilter,
     },
     initialState: {
-      // pagination: {
-      //   pageSize: pageSize,
-      // },
+      pagination: {
+        pageSize,
+      },
     },
   });
 
@@ -104,7 +115,10 @@ export function DataTable<TData, TValue = unknown>({
     );
   }
 
-  // const pageCount = table.getPageCount();
+  const pageCount = table.getPageCount();
+  const visibleRows = enablePagination
+    ? table.getPaginationRowModel().rows
+    : table.getRowModel().rows;
 
   return (
     <div>
@@ -154,8 +168,8 @@ export function DataTable<TData, TValue = unknown>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
+              {visibleRows?.length ? (
+                visibleRows.map((row) => (
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
@@ -189,106 +203,48 @@ export function DataTable<TData, TValue = unknown>({
         </div>
       </div>
 
-      {/* Pagination Controls */}
-      {/* {pageCount > 1 && (
-        <div className="flex items-center justify-between mt-8 p-4 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-900/50 dark:to-slate-800/30 rounded-2xl border border-slate-200 dark:border-slate-700">
-          <div className="text-sm font-medium text-slate-600 dark:text-slate-300">
-            Showing page{" "}
-            <span className="font-bold text-blue-600 dark:text-blue-400">
-              {table.getState().pagination.pageIndex + 1}
-            </span>{" "}
-            of{" "}
-            <span className="font-bold text-slate-700 dark:text-slate-200">
-              {pageCount}
-            </span>
+      {enablePagination && pageCount > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-muted-foreground">
+            Page {table.getState().pagination.pageIndex + 1} of {pageCount}
           </div>
 
           <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
-              size="icon-sm"
+              variant="outline"
+              size="sm"
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
-              title="First page"
-              className="hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
             >
-              <ChevronsLeft className="size-4" />
+              <ChevronsLeft className="h-4 w-4" />
             </Button>
-
             <Button
-              variant="ghost"
-              size="icon-sm"
+              variant="outline"
+              size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              title="Previous page"
-              className="hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
-
-            <div className="flex items-center gap-2">
-              {Array.from({ length: pageCount }, (_, i) => i + 1)
-                .filter((page) => {
-                  const distance = Math.abs(
-                    page - (table.getState().pagination.pageIndex + 1),
-                  );
-                  return distance <= 2 || page === 1 || page === pageCount;
-                })
-                .map((page, index, array) => {
-                  if (index > 0 && array[index - 1] !== page - 1) {
-                    return (
-                      <span key={`ellipsis-${page}`} className="px-2">
-                        ...
-                      </span>
-                    );
-                  }
-
-                  return (
-                    <Button
-                      key={page}
-                      variant={
-                        page === table.getState().pagination.pageIndex + 1
-                          ? "default"
-                          : "ghost"
-                      }
-                      size="sm"
-                      onClick={() => table.setPageIndex(page - 1)}
-                      className={`min-w-9 transition-all ${
-                        page === table.getState().pagination.pageIndex + 1
-                          ? "bg-gradient-to-r from-blue-500 to-blue-600 shadow-md"
-                          : "hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
-                      }`}
-                    >
-                      {page}
-                    </Button>
-                  );
-                })}
-            </div>
-
             <Button
-              variant="ghost"
-              size="icon-sm"
+              variant="outline"
+              size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              title="Next page"
-              className="hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
             >
-              <ChevronRight className="size-4" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
-
             <Button
-              variant="ghost"
-              size="icon-sm"
+              variant="outline"
+              size="sm"
               onClick={() => table.setPageIndex(pageCount - 1)}
               disabled={!table.getCanNextPage()}
-              title="Last page"
-              className="hover:bg-blue-100 dark:hover:bg-blue-950/40 hover:text-blue-600"
             >
-              <ChevronsRight className="size-4" />
+              <ChevronsRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

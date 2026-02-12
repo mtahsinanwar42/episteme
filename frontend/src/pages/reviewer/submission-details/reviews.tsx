@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -32,24 +33,43 @@ import {
   useCreateSubmissionVersionMutation,
   useSubmissionReviews,
 } from "@/hooks/useSubmissions";
-import { useMyReviewAssignments } from "@/hooks/useReviewAssignments";
+import { useSearchReviewAssignments } from "@/hooks/useReviewAssignments";
 import { ReviewAssignmentStatus } from "@/models/reviewAssignment";
 import { fileService } from "@/services/fileService";
 import { formatDateTime } from "@/utils/dateFormatter";
 import type { ColumnDef } from "@tanstack/react-table";
-import { DownloadCloud } from "lucide-react";
+import { DownloadCloud, Info } from "lucide-react";
 
 export default function SubmissionReviews() {
-  const { submission, isAdmin, isReviewer } =
+  const { submission, isAdmin, isReviewerNonOwner } =
     useOutletContext<SubmissionOutletContext>();
   const { showSuccessToast } = useSuccessToast();
 
   const submissionId = submission.submissionId ?? submission.id;
 
-  const { data, isLoading, isError, error } =
-    useSubmissionReviews(submissionId);
+  const {
+    data: assignmentsData,
+    isLoading: assignmentsLoading,
+    refetch: refetchReviewAssignments,
+  } =
+    useSearchReviewAssignments(
+    { submissionId: Number(submissionId), paginate: false },
+    { enabled: isReviewerNonOwner && !!submissionId },
+    );
 
-  const { data: assignmentsData } = useMyReviewAssignments();
+  const hasBaseReviewAccess = isAdmin || isReviewerNonOwner;
+  const hasReviewerAssignment = useMemo(
+    () => (assignmentsData?.data?.length ?? 0) > 0,
+    [assignmentsData],
+  );
+  const canFetchReviews =
+    !!submissionId &&
+    hasBaseReviewAccess &&
+    (isAdmin || (!assignmentsLoading && hasReviewerAssignment));
+
+  const { data, isLoading, isError, error } = useSubmissionReviews(submissionId, {
+    enabled: canFetchReviews,
+  });
 
   const createVersionMutation = useCreateSubmissionVersionMutation(
     submissionId ?? "",
@@ -59,6 +79,10 @@ export default function SubmissionReviews() {
   );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<SubmissionReview | null>(
+    null,
+  );
   const [changeLog, setChangeLog] = useState("");
   const [comment, setComment] = useState("");
   const [recommendation, setRecommendation] = useState("");
@@ -85,21 +109,57 @@ export default function SubmissionReviews() {
     submission.status === SubmissionStatus.RETURNED;
 
   const hasAcceptedAssignment = useMemo(() => {
-    if (!isReviewer) return false;
+    if (!isReviewerNonOwner) return false;
     const assignments = assignmentsData?.data ?? [];
     return assignments.some(
       (assignment) =>
         Number(assignment.submissionId) === Number(submissionId) &&
         assignment.assignmentStatus === ReviewAssignmentStatus.ACCEPTED,
     );
-  }, [isReviewer, assignmentsData, submissionId]);
+  }, [isReviewerNonOwner, assignmentsData, submissionId]);
+  const hasReviewForCurrentSubmissionVersion = useMemo(() => {
+    if (!isReviewerNonOwner) return false;
 
-  const canAddReview = isReviewer && isAllowedStatus && hasAcceptedAssignment;
+    const currentVersionId = submission.currentContentSubmissionVersionId;
+    if (currentVersionId == null) return false;
+
+    return reviews.some(
+      (review) =>
+        review.version?.versionId != null &&
+        Number(review.version.versionId) === Number(currentVersionId),
+    );
+  }, [isReviewerNonOwner, reviews, submission.currentContentSubmissionVersionId]);
+
+  const canAddReview =
+    isReviewerNonOwner &&
+    isAllowedStatus &&
+    hasAcceptedAssignment &&
+    !hasReviewForCurrentSubmissionVersion;
+  const reviewerAlreadyReviewedInfoMessage =
+    !isAdmin && isReviewerNonOwner && hasReviewForCurrentSubmissionVersion
+      ? "You already submitted a review for the current submission version. Add Review will be available after a new version is uploaded."
+      : null;
+  const reviewerNotAcceptedInfoMessage =
+    !reviewerAlreadyReviewedInfoMessage &&
+    !isAdmin &&
+    isReviewerNonOwner &&
+    hasReviewerAssignment &&
+    !hasAcceptedAssignment
+      ? "You cannot submit a review unless the assignment status is Accepted."
+      : null;
 
   const isSubmitting =
     createVersionMutation.isPending ||
     createReviewMutation.isPending ||
     uploading;
+  const isReviewSectionLoading = isLoading || (isReviewerNonOwner && assignmentsLoading);
+  const isRecommendationValid = recommendation.trim().length > 0;
+  const isChangeLogDependencyValid =
+    !changeLog.trim() || !!uploadedSubmissionFile?.storageKey;
+  const canSubmitReview =
+    isRecommendationValid &&
+    isChangeLogDependencyValid &&
+    !isSubmitting;
 
   const resetForm = () => {
     setChangeLog("");
@@ -169,12 +229,12 @@ export default function SubmissionReviews() {
     event.preventDefault();
     setErrorMessage(null);
 
-    if (!recommendation) {
+    if (!isRecommendationValid) {
       setErrorMessage("Recommendation is required");
       return;
     }
 
-    if (changeLog.trim() && !uploadedSubmissionFile?.storageKey) {
+    if (!isChangeLogDependencyValid) {
       setErrorMessage("Upload a submission file to add notes");
       return;
     }
@@ -198,6 +258,7 @@ export default function SubmissionReviews() {
         comment: comment.trim() || undefined,
         reviewerContentSubmissionVersionId,
       });
+      await refetchReviewAssignments();
 
       showSuccessToast("Review submitted successfully.");
       handleCloseModal();
@@ -267,11 +328,6 @@ export default function SubmissionReviews() {
         enableSorting: false,
       },
       {
-        accessorKey: "reviewedVersionCreatedAt",
-        header: "Reviewed Version Created At",
-        cell: ({ row }) => formatDateTime(row.original.version?.createdAt),
-      },
-      {
         accessorKey: "reviewerVersion",
         header: "Reviewer Version",
         cell: ({ row }) =>
@@ -298,30 +354,39 @@ export default function SubmissionReviews() {
         enableSorting: false,
       },
       {
-        accessorKey: "reviewerVersionCreatedAt",
-        header: "Reviewer Version Created At",
-        cell: ({ row }) =>
-          formatDateTime(row.original.reviewerVersion?.createdAt),
-      },
-      {
-        accessorKey: "reviewerVersionChangeLog",
-        header: "Reviewer Version Change Log / Notes",
-        cell: ({ row }) => row.original.reviewerVersion?.changeLog || "-",
-        enableSorting: false,
-      },
-      {
         accessorKey: "recommendation",
         header: "Recommendation",
-        cell: ({ row }) =>
-          row.original.recommendation
-            ? ReviewRecommendationLabel[row.original.recommendation] || "-"
-            : "-",
+        cell: ({ row }) => {
+          const recommendation = row.original.recommendation;
+          if (!recommendation) return "-";
+
+          const label = ReviewRecommendationLabel[recommendation] || "-";
+          const variant =
+            recommendation === ReviewRecommendation.ACCEPTED
+              ? "default"
+              : recommendation === ReviewRecommendation.REJECTED
+                ? "destructive"
+                : "secondary";
+
+          return <Badge variant={variant}>{label}</Badge>;
+        },
         enableSorting: false,
       },
       {
-        accessorKey: "comment",
-        header: "Comments",
-        cell: ({ row }) => row.original.comment || "-",
+        id: "actions",
+        header: () => <div className="text-center">Actions</div>,
+        cell: ({ row }) => (
+          <div
+            onClick={() => {
+              setSelectedReview(row.original);
+              setIsDetailsModalOpen(true);
+            }}
+            title="Review Details"
+            className="flex place-self-center"
+          >
+            <Info className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />
+          </div>
+        ),
         enableSorting: false,
       },
     );
@@ -329,11 +394,20 @@ export default function SubmissionReviews() {
     return baseColumns;
   }, [handleDownload, isAdmin, renderReviewer]);
 
-  if (!isAdmin && !isReviewer) {
+  if (!isAdmin && !isReviewerNonOwner) {
     return (
       <div className="rounded-lg border border-border p-6">
         <p className="text-sm text-muted-foreground">
           You do not have access to view reviews.
+        </p>
+      </div>
+    );
+  }
+  if (!isAdmin && isReviewerNonOwner && !assignmentsLoading && !hasReviewerAssignment) {
+    return (
+      <div className="rounded-lg border border-border p-6">
+        <p className="text-sm text-muted-foreground">
+          You do not have access to view reviews for this submission.
         </p>
       </div>
     );
@@ -345,7 +419,14 @@ export default function SubmissionReviews() {
         <h3 className="font-semibold">Reviews</h3>
       </div>
 
-      <LoadingOverlay visible={isLoading} />
+      {(reviewerAlreadyReviewedInfoMessage || reviewerNotAcceptedInfoMessage) && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-950/50 border-b border-blue-800/50 text-blue-300 text-xs">
+          <Info className="w-3.5 h-3.5 shrink-0" />
+          <span>{reviewerAlreadyReviewedInfoMessage || reviewerNotAcceptedInfoMessage}</span>
+        </div>
+      )}
+
+      <LoadingOverlay visible={isReviewSectionLoading} />
 
       {isError && (
         <div className="mt-4 rounded-md border border-red-500/30 bg-red-200/40 text-orange-700 p-4 text-sm">
@@ -356,7 +437,7 @@ export default function SubmissionReviews() {
       )}
 
       <div className="p-6">
-        {!isLoading && !isError && reviews.length === 0 && (
+        {!isReviewSectionLoading && !isError && reviews.length === 0 && (
           <div className="text-sm text-center">No reviews available.</div>
         )}
 
@@ -365,7 +446,7 @@ export default function SubmissionReviews() {
             <DataTable
               columns={columns}
               data={reviews}
-              isLoading={isLoading}
+              isLoading={isReviewSectionLoading}
               error={error ? (error as Error).message : null}
             />
           </div>
@@ -427,7 +508,7 @@ export default function SubmissionReviews() {
 
               <div className="flex flex-col space-y-2">
                 <label htmlFor="comment" className="text-sm font-medium">
-                  Comments *
+                  Comments (optional)
                 </label>
                 <textarea
                   id="comment"
@@ -476,11 +557,62 @@ export default function SubmissionReviews() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={!canSubmitReview}>
                   {isSubmitting ? "Submitting..." : "Submit Review"}
                 </Button>
               </div>
             </form>
+          </DialogBody>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isDetailsModalOpen}
+        onOpenChange={(open) => {
+          setIsDetailsModalOpen(open);
+          if (!open) {
+            setSelectedReview(null);
+          }
+        }}
+      >
+        <DialogContent
+          onClose={() => {
+            setIsDetailsModalOpen(false);
+            setSelectedReview(null);
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>Review Details</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-[220px_1fr] gap-2">
+                <span className="text-muted-foreground">Reviewed Version No.</span>
+                <span>{selectedReview?.version?.versionNo ?? "-"}</span>
+              </div>
+              <div className="grid grid-cols-[220px_1fr] gap-2">
+                <span className="text-muted-foreground">Reviewer Version No.</span>
+                <span>{selectedReview?.reviewerVersion?.versionNo ?? "-"}</span>
+              </div>
+              <div className="grid grid-cols-[220px_1fr] gap-2">
+                <span className="text-muted-foreground">Reviewed Version Created At</span>
+                <span>{formatDateTime(selectedReview?.version?.createdAt)}</span>
+              </div>
+              <div className="grid grid-cols-[220px_1fr] gap-2">
+                <span className="text-muted-foreground">Reviewer Version Created At</span>
+                <span>{formatDateTime(selectedReview?.reviewerVersion?.createdAt)}</span>
+              </div>
+              <div className="grid grid-cols-[220px_1fr] gap-2">
+                <span className="text-muted-foreground">
+                  Reviewer Version Change Log / Notes
+                </span>
+                <span>{selectedReview?.reviewerVersion?.changeLog || "-"}</span>
+              </div>
+              <div className="grid grid-cols-[220px_1fr] gap-2">
+                <span className="text-muted-foreground">Comments</span>
+                <span>{selectedReview?.comment || "-"}</span>
+              </div>
+            </div>
           </DialogBody>
         </DialogContent>
       </Dialog>

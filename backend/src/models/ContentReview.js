@@ -25,7 +25,7 @@ export default (sequelize, DataTypes) => {
       },
       comment: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
         field: "comment",
       },
       createdAt: {

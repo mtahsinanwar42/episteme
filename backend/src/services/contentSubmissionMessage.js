@@ -29,6 +29,7 @@ export function createSubmissionMessageService({ ContentSubmissionMessage, Conte
     const roles = Array.isArray(user.roles) ? user.roles : [];
     const isAdmin = roles.includes(USER_ROLE.ADMIN);
     const isReviewer = roles.includes(USER_ROLE.REVIEWER);
+    const isUser = roles.includes(USER_ROLE.USER);
 
     const { message, scope, receiverUsrId } = payload;
 
@@ -49,6 +50,7 @@ export function createSubmissionMessageService({ ContentSubmissionMessage, Conte
       loggedInUserId: user.id,
       receiverUsrId: receiverUsrId,
     });
+    const isOwningUser = isUser && checks.isOwner;
 
     if (!checks?.submissionExists) {
       throw new ErrorResponse(404, "ContentSubmission not found");
@@ -56,12 +58,12 @@ export function createSubmissionMessageService({ ContentSubmissionMessage, Conte
 
     let contentSubmissionMsg;
 
-    if (isAdmin) {
-      contentSubmissionMsg = await saveSubmissionMessageForAdmin({ user, submissionId, payload, checks });
+    if (isOwningUser) {
+      contentSubmissionMsg = await saveSubmissionMessageForUser({ user, submissionId, payload, checks });
     } else if (isReviewer) {
       contentSubmissionMsg = await saveSubmissionMessageForReviewer({ user, submissionId, payload, checks });
-    } else {
-      contentSubmissionMsg = await saveSubmissionMessageForUser({ user, submissionId, payload, checks });
+    } else if (isAdmin) {
+      contentSubmissionMsg = await saveSubmissionMessageForAdmin({ user, submissionId, payload, checks });
     }
 
     await publishSubmissionMsgCreateMail(user, { contentSubmissionMsg, });

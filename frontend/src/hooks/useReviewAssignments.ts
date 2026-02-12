@@ -4,6 +4,7 @@ import type {
   GetReviewAssignmentsParams,
   UpdateReviewAssignmentStatusRequest,
 } from "@/models/reviewAssignment";
+import type { SearchReviewAssignmentsParams } from "@/services/reviewAssignmentService";
 
 export function useReviewAssignments(params?: GetReviewAssignmentsParams) {
   return useQuery({
@@ -12,10 +13,25 @@ export function useReviewAssignments(params?: GetReviewAssignmentsParams) {
   });
 }
 
-export function useMyReviewAssignments(params?: GetReviewAssignmentsParams) {
+export function useMyReviewAssignments(
+  params?: GetReviewAssignmentsParams,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: ["myReviewAssignments", params],
     queryFn: () => reviewAssignmentService.getMyReviewAssignments(params),
+    enabled: options?.enabled,
+  });
+}
+
+export function useSearchReviewAssignments(
+  params?: SearchReviewAssignmentsParams,
+  options?: { enabled?: boolean },
+) {
+  return useQuery({
+    queryKey: ["reviewAssignments", "search", params],
+    queryFn: () => reviewAssignmentService.searchReviewAssignments(params),
+    enabled: options?.enabled,
   });
 }
 
@@ -38,6 +54,7 @@ export function useUpdateReviewAssignmentStatusMutation() {
       queryClient.invalidateQueries({
         queryKey: ["review-assignments", "search"],
       });
+      queryClient.invalidateQueries({ queryKey: ["submissionReviewers"] });
     },
   });
 }

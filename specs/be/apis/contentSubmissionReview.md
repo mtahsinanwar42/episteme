@@ -29,7 +29,7 @@ Required:
 
 Optional:
 
-- comment (text)
+- comment (text, nullable)
 - reviewerContentSubmissionVersionId (integer)
 
 Example:
@@ -37,7 +37,7 @@ Example:
 ```json
 {
   "reviewerContentSubmissionVersionId": 27,
-  "comment": "Looks good, but needs some refactoring",
+  "comment": null,
   "recommendation": 1
 }
 ```

@@ -28,7 +28,6 @@ interface StatusUpdateModalProps {
 }
 
 const STATUS_OPTIONS = [
-  SubmissionStatus.DRAFT,
   SubmissionStatus.PENDING_APPROVAL,
   SubmissionStatus.RETURNED,
   SubmissionStatus.APPROVED,

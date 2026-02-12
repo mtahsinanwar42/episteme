@@ -8,45 +8,67 @@ export async function findSubmissionMessagesByIdAndUserDetails({
   loggedInUserRoles,
 }) {
   const roles = Array.isArray(loggedInUserRoles) ? loggedInUserRoles : [];
+  const isUser = roles.includes(USER_ROLE.USER);
   const isAdmin = roles.includes(USER_ROLE.ADMIN);
   const isReviewer = roles.includes(USER_ROLE.REVIEWER);
 
   const replacements = {
     submissionId: Number(submissionId),
     loggedInUserId: Number(loggedInUserId),
+    isUserRole: isUser,
+    isAdminRole: isAdmin,
+    isReviewerRole: isReviewer,
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
     excludedConferenceStatus: [CONFERENCE_STATUS.INACTIVE, CONFERENCE_STATUS.DELETED],
     capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
     deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
   };
 
-  const accessWhereUser = `CS.owner_usr_id = :loggedInUserId`;
-  const accessWhereReviewer = `
+  const ownerScopePredicate = `
+    :isUserRole
+    AND CS.owner_usr_id = :loggedInUserId
+  `;
+  const reviewerScopePredicate = `
+    :isReviewerRole
+    AND CS.owner_usr_id <> :loggedInUserId
+    AND EXISTS (
+      SELECT 1
+      FROM episteme.content_review_assignment CRA
+      WHERE CRA.content_submission_id = CS.id
+        AND CRA.reviewer_usr_id = :loggedInUserId
+        AND CRA.status <> :deletedAssignmentStatus
+    )
+  `;
+  const adminScopePredicate = `
+    :isAdminRole
+    AND NOT (${ownerScopePredicate})
+    AND NOT (${reviewerScopePredicate})
+    AND CS.owner_usr_id <> :loggedInUserId
+  `;
+
+  const accessWhere = `
     (
-      CS.owner_usr_id = :loggedInUserId
-      OR EXISTS (
-        SELECT 1
-        FROM episteme.content_review_assignment CRA
-        WHERE CRA.content_submission_id = CS.id
-          AND CRA.reviewer_usr_id = :loggedInUserId
-          AND CRA.status <> :deletedAssignmentStatus
+      ${ownerScopePredicate}
+      OR ${reviewerScopePredicate}
+      OR ${adminScopePredicate}
+    )
+  `;
+
+  const msgWhere = `
+    (
+      (${ownerScopePredicate} AND M.visibility_scope = 'USER_ADMIN')
+      OR
+      (${reviewerScopePredicate}
+        AND M.visibility_scope = 'ADMIN_REVIEWER'
+        AND (
+          M.sender_usr_id = :loggedInUserId
+          OR M.receiver_usr_id = :loggedInUserId
+        )
       )
+      OR
+      (${adminScopePredicate})
     )
   `;
-  const accessWhereAdmin = `CS.owner_usr_id <> :loggedInUserId`;
-
-  const msgWhereUser = `M.visibility_scope = 'USER_ADMIN'`;
-  const msgWhereReviewer = `
-    M.visibility_scope = 'ADMIN_REVIEWER'
-    AND (
-      M.sender_usr_id = :loggedInUserId
-      OR M.receiver_usr_id = :loggedInUserId
-    )
-  `;
-  const msgWhereAdmin = `1=1`;
-
-  const accessWhere = isAdmin ? accessWhereAdmin : isReviewer ? accessWhereReviewer : accessWhereUser;
-  const msgWhere = isAdmin ? msgWhereAdmin : isReviewer ? msgWhereReviewer : msgWhereUser;
 
   const sql = `
     SELECT

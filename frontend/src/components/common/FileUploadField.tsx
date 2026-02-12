@@ -27,7 +27,7 @@ export function FileUploadField({
   accept,
   helperText = 'Any file type is supported',
   uploadedFile,
-  maxNameLength = 60,
+  maxNameLength = 40,
 }: FileUploadFieldProps) {
   const inputId = useId();
 
@@ -69,8 +69,10 @@ export function FileUploadField({
               {selectedFile ? (
                 <div className="flex flex-col items-center space-y-1">
                   <FileText className="w-5 h-5 text-green-600" />
-                  <p className="font-medium text-green-600">
-                    {selectedFile.name}
+                  <p className="font-medium text-green-600 max-w-[280px] truncate" title={selectedFile.name}>
+                    {selectedFile.name.length > maxNameLength
+                      ? `${selectedFile.name.slice(0, maxNameLength)}...`
+                      : selectedFile.name}
                   </p>
                   <p className="text-xs text-foreground/80">
                     ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)

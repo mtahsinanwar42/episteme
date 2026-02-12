@@ -8,47 +8,52 @@ export async function findSubmissionVersionsByIdAndUserDetails({
   loggedInUserRoles,
 }) {
   const roles = Array.isArray(loggedInUserRoles) ? loggedInUserRoles : [];
+  const isUser = roles.includes(USER_ROLE.USER);
   const isAdmin = roles.includes(USER_ROLE.ADMIN);
   const isReviewer = roles.includes(USER_ROLE.REVIEWER);
 
   const replacements = {
     submissionId: Number(submissionId),
     loggedInUserId: Number(loggedInUserId),
+    isUserRole: isUser,
+    isAdminRole: isAdmin,
+    isReviewerRole: isReviewer,
     deletedSubmissionStatus: CONTENT_SUBMISSION_STATUS.DELETED,
     deletedConferenceStatus: CONFERENCE_STATUS.DELETED,
     capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
     deletedAssignmentStatus: REVIEW_ASSIGNMENT_STATUS.DELETED,
   };
 
-  const accessWhereUser = `CS.owner_usr_id = :loggedInUserId`;
-  const accessWhereReviewer = `
-    (
-      CS.owner_usr_id = :loggedInUserId
-      OR EXISTS (
-        SELECT 1
-        FROM episteme.content_review_assignment CRA
-        WHERE CRA.content_submission_id = CS.id
-          AND CRA.reviewer_usr_id = :loggedInUserId
-          AND CRA.status <> :deletedAssignmentStatus
-      )
+  const ownerScopePredicate = `
+    :isUserRole
+    AND CS.owner_usr_id = :loggedInUserId
+  `;
+  const reviewerScopePredicate = `
+    :isReviewerRole
+    AND CS.owner_usr_id <> :loggedInUserId
+    AND EXISTS (
+      SELECT 1
+      FROM episteme.content_review_assignment CRA
+      WHERE CRA.content_submission_id = CS.id
+        AND CRA.reviewer_usr_id = :loggedInUserId
+        AND CRA.status <> :deletedAssignmentStatus
     )
   `;
-  const accessWhereAdmin = `CS.owner_usr_id <> :loggedInUserId`;
+  const adminScopePredicate = `
+    :isAdminRole
+    AND NOT (${ownerScopePredicate})
+    AND NOT (${reviewerScopePredicate})
+    AND CS.owner_usr_id <> :loggedInUserId
+  `;
 
-  const versionWhereUser = `V.uploader_usr_type IN ('USER', 'ADMIN')`;
-  const versionWhereReviewer = `V.uploader_usr_type = 'USER'`;
-  const versionWhereAdmin = `V.uploader_usr_type IN ('USER', 'ADMIN')`;
-
-  const accessWhere = isAdmin
-    ? accessWhereAdmin
-    : isReviewer
-      ? accessWhereReviewer
-      : accessWhereUser;
-  const versionWhere = isAdmin
-    ? versionWhereAdmin
-    : isReviewer
-      ? versionWhereReviewer
-      : versionWhereUser;
+  const accessWhere = `
+    (
+      ${ownerScopePredicate}
+      OR ${reviewerScopePredicate}
+      OR ${adminScopePredicate}
+    )
+  `;
+  const versionWhere = `V.uploader_usr_type IN ('USER', 'ADMIN')`;
 
   const sql = `
     SELECT

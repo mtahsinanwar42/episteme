@@ -377,13 +377,6 @@ const messageTemplatesBySubmission = [
     {
       senderKey: "admin",
       senderUsrType: USER_ROLE.ADMIN,
-      receiverKey: "reviewer",
-      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
-      message: "Reviewers have been assigned to this submission. Please complete your reviews within two weeks.",
-    },
-    {
-      senderKey: "admin",
-      senderUsrType: USER_ROLE.ADMIN,
       receiverKey: "owner",
       visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
       message: "Reviewers have been assigned. You can expect feedback within 2-3 weeks.",
@@ -409,13 +402,6 @@ const messageTemplatesBySubmission = [
       visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
       message: "Yes, the appendices contain proofs and benchmark data that support the core claims. They are necessary for a thorough review.",
     },
-    {
-      senderKey: "admin",
-      senderUsrType: USER_ROLE.ADMIN,
-      receiverKey: "reviewer",
-      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
-      message: "This submission includes appendices with proofs and benchmarks. Please consider these during your evaluation.",
-    },
   ],
   [
     {
@@ -432,13 +418,6 @@ const messageTemplatesBySubmission = [
       message: "Thank you. Your submission is now in the review queue.",
     },
     {
-      senderKey: "admin",
-      senderUsrType: USER_ROLE.ADMIN,
-      receiverKey: "reviewer",
-      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
-      message: "New submission assigned for review. The author is responsive — feel free to request clarifications via admin.",
-    },
-    {
       senderKey: "owner",
       senderUsrType: USER_ROLE.USER,
       visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
@@ -450,13 +429,6 @@ const messageTemplatesBySubmission = [
       receiverKey: "owner",
       visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.USER_ADMIN,
       message: "Yes, reviewers are assigned and evaluating your paper. We will update you once reviews are complete.",
-    },
-    {
-      senderKey: "admin",
-      senderUsrType: USER_ROLE.ADMIN,
-      receiverKey: "reviewer",
-      visibilityScope: CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE.ADMIN_REVIEWER,
-      message: "Gentle reminder: please submit your reviews for this paper by end of this week.",
     },
   ],
 ];
@@ -874,3 +846,4 @@ if (isDirectExecution) {
     await importData();
   }
 }
+

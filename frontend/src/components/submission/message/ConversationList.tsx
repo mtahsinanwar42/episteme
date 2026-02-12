@@ -1,4 +1,5 @@
 import type { MessageGroup } from "@/models/submission";
+import { MessageScope } from "@/models/submission";
 import { ConversationItem } from "./ConversationItem";
 
 interface ConversationListProps {
@@ -24,6 +25,7 @@ export function ConversationList({
             recipient={group.recipient}
             isSelected={selectedUserId === key}
             onClick={() => onSelectConversation(key)}
+            role={group.scope === MessageScope.USER_ADMIN ? "user" : "reviewer"}
           />
         ))}
 
