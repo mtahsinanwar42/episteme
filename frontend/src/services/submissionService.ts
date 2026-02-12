@@ -81,6 +81,17 @@ export const submissionService = {
     );
   },
 
+  updateSubmissionDoi: async (
+    submissionId: string | number,
+    data: { doi: string },
+  ): Promise<SubmissionDetailsResponse> => {
+    return api.put<SubmissionDetailsResponse>(
+      `/submissions/${submissionId}/doi`,
+      data,
+      true,
+    );
+  },
+
   getSubmissionVersions: async (
     submissionId: string | number,
   ): Promise<SubmissionVersionsResponse> => {

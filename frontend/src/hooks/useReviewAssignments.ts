@@ -29,12 +29,32 @@ export function useUpdateReviewAssignmentStatusMutation() {
     }: {
       assignmentId: number | string;
       data: UpdateReviewAssignmentStatusRequest;
-    }) => reviewAssignmentService.updateReviewAssignmentStatus(assignmentId, data),
+    }) =>
+      reviewAssignmentService.updateReviewAssignmentStatus(assignmentId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reviewAssignments"] });
       queryClient.invalidateQueries({ queryKey: ["myReviewAssignments"] });
       queryClient.invalidateQueries({ queryKey: ["review-assignments"] });
-      queryClient.invalidateQueries({ queryKey: ["review-assignments", "search"] });
+      queryClient.invalidateQueries({
+        queryKey: ["review-assignments", "search"],
+      });
+    },
+  });
+}
+
+export function useCreateReviewAssignmentMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      contentSubmissionId: number | string;
+      reviewerUsrId: number | string;
+      assignedByNotes?: string;
+    }) => reviewAssignmentService.createReviewAssignment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviewAssignments"] });
+      queryClient.invalidateQueries({ queryKey: ["review-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["submissionReviewers"] });
     },
   });
 }

@@ -53,6 +53,19 @@ export function useUpdateSubmissionStatusMutation(
   });
 }
 
+export function useUpdateSubmissionDoiMutation(submissionId: string | number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { doi: string }) =>
+      submissionService.updateSubmissionDoi(submissionId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["submission", submissionId] });
+      queryClient.invalidateQueries({ queryKey: ["submissions"] });
+    },
+  });
+}
+
 export function useSubmissionVersions(submissionId?: string | number) {
   return useQuery({
     queryKey: ["submissionVersions", submissionId],

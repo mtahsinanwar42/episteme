@@ -56,11 +56,15 @@ export const reviewAssignmentService = {
     assignmentId: number | string,
     data: UpdateReviewAssignmentStatusRequest,
   ): Promise<{ success: boolean; data: unknown }> => {
-    return api.put(
-      `/review-assignments/${assignmentId}/status`,
-      data,
-      true,
-    );
+    return api.put(`/review-assignments/${assignmentId}/status`, data, true);
+  },
+
+  createReviewAssignment: async (data: {
+    contentSubmissionId: number | string;
+    reviewerUsrId: number | string;
+    assignedByNotes?: string;
+  }): Promise<{ success: boolean; data: unknown }> => {
+    return api.post("/review-assignments", data, true);
   },
 
   searchReviewAssignments: async (
