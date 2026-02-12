@@ -73,6 +73,29 @@ export async function findConferencePublicationsById({
   };
 }
 
+export async function findConferencesToAutoFinish({
+  activeConferenceStatus = CONFERENCE_STATUS.ACTIVE,
+}) {
+  const sql = `
+    SELECT
+      C.id AS "id"
+    FROM episteme.conference C
+    WHERE
+      C.status = :activeConferenceStatus
+      AND C.end_at + INTERVAL '1 day' <= NOW()
+    ORDER BY C.end_at ASC;
+  `;
+
+  const rows = await sequelize.query(sql, {
+    type: QueryTypes.SELECT,
+    replacements: {
+      activeConferenceStatus: Number(activeConferenceStatus),
+    },
+  });
+
+  return rows.map((row) => Number(row.id));
+}
+
 export async function markConferenceAsStatus(
   { conferenceId, status },
   { t }

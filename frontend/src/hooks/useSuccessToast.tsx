@@ -12,6 +12,7 @@ interface SuccessToastState {
   message: string;
   visible: boolean;
   leaving: boolean;
+  key: number;
 }
 
 interface SuccessToastContextValue {
@@ -31,6 +32,7 @@ export function SuccessToastProvider({
     message: "",
     visible: false,
     leaving: false,
+    key: 0,
   });
 
   const timers = useRef<{ hide?: number; remove?: number }>({});
@@ -47,7 +49,7 @@ export function SuccessToastProvider({
 
   const showSuccessToast = (message: string) => {
     clearTimers();
-    setToast({ message, visible: true, leaving: false });
+    setToast((prev) => ({ message, visible: true, leaving: false, key: prev.key + 1 }));
   };
 
   useEffect(() => {
@@ -58,11 +60,11 @@ export function SuccessToastProvider({
     }, duration);
 
     timers.current.remove = window.setTimeout(() => {
-      setToast({ message: "", visible: false, leaving: false });
+      setToast((prev) => ({ ...prev, message: "", visible: false, leaving: false }));
     }, duration + 300);
 
     return clearTimers;
-  }, [toast.visible, toast.message, duration]);
+  }, [toast.key, duration]);
 
   return (
     <SuccessToastContext.Provider value={{ showSuccessToast }}>

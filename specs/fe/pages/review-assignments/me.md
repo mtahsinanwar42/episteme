@@ -1,76 +1,119 @@
-# Review Assignments — My Assignments
+# Review Assignments - My Assignments
 
 ## Route
 
 - Path: `/review-assignments/me`
 - Access: REVIEWER
-- Mode: View (read-only) + partial update (accept/reject)
+- Mode: View + update assignment status (Accept/Decline via modal)
 
 ---
 
 ## Purpose
 
-- Display a list of submissions assigned to the logged-in REVIEWER.
-- Allow REVIEWER to navigate to the submission detail page
+- Display submissions assigned to the logged-in reviewer.
+- Let REVIEWER view assignment details.
+- Let REVIEWER navigate to submission detail pages.
+- Let REVIEWER accept or decline assignment status when allowed.
 
 ---
 
 ## API
 
-- `GET /api/v1/review-assignments/me`
-- Trigger: Page load + pagination changes
-- Query params: As defined in Reviewer Assignment API spec
+### Fetch My Review Assignments
 
-- `PUT /api/v1/review-assignments/:id/status` for Accepting/Rejecting the assignment
+- `GET /api/v1/review-assignments/me`
+- Trigger: initial load and pagination changes
+- Query params used by FE: `page`, `limit`
+
+### Update Review Assignment Status
+
+- `PUT /api/v1/review-assignments/:id/status`
+- Trigger: Accept or Decline action in Assignment Details modal
+- Request body:
+  - `status` (number, required)
 
 ---
 
 ## UI Requirements
 
-- Layout: **table view**
-- Columns:
-  - Submission Title (text)
-  - Submission Status (badge)
-  - Conference (text)
-  - Assigned By (name + email)
-  - Assignment Status (badge)
-  - Assignment Status Update Notes (Text)
-  - Assigned At (date/time)
-  - Submitter (name + email)
-  - **Action**: View, Accept, Decline
+- Layout: table view + modal
+- Search:
+  - Client-side table search input with placeholder `Filter assignments`
 
-- View Action navigates to:
-  - `/submissions/:id`
+### Table Columns
 
-- Accept/Reject action will call the status update endpoint per spec. Applicable for ASSIGNED statuses only.
+- Submission Title
+- Submission Status (badge)
+- Conference
+- Conference Status (badge)
+- Assigned By (name + email)
+- Assignment Status (badge)
+- Assigned At (formatted datetime)
+- Submitter (name + email)
+- Actions
+
+### Row Actions
+
+- View Submission: navigate to `/submissions/:submissionId`
+- Assignment Details: open `Review Assignment Details` modal
+
+---
+
+## Assignment Details Modal (REVIEWER)
+
+### Read-Only Details
+
+- Submission
+- Submission Status
+- Conference
+- Conference Status
+- Assigned By
+- Assigned At
+- Assignment Notes (shown only when `assignedByNotes` exists; displayed in italic style)
+- Submitter
+- Assignment Status
+- Status Update Notes (shown only when `assignmentStatusUpdateNotes` is non-empty)
+
+### Update Eligibility (`canUpdateStatus`)
+
+- Assignment status is one of: `ASSIGNED`, `ACCEPTED`, `DECLINED`
+- Submission status is `PENDING_APPROVAL` or `RETURNED`
+- Conference status is `ACTIVE`
+
+### Modal Actions
+
+- Always available: `Close`
+- If `canUpdateStatus` is true:
+  - `Decline` button is shown when current status is not `DECLINED`
+  - `Accept` button is shown when current status is not `ACCEPTED`
+
+### Update Result
+
+- On success:
+  - Modal closes
+  - Success toast: `Assignment status updated.`
+  - Assignment lists are refreshed via query invalidation
+- On error:
+  - Error is logged to console
 
 ---
 
 ## Pagination Requirements
 
-- Pagination is required (page / limit)
-- Provide navigation controls:
-  - previous / next
-  - current page indicator
-
----
-
-## Navigation Behavior
-
-- Clicking **View Submission** opens:
-  - `/submissions/:id`
+- Server pagination with `page` and `limit`
+- Pagination component is shown only when:
+  - not loading
+  - no error
+  - `total > 0`
 
 ---
 
 ## States
 
-- Loading (initial load)
-- Loading (pagination / filter / sort change)
-- Empty:
-  - Message: “No review assignments available.”
-- Error (API failure)
-- Forbidden:
-  - Non-REVIEWER attempting to access this page
+- Loading: loading overlay in table area
+- Error: inline text `Error: <message>`
+- Empty: text `No data available`
+- Forbidden: non-REVIEWER cannot access route
 
 ---
 
@@ -78,4 +121,4 @@
 
 - Only REVIEWER can access this page.
 - REVIEWER sees only assignments linked to their account.
-- ADMIN and USER must not see navigation entry or access this route.
+- ADMIN and USER must not access this route.

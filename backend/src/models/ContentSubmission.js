@@ -18,6 +18,11 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         field: "title",
       },
+      abstract: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        field: "abstract",
+      },
       topics: {
         type: DataTypes.ARRAY(DataTypes.TEXT),
         allowNull: false,

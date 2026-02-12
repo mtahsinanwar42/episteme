@@ -124,6 +124,33 @@ h6 {
   line-height: 1.5rem;
 }
 
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-foreground);
+  border-radius: 3px;
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  opacity: 0.8;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-foreground) var(--color-border);
+}
+
 @layer utilities {
   .gradient-title {
     @apply bg-linear-to-r bg-clip-text text-transparent;
@@ -134,4 +161,146 @@ h6 {
     @apply bg-linear-to-br;
     background-image: linear-gradient(135deg, var(--card-gradient));
   }
+}
+
+/* React Quill Editor Styles */
+.rich-text-editor .ql-toolbar {
+  border: 1px solid var(--color-accent);
+  border-radius: 0.5rem 0.5rem 0 0;
+  background: var(--color-card);
+}
+
+.rich-text-editor .ql-container {
+  border: 1px solid var(--color-accent);
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background: var(--color-background);
+  min-height: 120px;
+  font-size: 0.875rem;
+}
+
+.rich-text-editor .ql-editor {
+  color: var(--color-foreground);
+  min-height: 100px;
+}
+
+.rich-text-editor .ql-editor.ql-blank::before {
+  color: var(--color-border);
+  font-style: normal;
+}
+
+.rich-text-editor .ql-stroke {
+  stroke: var(--color-foreground);
+}
+
+.rich-text-editor .ql-fill {
+  fill: var(--color-foreground);
+}
+
+.rich-text-editor .ql-picker {
+  color: var(--color-foreground);
+}
+
+.rich-text-editor .ql-picker-options {
+  background: var(--color-card);
+  border-color: var(--color-accent);
+}
+
+.rich-text-editor .ql-toolbar button:hover,
+.rich-text-editor .ql-toolbar button.ql-active {
+  background: var(--color-accent);
+  border-radius: 0.25rem;
+}
+
+.rich-text-editor .ql-toolbar button:hover .ql-stroke,
+.rich-text-editor .ql-toolbar button.ql-active .ql-stroke {
+  stroke: var(--color-accent-foreground);
+}
+
+.rich-text-editor .ql-toolbar button:hover .ql-fill,
+.rich-text-editor .ql-toolbar button.ql-active .ql-fill {
+  fill: var(--color-accent-foreground);
+}
+
+/* Rich Text Content Display (for rendered HTML from Quill) */
+.rich-text-content {
+  color: var(--color-foreground);
+}
+
+.rich-text-content h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0.75rem 0;
+}
+
+.rich-text-content h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.rich-text-content p {
+  margin: 0.5rem 0;
+}
+
+.rich-text-content strong {
+  font-weight: bold;
+}
+
+.rich-text-content em {
+  font-style: italic;
+}
+
+.rich-text-content u {
+  text-decoration: underline;
+}
+
+.rich-text-content s {
+  text-decoration: line-through;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  padding-left: 0;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+  padding-left: 0;
+}
+
+.rich-text-content li {
+  margin: 0.25rem 0;
+}
+
+.rich-text-content blockquote {
+  border-left: 4px solid var(--color-accent);
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  font-style: italic;
+  color: var(--color-foreground);
+  opacity: 0.9;
+}
+
+.rich-text-content pre {
+  background: var(--color-border);
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+.rich-text-content code {
+  font-family: monospace;
+  background: var(--color-border);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.125rem;
+}
+
+.rich-text-content a {
+  color: var(--color-accent);
+  text-decoration: underline;
 }

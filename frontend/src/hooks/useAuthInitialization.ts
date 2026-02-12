@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { validateStoredToken } from "@/utils/tokenValidator";
-import { setToken, logout, setUser } from "@/stores/authSlice";
+import { setToken, setUser } from "@/stores/authSlice";
+import { handleLogout as performLogout } from "@/utils/logoutHandler";
 import { api } from "@/services/api";
 import type { AppDispatch } from "@/stores/store";
 
@@ -19,7 +20,7 @@ export const useAuthInitialization = () => {
       try {
         // Set up the unauthorized callback for API interceptor
         api.setUnauthorizedCallback(() => {
-          dispatch(logout());
+          performLogout(dispatch);
         });
 
         // Validate stored token
@@ -28,7 +29,7 @@ export const useAuthInitialization = () => {
         if (!tokenValidation.valid) {
           // Token is invalid or expired
           console.warn("Token is invalid or expired");
-          dispatch(logout());
+          await performLogout(dispatch);
           dispatch(setUser(null));
           return;
         }
@@ -38,7 +39,7 @@ export const useAuthInitialization = () => {
         console.log("User authenticated and restored from store");
       } catch (error) {
         console.error("Authentication initialization error:", error);
-        dispatch(logout());
+        await performLogout(dispatch);
       }
     };
 

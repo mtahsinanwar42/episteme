@@ -4,6 +4,7 @@ export interface Submission {
   id?: string | number;
   title: string;
   topics?: string[];
+  abstract?: string | null;
   doi?: string | null;
   status?: number;
   statusUpdateNotes?: string | null;
@@ -52,6 +53,7 @@ export interface CreateSubmissionRequest {
   title: string;
   conferenceId: string | number;
   topics?: string[];
+  abstract: string;
   contentFilePath: string;
   message?: string;
 }
@@ -64,6 +66,18 @@ export enum SubmissionStatus {
   REJECTED = 4,
   DELETED = 9,
 }
+
+export enum ReviewRecommendation {
+  ACCEPTED = 1,
+  REJECTED = 2,
+  NEEDS_REVISION = 3,
+}
+
+export const ReviewRecommendationLabel: Record<number, string> = {
+  [ReviewRecommendation.ACCEPTED]: "Accepted",
+  [ReviewRecommendation.REJECTED]: "Rejected",
+  [ReviewRecommendation.NEEDS_REVISION]: "Needs Revision",
+};
 
 export interface UpdateSubmissionStatusRequest {
   status: number;
@@ -158,6 +172,35 @@ export interface SubmissionReviewer {
 export interface SubmissionReviewersResponse {
   data: SubmissionReviewer[];
   success: boolean;
+}
+
+export interface SubmissionReviewReviewer {
+  id?: string | number;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface SubmissionReview {
+  reviewId?: string | number;
+  createdAt?: string;
+  comment?: string | null;
+  recommendation?: number | null;
+  contentReviewAssignmentId?: string | number;
+  reviewer?: SubmissionReviewReviewer | null;
+  version?: SubmissionVersion | null;
+  reviewerVersion?: SubmissionVersion | null;
+}
+
+export interface SubmissionReviewsResponse {
+  data: SubmissionReview[];
+  success: boolean;
+}
+
+export interface CreateSubmissionReviewRequest {
+  reviewerContentSubmissionVersionId?: string | number;
+  recommendation: number;
+  comment?: string;
 }
 
 export interface MessageGroup {

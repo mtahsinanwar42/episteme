@@ -154,7 +154,8 @@ export default function Users() {
         enableSorting: false,
       },
       {
-        accessorKey: "status",
+        id: "status",
+        accessorFn: (row) => UserStatus[row.status] ?? String(row.status),
         header: ({ column }) => {
           return (
             <div
@@ -170,7 +171,7 @@ export default function Users() {
         },
         enableSorting: true,
         cell: ({ row }) => {
-          const status = row.getValue("status") as number;
+          const status = row.original.status;
           return (
             <div className="flex place-self-center">
               {getStatusBadge(status)}
@@ -238,6 +239,13 @@ export default function Users() {
           pageSize={pageSize}
           enableSearch
           searchPlaceholder="Filter Users"
+          searchableColumnIds={[
+            "firstName",
+            "lastName",
+            "email",
+            "institution",
+            "status",
+          ]}
         />
 
         {!isLoading && !error && total > 0 && (

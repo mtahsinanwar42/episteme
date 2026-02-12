@@ -10,6 +10,13 @@ import type {
 } from "@/models/conference";
 
 export const conferenceService = {
+  getActiveAndFinishedConferences: async (): Promise<ConferenceResponse> => {
+    return api.get<ConferenceResponse>(
+      "/conferences?status[in]=1,2&paginate=false&sort=title",
+      false,
+    );
+  },
+
   getConferences: async (
     params?: GetConferencesParams,
   ): Promise<ConferenceResponse> => {
@@ -39,6 +46,16 @@ export const conferenceService = {
       queryParams.append(
         "submissionPeriodStartAt[lte]",
         `${params.submissionStartAtTo}T23:59:59`,
+      );
+    if (params?.submissionEndAtFrom)
+      queryParams.append(
+        "submissionPeriodEndAt[gte]",
+        params.submissionEndAtFrom,
+      );
+    if (params?.submissionEndAtTo)
+      queryParams.append(
+        "submissionPeriodEndAt[lte]",
+        `${params.submissionEndAtTo}T23:59:59`,
       );
     if (params?.createdAtFrom)
       queryParams.append("createdAt[gte]", params.createdAtFrom);

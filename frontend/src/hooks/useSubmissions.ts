@@ -8,6 +8,7 @@ import type {
   UpdateSubmissionStatusRequest,
   CreateSubmissionVersionRequest,
   CreateSubmissionMessageRequest,
+  CreateSubmissionReviewRequest,
 } from "@/models/submission";
 
 export function useSubmissions(params?: GetSubmissionsParams) {
@@ -45,6 +46,19 @@ export function useUpdateSubmissionStatusMutation(
   return useMutation({
     mutationFn: (data: UpdateSubmissionStatusRequest) =>
       submissionService.updateSubmissionStatus(submissionId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["submission", submissionId] });
+      queryClient.invalidateQueries({ queryKey: ["submissions"] });
+    },
+  });
+}
+
+export function useUpdateSubmissionDoiMutation(submissionId: string | number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { doi: string }) =>
+      submissionService.updateSubmissionDoi(submissionId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["submission", submissionId] });
       queryClient.invalidateQueries({ queryKey: ["submissions"] });
@@ -112,6 +126,33 @@ export function useSubmissionReviewers(
       options?.enabled !== undefined
         ? options.enabled && !!submissionId
         : !!submissionId,
+  });
+}
+
+export function useSubmissionReviews(submissionId?: string | number) {
+  return useQuery({
+    queryKey: ["submissionReviews", submissionId],
+    queryFn: () => submissionService.getSubmissionReviews(submissionId!),
+    enabled: !!submissionId,
+  });
+}
+
+export function useCreateSubmissionReviewMutation(
+  submissionId: string | number,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateSubmissionReviewRequest) =>
+      submissionService.createSubmissionReview(submissionId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["submissionReviews", submissionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["myReviewAssignments"],
+      });
+    },
   });
 }
 
