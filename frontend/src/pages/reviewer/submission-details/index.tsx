@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Link,
   NavLink,
@@ -8,13 +7,7 @@ import {
 } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
-import { FileText, Settings } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { FileText } from "lucide-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useSubmissionById } from "@/hooks/useSubmissions";
 import PageTitle from "@/components/common/PageTitle";
@@ -22,12 +15,9 @@ import { LoadingOverlay } from "@/components/common/LoadingOverlay";
 import { cn } from "@/lib/utils";
 import type { RootState } from "@/stores/store";
 import { UserRole } from "@/models/user";
-import { SubmissionStatus, type Submission } from "@/models/submission";
+import type { Submission } from "@/models/submission";
 import { getConferenceStatusBadge } from "@/components/common/ConferenceStatusBadge";
 import { RichTextDisplay } from "@/components/common/RichTextDisplay";
-import { StatusUpdateModal } from "@/components/submission/StatusUpdateModal";
-import { DoiUpdateModal } from "@/components/submission/DoiUpdateModal";
-import { AssignReviewerModal } from "@/components/submission/AssignReviewerModal";
 
 export type SubmissionOutletContext = {
   submission: Submission;
@@ -35,7 +25,7 @@ export type SubmissionOutletContext = {
   isReviewer: boolean;
 };
 
-export default function SubmissionDetails() {
+export default function ReviewerSubmissionDetails() {
   const { submissionId } = useParams();
   const navigate = useNavigate();
   const currentRoles = useSelector(
@@ -47,23 +37,6 @@ export default function SubmissionDetails() {
   const { data, isLoading, isError, error } = useSubmissionById(submissionId);
 
   const submission = data?.data as Submission;
-
-  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [isDoiModalOpen, setIsDoiModalOpen] = useState(false);
-  const [isAssignReviewerModalOpen, setIsAssignReviewerModalOpen] =
-    useState(false);
-
-  const canUpdateStatus =
-    isAdmin &&
-    submission?.status !== undefined &&
-    [
-      SubmissionStatus.DRAFT,
-      SubmissionStatus.PENDING_APPROVAL,
-      SubmissionStatus.RETURNED,
-    ].includes(submission.status);
-
-  const canUpdateDoi =
-    isAdmin && submission?.status === SubmissionStatus.APPROVED;
 
   if (isLoading) {
     return (
@@ -109,7 +82,7 @@ export default function SubmissionDetails() {
     <div>
       <Breadcrumb
         items={[
-          { label: "Submissions", href: "/submissions" },
+          { label: "My Review Assignments", href: "/review-assignments/me" },
           { label: submission.title },
         ]}
       />
@@ -122,7 +95,7 @@ export default function SubmissionDetails() {
         <div className="h-fit gradient-card">
           <nav className="">
             <NavLink
-              to={`/submissions/${submission.submissionId}/details`}
+              to={`/reviewer/submissions/${submission.submissionId}/details`}
               className={({ isActive }) =>
                 cn(
                   "block px-4 py-3 bg-slate-900 text-sm hover:bg-accent/70 border-b border-white/20",
@@ -133,7 +106,7 @@ export default function SubmissionDetails() {
               Details
             </NavLink>
             <NavLink
-              to={`/submissions/${submission.submissionId}/messages`}
+              to={`/reviewer/submissions/${submission.submissionId}/messages`}
               className={({ isActive }) =>
                 cn(
                   "block px-4 py-3 bg-slate-900 text-sm hover:bg-accent/70 border-b border-white/20",
@@ -143,23 +116,10 @@ export default function SubmissionDetails() {
             >
               Messages
             </NavLink>
-            {!isReviewer && (
-              <NavLink
-                to={`/submissions/${submission.submissionId}/versions`}
-                className={({ isActive }) =>
-                  cn(
-                    "block px-4 py-3 bg-slate-900 text-sm hover:bg-accent/70 border-b border-white/20",
-                    isActive ? "bg-accent/70 text-foreground" : "",
-                  )
-                }
-              >
-                Versions
-              </NavLink>
-            )}
 
             {isAdmin || isReviewer ? (
               <NavLink
-                to={`/submissions/${submission.submissionId}/reviews`}
+                to={`/reviewer/submissions/${submission.submissionId}/reviews`}
                 className={({ isActive }) =>
                   cn(
                     "block px-4 py-3 bg-slate-900 text-sm hover:bg-accent/70",
@@ -175,39 +135,7 @@ export default function SubmissionDetails() {
 
         <div>
           <div className="mb-6">
-            <div className="flex items-start justify-between gap-4">
-              <h1 className="mb-2">{submission.title}</h1>
-
-              {isAdmin && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="shrink-0">
-                      <Settings className="h-5 w-5" />
-                      <span className="sr-only">Submission actions</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {canUpdateStatus && (
-                      <DropdownMenuItem
-                        onClick={() => setIsStatusModalOpen(true)}
-                      >
-                        Update Status
-                      </DropdownMenuItem>
-                    )}
-                    {canUpdateDoi && (
-                      <DropdownMenuItem onClick={() => setIsDoiModalOpen(true)}>
-                        Update DOI
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem
-                      onClick={() => setIsAssignReviewerModalOpen(true)}
-                    >
-                      Assign Reviewer
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
+            <h1 className="mb-2">{submission.title}</h1>
 
             <div className="flex items-center gap-2">
               Conference:{" "}
@@ -250,27 +178,6 @@ export default function SubmissionDetails() {
           </div>
         </div>
       </div>
-
-      <StatusUpdateModal
-        open={isStatusModalOpen}
-        onOpenChange={setIsStatusModalOpen}
-        selectedSubmission={submission}
-        onClose={() => setIsStatusModalOpen(false)}
-      />
-
-      <DoiUpdateModal
-        open={isDoiModalOpen}
-        onOpenChange={setIsDoiModalOpen}
-        selectedSubmission={submission}
-        onClose={() => setIsDoiModalOpen(false)}
-      />
-
-      <AssignReviewerModal
-        open={isAssignReviewerModalOpen}
-        onOpenChange={setIsAssignReviewerModalOpen}
-        selectedSubmission={submission}
-        onClose={() => setIsAssignReviewerModalOpen(false)}
-      />
     </div>
   );
 }

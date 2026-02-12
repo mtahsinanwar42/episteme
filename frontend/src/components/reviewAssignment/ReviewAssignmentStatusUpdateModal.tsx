@@ -125,29 +125,52 @@ export function ReviewAssignmentStatusUpdateModal({
             <div className="space-y-3">
               <h3 className="text-sm font-semibold">Submission Information</h3>
               <div className="grid grid-cols-[140px_1fr] gap-x-3 gap-y-2 text-sm">
-                <span className="font-medium text-muted-foreground">Submission</span>
+                <span className="font-medium text-muted-foreground">
+                  Submission
+                </span>
                 <span>{selectedAssignment?.submissionTitle}</span>
 
-                <span className="font-medium text-muted-foreground">Submission Status</span>
+                <span className="font-medium text-muted-foreground">
+                  Submission Status
+                </span>
                 <span className="flex items-center">
                   {selectedAssignment &&
-                    getSubmissionStatusBadge(selectedAssignment.submissionStatus)}
+                    getSubmissionStatusBadge(
+                      selectedAssignment.submissionStatus,
+                    )}
                 </span>
 
-                <span className="font-medium text-muted-foreground">Conference</span>
+                <span className="font-medium text-muted-foreground">
+                  Conference
+                </span>
                 <span>{selectedAssignment?.conferenceTitle}</span>
 
-                <span className="font-medium text-muted-foreground">Conference Status</span>
+                <span className="font-medium text-muted-foreground">
+                  Conference Status
+                </span>
                 <span className="flex items-center">
                   {selectedAssignment &&
-                    getConferenceStatusBadge(selectedAssignment.conferenceStatus)}
+                    getConferenceStatusBadge(
+                      selectedAssignment.conferenceStatus,
+                    )}
                 </span>
 
-                <span className="font-medium text-muted-foreground">Submission Owner</span>
-                <div>
-                  <div>{selectedAssignment?.ownerFirstName} {selectedAssignment?.ownerLastName}</div>
-                  <div className="text-xs text-muted-foreground">{selectedAssignment?.ownerEmail}</div>
-                </div>
+                {mode === "admin" && (
+                  <>
+                    <span className="font-medium text-muted-foreground">
+                      Submission Owner
+                    </span>
+                    <div>
+                      <div>
+                        {selectedAssignment?.ownerFirstName}{" "}
+                        {selectedAssignment?.ownerLastName}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {selectedAssignment?.ownerEmail}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               <hr className="border-border" />
@@ -156,21 +179,37 @@ export function ReviewAssignmentStatusUpdateModal({
               <div className="grid grid-cols-[140px_1fr] gap-x-3 gap-y-2 text-sm">
                 {mode === "admin" && (
                   <>
-                    <span className="font-medium text-muted-foreground">Reviewer</span>
+                    <span className="font-medium text-muted-foreground">
+                      Reviewer
+                    </span>
                     <div>
-                      <div>{selectedAssignment?.reviewerFirstName} {selectedAssignment?.reviewerLastName}</div>
-                      <div className="text-xs text-muted-foreground">{selectedAssignment?.reviewerEmail}</div>
+                      <div>
+                        {selectedAssignment?.reviewerFirstName}{" "}
+                        {selectedAssignment?.reviewerLastName}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {selectedAssignment?.reviewerEmail}
+                      </div>
                     </div>
                   </>
                 )}
 
-                <span className="font-medium text-muted-foreground">Assigned By</span>
+                <span className="font-medium text-muted-foreground">
+                  Assigned By
+                </span>
                 <div>
-                  <div>{selectedAssignment?.assignedByFirstName} {selectedAssignment?.assignedByLastName}</div>
-                  <div className="text-xs text-muted-foreground">{selectedAssignment?.assignedByEmail}</div>
+                  <div>
+                    {selectedAssignment?.assignedByFirstName}{" "}
+                    {selectedAssignment?.assignedByLastName}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {selectedAssignment?.assignedByEmail}
+                  </div>
                 </div>
 
-                <span className="font-medium text-muted-foreground">Assigned At</span>
+                <span className="font-medium text-muted-foreground">
+                  Assigned At
+                </span>
                 <span>
                   {selectedAssignment &&
                     formatDateTime(selectedAssignment.assignedAt)}
@@ -178,13 +217,17 @@ export function ReviewAssignmentStatusUpdateModal({
 
                 {selectedAssignment?.assignedByNotes && (
                   <>
-                    <span className="font-medium text-muted-foreground">Assignment Notes</span>
+                    <span className="font-medium text-muted-foreground">
+                      Assignment Notes
+                    </span>
                     <span className="italic text-muted-foreground">
                       {selectedAssignment.assignedByNotes}
                     </span>
                   </>
                 )}
-                <span className="font-medium text-muted-foreground">Assignment Status</span>
+                <span className="font-medium text-muted-foreground">
+                  Assignment Status
+                </span>
                 <span className="flex items-center">
                   {selectedAssignment &&
                     getReviewAssignmentStatusBadge(
@@ -194,8 +237,12 @@ export function ReviewAssignmentStatusUpdateModal({
 
                 {hasStatusUpdateNotes && (
                   <>
-                    <span className="font-medium text-muted-foreground">Status Update Notes</span>
-                    <span>{selectedAssignment.assignmentStatusUpdateNotes}</span>
+                    <span className="font-medium text-muted-foreground">
+                      Status Update Notes
+                    </span>
+                    <span>
+                      {selectedAssignment?.assignmentStatusUpdateNotes}
+                    </span>
                   </>
                 )}
               </div>
@@ -261,7 +308,8 @@ export function ReviewAssignmentStatusUpdateModal({
               >
                 Close
               </Button>
-              {selectedAssignment?.assignmentStatus !== ReviewAssignmentStatus.DECLINED && (
+              {selectedAssignment?.assignmentStatus !==
+                ReviewAssignmentStatus.DECLINED && (
                 <Button
                   variant="outline"
                   onClick={() =>
@@ -274,7 +322,8 @@ export function ReviewAssignmentStatusUpdateModal({
                   Decline
                 </Button>
               )}
-              {selectedAssignment?.assignmentStatus !== ReviewAssignmentStatus.ACCEPTED && (
+              {selectedAssignment?.assignmentStatus !==
+                ReviewAssignmentStatus.ACCEPTED && (
                 <Button
                   onClick={() =>
                     handleReviewerAction(ReviewAssignmentStatus.ACCEPTED)
@@ -299,9 +348,7 @@ export function ReviewAssignmentStatusUpdateModal({
               {canUpdateStatus && (
                 <Button
                   onClick={handleUpdateStatus}
-                  disabled={
-                    updateStatusMutation.isPending || !selectedStatus
-                  }
+                  disabled={updateStatusMutation.isPending || !selectedStatus}
                 >
                   {updateStatusMutation.isPending ? "Saving..." : "Save"}
                 </Button>

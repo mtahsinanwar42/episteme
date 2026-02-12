@@ -67,13 +67,10 @@ export default function MyReviewAssignments() {
   const currentPage = page;
   const totalPages = Math.ceil(total / pageSize);
 
-  const handleOpenStatusModal = useCallback(
-    (assignment: ReviewAssignment) => {
-      setSelectedAssignment(assignment);
-      setIsStatusModalOpen(true);
-    },
-    [],
-  );
+  const handleOpenStatusModal = useCallback((assignment: ReviewAssignment) => {
+    setSelectedAssignment(assignment);
+    setIsStatusModalOpen(true);
+  }, []);
 
   const handleCloseStatusModal = useCallback(() => {
     setIsStatusModalOpen(false);
@@ -105,9 +102,7 @@ export default function MyReviewAssignments() {
         header: "Submission Status",
         cell: ({ row }) => (
           <div className="flex place-self-center">
-            {getSubmissionStatusBadge(
-              row.original.submissionStatus,
-            )}
+            {getSubmissionStatusBadge(row.original.submissionStatus)}
           </div>
         ),
         enableSorting: false,
@@ -116,32 +111,15 @@ export default function MyReviewAssignments() {
         accessorKey: "conferenceTitle",
         header: "Conference",
         cell: ({ row }) => (
-          <span className="text-sm">
-            {row.getValue("conferenceTitle")}
-          </span>
+          <span className="text-sm">{row.getValue("conferenceTitle")}</span>
         ),
         enableSorting: false,
       },
-      {
-        id: "submitter",
-        accessorFn: (row) =>
-          `${row.ownerFirstName} ${row.ownerLastName} ${row.ownerEmail}`,
-        header: "Submission Owner",
-        cell: ({ row }) => (
-          <div className="text-sm">
-            <div>
-              {row.original.ownerFirstName} {row.original.ownerLastName}
-            </div>
-            <div className="text-muted-foreground text-xs">
-              {row.original.ownerEmail}
-            </div>
-          </div>
-        ),
-        enableSorting: false,
-      },
+
       {
         id: "assignmentStatus",
-        accessorFn: (row) => getReviewAssignmentStatusLabel(row.assignmentStatus),
+        accessorFn: (row) =>
+          getReviewAssignmentStatusLabel(row.assignmentStatus),
         header: ({ column }) => {
           return (
             <div
@@ -157,9 +135,7 @@ export default function MyReviewAssignments() {
         },
         cell: ({ row }) => (
           <div className="flex place-self-center">
-            {getReviewAssignmentStatusBadge(
-              row.original.assignmentStatus,
-            )}
+            {getReviewAssignmentStatusBadge(row.original.assignmentStatus)}
           </div>
         ),
       },
@@ -198,7 +174,7 @@ export default function MyReviewAssignments() {
           return (
             <div className="flex gap-4 place-self-center">
               <Link
-                to={`/submissions/${assignment.submissionId}`}
+                to={`/reviewer/submissions/${assignment.submissionId}`}
                 title="View Submission"
               >
                 <Eye className="size-4 text-foreground hover:text-foreground/80 cursor-pointer" />

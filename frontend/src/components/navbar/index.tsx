@@ -1,12 +1,12 @@
 import { useSelector, useDispatch } from "react-redux";
-import { type RootState } from "@/stores/store";
+import { type RootState, type AppDispatch } from "@/stores/store";
 import {
   NavItem,
   type NavItemConfig,
   canViewNavItem,
 } from "@/components/common/NavItem";
 import { Link, useNavigate } from "react-router-dom";
-import { logout } from "@/stores/authSlice";
+import { handleLogout } from "@/utils/logoutHandler";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -263,11 +263,11 @@ export default function Navbar() {
   const user = useSelector((state: RootState) => state.auth.user);
   const isLoggedIn = user !== null;
   const isAdmin = user?.roles?.includes(UserRole.ADMIN);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const onLogout = async () => {
+    await handleLogout(dispatch);
     navigate("/login", {
       state: { fromLogout: true },
     });
@@ -367,7 +367,7 @@ export default function Navbar() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                  onClick={handleLogout}
+                  onClick={onLogout}
                   variant="destructive"
                   className="cursor-pointer text-orange-700 hover:bg-orange-700! hover:text-white!"
                 >
