@@ -14,7 +14,7 @@ import type {
 export function useSubmissions(params?: GetSubmissionsParams) {
   return useQuery({
     queryKey: ["submissions", params],
-    queryFn: () => submissionService.getSubmissions(),
+    queryFn: () => submissionService.getSubmissions(params),
   });
 }
 

@@ -173,9 +173,13 @@ export interface SubmissionReviewer {
   country?: string;
   assignmentId?: string | number;
   assignmentStatus?: number;
+  assignmentStatusUpdateNotes?: string | null;
   assignedAt?: string;
   assignedByUserId?: string | number;
   assignedByNotes?: string;
+  assignedByEmail?: string;
+  assignedByFirstName?: string;
+  assignedByLastName?: string;
 }
 
 export interface SubmissionReviewersResponse {

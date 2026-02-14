@@ -1,156 +1,112 @@
-# Submissions — Reviews
+# Submissions - Reviews
 
 ## Route
 
-- Route: `/submissions/:id/reviews`
+- Route: `/submissions/:submissionId/reviews`
 - Access:
   - REVIEWER
   - ADMIN
 - Mode:
-  - REVIEWER: View + Create (for submissions of PENDING_APPROVAL or RETURNED status)
-  - ADMIN: View (read-only)
-
----
+  - REVIEWER: View + Create (strictly conditional)
+  - ADMIN: View only
 
 ## Purpose
 
-- Display reviews associated with a submission.
-- Allow REVIEWER to submit a review for a submission.
-- Allow ADMIN to view all reviewer feedback and recommendations.
+- Show review records for a submission.
+- Allow assigned reviewer to submit one review per current submission version.
 
----
+## APIs
 
-## API
+### Fetch Review Assignments (reviewer only)
+
+- `GET /api/v1/review-assignments/search?submissionId=<id>&paginate=false`
+- Used to determine reviewer access and add-review eligibility.
 
 ### Fetch Reviews
 
 - `GET /api/v1/submissions/:id/reviews`
-- Trigger: Page load
-- Sort: Descending by `createdAt` (latest first)
+- Trigger: when page has access
+- UI sorting: descending by `createdAt`
 
-### Create Review (REVIEWER only)
-
-- `POST /api/v1/submissions/:id/reviews`
-- Trigger: Add Review action
-- Request body: As defined in Review API spec
-- Applicable for submissions of PENDING_APPROVAL or RETURNED status
-
-### Create Reviewer Version (conditional)
+### Create Reviewer Version (optional)
 
 - `POST /api/v1/submissions/:id/versions`
-- Trigger: Review submission when reviewer uploads a reviewed file
-- Purpose: Create reviewer version before creating review
+- Called only when reviewer uploads a file.
 
----
+### Create Review
 
-## UI Requirements
+- `POST /api/v1/submissions/:id/reviews`
 
-### Reviews List
+Request body:
 
-- Layout: **table view**
-- Default order: latest review first
+```json
+{
+  "recommendation": 1,
+  "comment": "optional",
+  "reviewerContentSubmissionVersionId": 123
+}
+```
 
----
+## Reviewer Eligibility to Add Review
 
-## Role-Based Behavior
+Add Review button is visible only when all are true:
 
-### REVIEWER
+- Reviewer is non-owner and has assignment for this submission
+- Assignment status is ACCEPTED
+- Submission status is PENDING_APPROVAL or RETURNED
+- Reviewer has not already submitted a review for `submission.currentContentSubmissionVersionId`
 
-#### Reviews List
+Info messages shown when blocked:
 
-- Display only reviews created by the logged-in reviewer.
+- `Review submission is only available for submissions with status Pending Approval or Returned.`
+- `You cannot submit a review unless the assignment status is Accepted.`
+- `You already submitted a review for the current submission version. Add Review will be available after a new version is uploaded.`
 
-**Columns:**
+## Table Columns
 
-- Reviewed Version
-  - File name with downloadable hyperlink
-- Reviewed Version Created At (date/time)
-- Reviewer Version (file link, optional)
-- Reviewer Version Created At (date/time, optional)
-- Reviewer Version Change Log / Notes
-- Recommendation
-- Comments
-
----
-
-#### Add New Review
-
-- Display **“Add Review”** button below the reviews list.
-- Action opens a modal for review submission.
-
-##### Modal Fields
-
-- Submission File (optional)
-  - Single file upload
-  - Accepted types and max size: as enforced by backend
-- Change Log / Notes (optional)
-- Recommendation (required)
-- Comments (optional)
-
-##### Submit Behavior
-
-- If **Submission File** and/or **Change Log / Notes** are provided:
-  1. Call `POST /api/v1/submissions/:id/versions`
-  2. Capture `reviewerContentSubmissionVersionId` from response
-- Then:
-  - Call `POST /api/v1/submissions/:id/reviews`
-  - Include `reviewerContentSubmissionVersionId` if a reviewer version was created
-
-##### Post-Submit Behavior
-
-- On success:
-  - Close modal
-  - Refresh reviews list
-  - Show success message: “Review submitted successfully.”
-- On validation error:
-  - Show field-level errors (if provided by API)
-  - Preserve entered values
-- On error:
-  - Show error message: “Failed to submit review.”
-  - Allow retry
-
----
-
-### ADMIN
-
-#### Reviews List
-
-- Display reviews submitted by all reviewers.
-
-**Columns (minimum; dev may add more from API response):**
+ADMIN columns:
 
 - Reviewer (name + email)
-- Reviewed Version
-  - File name with downloadable hyperlink
-- Reviewed Version Created At (date/time)
-- Reviewer Version (file link, optional)
-- Reviewer Version Created At (date/time, optional)
-- Reviewer Version Change Log / Notes
+- Reviewed Version (download)
+- Reviewer Version (download, optional)
 - Recommendation
-- Comments
+- Actions (open review details modal)
 
-- Reviews are read-only for ADMIN.
+REVIEWER columns:
 
----
+- Reviewed Version (download)
+- Reviewer Version (download, optional)
+- Recommendation
+- Actions (open review details modal)
+
+## Add Review Modal
+
+Fields:
+
+- Recommendation (required)
+- Comments (optional)
+- Submission File (optional)
+- Change Log / Notes (optional)
+
+Validation:
+
+- Recommendation required
+- If Change Log / Notes is provided, reviewer file upload must exist
+
+Behavior:
+
+1. If file uploaded, create reviewer version first and capture `versionId` or `id` from response.
+2. Submit review payload.
+3. Refetch reviewer assignment data.
+4. Show success toast: `Review submitted successfully.`
+
+## Access Outcomes
+
+- USER reaching this page: redirected to `/submissions/:submissionId/details`
+- REVIEWER without assignment: in-page message `You do not have access to view reviews for this submission.`
 
 ## States
 
-- Loading (initial reviews load)
-- Loading (review submission)
-- Empty:
-  - Message: “No reviews available.”
-- Error (API failure)
-- Forbidden:
-  - USER attempting to access Reviews tab
-  - ADMIN attempting to add a review
-
----
-
-## Access Control Rules
-
-- REVIEWER:
-  - Can view and submit reviews only for assigned submissions.
-  - Can see only their own reviews.
-- ADMIN:
-  - Can view all reviews.
-  - Must not see controls to add or edit reviews.
+- Loading: reviews and reviewer assignment queries
+- Empty: `No reviews available.`
+- Error: API error text or fallback `Failed to load submission reviews.`

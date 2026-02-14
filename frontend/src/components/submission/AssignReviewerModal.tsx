@@ -1,10 +1,10 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import type { Submission, SubmissionReviewer } from "@/models/submission";
+import type { ReviewAssignment } from "@/models/reviewAssignment";
 import { UserRole, UserStatus } from "@/models/user";
 import {
   ContentSubmissionStatus,
   ReviewAssignmentStatus,
-  ReviewAssignmentStatusLabel,
 } from "@/models/reviewAssignment";
 import { ConferenceStatus } from "@/models/conference";
 import {
@@ -17,14 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { CheckIcon, ChevronDownIcon, RefreshCw } from "lucide-react";
+import { ReviewAssignmentStatusUpdateModal } from "@/components/reviewAssignment/ReviewAssignmentStatusUpdateModal";
 import { cn } from "@/lib/utils";
 import { DataTable } from "@/components/ui/data-table";
 import { LoadingOverlay } from "@/components/common/LoadingOverlay";
@@ -33,7 +27,6 @@ import { useSubmissionReviewers } from "@/hooks/useSubmissions";
 import { useUsers } from "@/hooks/useUsers";
 import {
   useCreateReviewAssignmentMutation,
-  useUpdateReviewAssignmentStatusMutation,
 } from "@/hooks/useReviewAssignments";
 import { useSuccessToast } from "@/hooks/useSuccessToast";
 import { formatDateTime } from "@/utils/dateFormatter";
@@ -62,8 +55,6 @@ export function AssignReviewerModal({
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedAssignmentRow, setSelectedAssignmentRow] =
     useState<SubmissionReviewer | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const [statusUpdateNotes, setStatusUpdateNotes] = useState<string>("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { showSuccessToast } = useSuccessToast();
@@ -105,7 +96,6 @@ export function AssignReviewerModal({
     });
 
   const createAssignmentMutation = useCreateReviewAssignmentMutation();
-  const updateStatusMutation = useUpdateReviewAssignmentStatusMutation();
 
   const ADMIN_ALLOWED_STATUSES = [
     ReviewAssignmentStatus.ASSIGNED,
@@ -123,8 +113,11 @@ export function AssignReviewerModal({
 
   const availableReviewers = useMemo(() => {
     const allReviewers = allReviewersResponse?.data ?? [];
+    const ownerUserId = selectedSubmission?.ownerUserId;
     let filtered = allReviewers.filter(
-      (reviewer) => !assignedReviewerIds.has(String(reviewer.id)),
+      (reviewer) =>
+        !assignedReviewerIds.has(String(reviewer.id)) &&
+        String(reviewer.id) !== String(ownerUserId),
     );
 
     if (reviewerSearch.trim()) {
@@ -139,7 +132,7 @@ export function AssignReviewerModal({
     }
 
     return filtered;
-  }, [allReviewersResponse, assignedReviewerIds, reviewerSearch]);
+  }, [allReviewersResponse, assignedReviewerIds, reviewerSearch, selectedSubmission]);
 
   const selectedReviewerLabel = useMemo(() => {
     if (!selectedReviewerId) return "";
@@ -180,8 +173,6 @@ export function AssignReviewerModal({
     setIsReviewerDropdownOpen(false);
     setIsStatusModalOpen(false);
     setSelectedAssignmentRow(null);
-    setSelectedStatus("");
-    setStatusUpdateNotes("");
     onClose();
   };
 
@@ -204,41 +195,43 @@ export function AssignReviewerModal({
 
   const handleOpenStatusModal = (reviewer: SubmissionReviewer) => {
     setSelectedAssignmentRow(reviewer);
-    setSelectedStatus("");
-    setStatusUpdateNotes("");
     setIsStatusModalOpen(true);
   };
 
   const handleCloseStatusModal = () => {
-    if (updateStatusMutation.isPending) return;
     setIsStatusModalOpen(false);
     setSelectedAssignmentRow(null);
-    setSelectedStatus("");
-    setStatusUpdateNotes("");
   };
 
-  const handleUpdateAssignmentStatus = () => {
-    if (!selectedAssignmentRow?.assignmentId || !selectedStatus) return;
-
-    updateStatusMutation.mutate(
-      {
-        assignmentId: selectedAssignmentRow.assignmentId,
-        data: {
-          status: Number(selectedStatus),
-          statusUpdateNotes: statusUpdateNotes.trim() || undefined,
-        },
-      },
-      {
-        onSuccess: () => {
-          showSuccessToast("Assignment status updated.");
-          handleCloseStatusModal();
-        },
-        onError: (error) => {
-          console.error("Failed to update assignment status:", error);
-        },
-      },
-    );
-  };
+  const selectedAssignmentForModal = useMemo((): ReviewAssignment | null => {
+    if (!selectedAssignmentRow || !selectedSubmission) return null;
+    return {
+      assignmentId: Number(selectedAssignmentRow.assignmentId),
+      submissionId: Number(submissionId),
+      reviewerUserId: Number(selectedAssignmentRow.id),
+      assignmentStatus: selectedAssignmentRow.assignmentStatus ?? 0,
+      assignmentStatusUpdateNotes: selectedAssignmentRow.assignmentStatusUpdateNotes ?? null,
+      assignedAt: selectedAssignmentRow.assignedAt ?? "",
+      assignedByUserId: Number(selectedAssignmentRow.assignedByUserId),
+      assignedByNotes: selectedAssignmentRow.assignedByNotes ?? null,
+      assignedByEmail: selectedAssignmentRow.assignedByEmail ?? "",
+      assignedByFirstName: selectedAssignmentRow.assignedByFirstName ?? "",
+      assignedByLastName: selectedAssignmentRow.assignedByLastName ?? "",
+      submissionTitle: selectedSubmission.title,
+      conferenceId: Number(selectedSubmission.conferenceId),
+      submissionStatus: selectedSubmission.status ?? 0,
+      submissionCreatedAt: selectedSubmission.createdAt ?? "",
+      submissionUpdatedAt: selectedSubmission.updatedAt ?? "",
+      conferenceTitle: selectedSubmission.conferenceTitle ?? "",
+      conferenceStatus: selectedSubmission.conferenceStatus ?? 0,
+      reviewerEmail: selectedAssignmentRow.email ?? "",
+      reviewerFirstName: selectedAssignmentRow.firstName ?? "",
+      reviewerLastName: selectedAssignmentRow.lastName ?? "",
+      ownerEmail: selectedSubmission.ownerEmail ?? "",
+      ownerFirstName: selectedSubmission.ownerFirstName ?? "",
+      ownerLastName: selectedSubmission.ownerLastName ?? "",
+    };
+  }, [selectedAssignmentRow, selectedSubmission, submissionId]);
 
   const columns: ColumnDef<SubmissionReviewer>[] = [
     {
@@ -306,7 +299,7 @@ export function AssignReviewerModal({
   const isLoading = reviewersLoading || allReviewersLoading;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} size="xl">
+    <Dialog open={open} onOpenChange={onOpenChange} size="2xl">
       <DialogContent onClose={handleClose}>
         <DialogHeader>
           <DialogTitle>Assign Reviewer</DialogTitle>
@@ -461,70 +454,16 @@ export function AssignReviewerModal({
         </DialogFooter>
       </DialogContent>
 
-      <Dialog open={isStatusModalOpen} onOpenChange={setIsStatusModalOpen}>
-        <DialogContent onClose={handleCloseStatusModal}>
-          <DialogHeader>
-            <DialogTitle>Update Assignment Status</DialogTitle>
-          </DialogHeader>
-          <DialogBody>
-            <div className="space-y-4">
-              <div className="flex flex-col space-y-2">
-                <label className="text-sm font-medium">Status *</label>
-                <Select
-                  value={selectedStatus}
-                  onValueChange={setSelectedStatus}
-                  disabled={updateStatusMutation.isPending}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ADMIN_ALLOWED_STATUSES.map((statusValue) => (
-                      <SelectItem key={statusValue} value={String(statusValue)}>
-                        {ReviewAssignmentStatusLabel[statusValue]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="statusUpdateNotes" className="text-sm font-medium">
-                  Status Update Notes
-                </label>
-                <Input
-                  id="statusUpdateNotes"
-                  name="statusUpdateNotes"
-                  type="text"
-                  placeholder="Enter status update notes (optional)"
-                  value={statusUpdateNotes}
-                  onChange={(e) => setStatusUpdateNotes(e.target.value)}
-                  disabled={updateStatusMutation.isPending}
-                />
-              </div>
-            </div>
-          </DialogBody>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleCloseStatusModal}
-              disabled={updateStatusMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleUpdateAssignmentStatus}
-              disabled={
-                updateStatusMutation.isPending ||
-                !selectedStatus ||
-                !canAdminUpdateStatus(selectedAssignmentRow?.assignmentStatus)
-              }
-            >
-              {updateStatusMutation.isPending ? "Saving..." : "Save"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ReviewAssignmentStatusUpdateModal
+        open={isStatusModalOpen}
+        onOpenChange={setIsStatusModalOpen}
+        selectedAssignment={selectedAssignmentForModal}
+        onClose={handleCloseStatusModal}
+        showNotes
+        showSubmissionInfo={false}
+        allowedStatuses={ADMIN_ALLOWED_STATUSES}
+        canUpdateStatus={canAdminUpdateStatus(selectedAssignmentRow?.assignmentStatus)}
+      />
     </Dialog>
   );
 }

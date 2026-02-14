@@ -1,170 +1,109 @@
-# Submissions — Messages
+# Submissions - Messages
 
 ## Route
 
-- Route: `/submissions/:id/messages`
+- Route: `/submissions/:submissionId/messages`
 - Access:
   - USER
   - REVIEWER
   - ADMIN
-- Mode: View + Create (for submissions of PENDING_APPROVAL or RETURNED status)
-
----
+- Mode: View + Create (status and role constrained)
 
 ## Purpose
 
-- Display submission-related messages.
-- Enable role-based communication between:
-  - USER ↔ ADMIN
-  - ADMIN ↔ REVIEWER
-- Maintain a clear, chronological conversation history.
+- Provide role-scoped communication for a submission.
+- Support these scopes:
+  - `USER_ADMIN`
+  - `ADMIN_REVIEWER`
 
----
-
-## API
+## APIs
 
 ### Fetch Messages
 
 - `GET /api/v1/submissions/:id/messages`
-- Trigger: Page load
-- Sort: Descending by `createdAt` (latest first)
+- Trigger: page load
+- UI sorting: ascending by `createdAt`
 
 ### Create Message
 
 - `POST /api/v1/submissions/:id/messages`
-- Trigger: Send message action
-- Request body: As defined in Message API spec
-- Applicable for submissions of PENDING_APPROVAL or RETURNED status
+- Trigger: send message
+- Allowed only when submission status is:
+  - PENDING_APPROVAL
+  - RETURNED
 
 ### Fetch Reviewers (ADMIN only)
 
-- `GET /api/v1/submissions/:id/reviewers`
-- Purpose: Determine valid reviewer recipients
-- Reviewer states to include:
-  - ACCEPTED
-  - COMPLETED
+- `GET /api/v1/submissions/:id/reviewers?paginate=false`
+- Purpose: admin recipient list and assignment metadata
 
----
+### Fetch Reviewer Assignment (reviewer non-owner)
 
-## UI Requirements
+- `GET /api/v1/review-assignments/search?submissionId=<id>&paginate=false`
+- Purpose: verify reviewer accepted assignment before enabling send
 
-### Messages List
-
-- Display messages ordered by:
-  - `createdAt` descending
-- Each message displays:
-  - Sender name
-  - Sender email
-  - Timestamp
-  - Message content
-  - Sender badge (role-based)
-
-### Sender / Receiver Badges
-
-- If `sender.id === loggedInUserId`:
-  - Show badge: **You**
-- Else:
-  - Show badge: `<Sender Name> (<Sender Email>)`
-
----
-
-## Role-Based Behavior
+## Role Behavior
 
 ### USER
 
-- Can view messages related to own submission.
-- Can send new messages to ADMIN.
+- Sees single thread with admin.
+- Send payload:
 
-**New Message**
+```json
+{
+  "message": "<text>",
+  "scope": "USER_ADMIN"
+}
+```
 
-- Input: Single text area below message list
-- On Send:
-  - Call `POST /api/v1/submissions/:id/messages`
-  - Payload:
-    - `scope = USER_ADMIN`
+### REVIEWER (non-owner)
 
----
+- Sees single thread with admin.
+- Send is disabled unless reviewer assignment status is ACCEPTED.
+- Send payload:
 
-### REVIEWER
-
-- Can view messages related to assigned submissions.
-- Can send new messages to ADMIN.
-
-**New Message**
-
-- Input: Single text area below message list
-- On Send:
-  - Call `POST /api/v1/submissions/:id/messages`
-  - Payload:
-    - `scope = USER_ADMIN`
-
----
+```json
+{
+  "message": "<text>",
+  "scope": "ADMIN_REVIEWER"
+}
+```
 
 ### ADMIN
 
-- Can view all messages for the submission.
-- Can communicate individually with:
-  - Submission owner (USER)
-  - REVIEWERs with status **ACCEPTED** or **COMPLETED**
+- Sees conversation list (submission owner + reviewers inferred from API/messages).
+- For owner thread, send payload:
 
----
+```json
+{
+  "message": "<text>",
+  "scope": "USER_ADMIN",
+  "receiverUsrId": "<ownerUserId>"
+}
+```
 
-#### Message Groups (Per Recipient)
+- For reviewer thread, send payload:
 
-- Display separate message groups (cards/sections) for each recipient:
-  - One group for the submission owner (scope = USER_ADMIN)
-  - One group per REVIEWER with status:
-    - ACCEPTED
-    - COMPLETED
+```json
+{
+  "message": "<text>",
+  "scope": "ADMIN_REVIEWER",
+  "receiverUsrId": "<reviewerUserId>"
+}
+```
 
-> REVIEWERs with status other than ACCEPTED or COMPLETED must not be shown.
+- Sending to a reviewer is disabled unless that reviewer assignment status is ACCEPTED.
 
-- Each group displays:
-  - Recipient name and email
-  - Messages exchanged with that recipient
-  - Messages ordered by `createdAt` (descending)
+## Send Blocking Messages
 
----
-
-#### New Message (Per Group)
-
-- Each message group contains:
-  - A text area below the message list
-  - A Send action specific to that recipient
-
-- On Send:
-  - Call `POST /api/v1/submissions/:id/messages`
-  - Payload:
-    - When sending to USER:
-      - `scope = USER_ADMIN`
-      - `receiverUsrId = <userId>`
-    - When sending to REVIEWER:
-      - `scope = ADMIN_REVIEWER`
-      - `receiverUsrId = <reviewerId>`
-
-- After successful send:
-  - Clear the text area for that group
-  - Append the new message to the message list
-
----
+- Submission status not eligible:
+  - `Message creation is only available for submissions with status Pending Approval or Returned.`
+- Reviewer assignment not accepted:
+  - `You cannot send new messages unless the assignment status is Accepted.`
 
 ## States
 
-- Loading (initial message load)
-- Loading (send message)
-- Empty:
-  - Message: “No messages yet.”
-- Error (API failure)
-- Forbidden (user not allowed to access messages)
-- Message Text Box preserves input on error and clears on success.
-
----
-
-## Access Control Rules
-
-- USER:
-  - Can access messages only for own submissions.
-- REVIEWER:
-  - Can access messages only for assigned submissions.
-- ADMIN:
-  - Can access messages for all submissions.
+- Loading: messages/reviewers/assignments query in progress
+- Empty thread: `No messages yet.`
+- Admin with no selected conversation: `Select a conversation to view messages`
+- Error on send: render mutation error text in message thread

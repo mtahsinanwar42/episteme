@@ -124,12 +124,18 @@ export async function findSubmissionReviewersById({
       U.country           AS "country",
       CRA.id              AS "assignmentId",
       CRA.status          AS "assignmentStatus",
+      CRA.status_update_notes AS "assignmentStatusUpdateNotes",
       CRA.assigned_at     AS "assignedAt",
       CRA.assigned_by_usr_id AS "assignedByUserId",
-      CRA.assigned_by_notes  AS "assignedByNotes"
+      CRA.assigned_by_notes  AS "assignedByNotes",
+      AB.email            AS "assignedByEmail",
+      AB.first_name       AS "assignedByFirstName",
+      AB.last_name        AS "assignedByLastName"
     FROM episteme.content_review_assignment CRA
     JOIN episteme.user U
       ON U.id = CRA.reviewer_usr_id
+    LEFT JOIN episteme.user AB
+      ON AB.id = CRA.assigned_by_usr_id
     WHERE
       CRA.content_submission_id = :submissionId
       AND CRA.status <> :deletedAssignmentStatus

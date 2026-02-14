@@ -56,15 +56,13 @@ export default function Submissions() {
     page,
     limit: pageSize,
     sort: "-createdAt",
-    paginate: true,
   });
 
   const submissions = response?.data || [];
   const total = response?.total || 0;
 
   const currentPage = page;
-  const currentLimit = response?.pagination?.next?.limit || pageSize;
-  const totalPages = Math.ceil(total / currentLimit);
+  const totalPages = Math.ceil(total / pageSize);
 
   const handlePageChange = useCallback((newPage: number) => {
     setPage(newPage);
@@ -245,7 +243,7 @@ export default function Submissions() {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            pageSize={currentLimit}
+            pageSize={pageSize}
             totalItems={total}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}

@@ -1,6 +1,6 @@
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
-import { REVIEW_ASSIGNMENT_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, USER_ROLE } from "../utils/constants.js";
+import { REVIEW_ASSIGNMENT_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, USER_ROLE, CONFERENCE_STATUS } from "../utils/constants.js";
 
 const GET_REVIEW_ASSIGNMENTS_BASE_SELECT = `
   SELECT
@@ -250,6 +250,7 @@ export async function canCreateReviewAssignment({
         WHERE CS.id = :contentSubmissionId
         AND CS.current_status IN (:allowedSubmissionStatus)
         AND CSP.status = :capturedPaymentStatus
+        AND CS.owner_usr_id != :reviewerUsrId
       ) AS "submissionExists",
       EXISTS (
         SELECT 1
@@ -282,9 +283,12 @@ export async function canUpdateReviewAssignmentStatus({
         FROM episteme.content_submission CS
         LEFT JOIN episteme.content_submission_payment CSP
           ON CSP.content_submission_id = CS.id
+        JOIN episteme.conference C
+          ON C.id = CS.conference_id
         WHERE CS.id = :contentSubmissionId
         AND CS.current_status IN (:allowedSubmissionStatus)
         AND CSP.status = :capturedPaymentStatus
+        AND C.status = :activeConferenceStatus
       ) AS "submissionExists";
   `;
 
@@ -294,6 +298,7 @@ export async function canUpdateReviewAssignmentStatus({
       contentSubmissionId: Number(contentSubmissionId),
       allowedSubmissionStatus: [CONTENT_SUBMISSION_STATUS.PENDING_APPROVAL, CONTENT_SUBMISSION_STATUS.RETURNED],
       capturedPaymentStatus: CONTENT_SUBMISSION_PAYMENT_STATUS.CAPTURED,
+      activeConferenceStatus: CONFERENCE_STATUS.ACTIVE,
     },
   });
 

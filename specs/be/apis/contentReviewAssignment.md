@@ -2,95 +2,75 @@
 
 Base Path: **/api/v1/review-assignments**
 
----
+## Assignment Status Enums
+
+- `1` ASSIGNED
+- `2` ACCEPTED
+- `3` DECLINED
+- `4` COMPLETED
+- `5` CANCELLED
+- `9` DELETED
 
 ## 1. Get All Review Assignments
 
 **GET /**
 Access: ADMIN
 
-### Request Params
+Query params:
 
-Optional:
-
-- limit _(default to 10)_
-- page _(default to 1)_
-
-Example:
-
-```perl
-/api/v1/review-assignments?page=2&limit=10
-```
+- `page` (default `1`)
+- `limit` (default `10`)
 
 ## 2. Get My Review Assignments
 
 **GET /me**
 Access: REVIEWER
 
-### Request Params
+Query params:
 
-Optional:
-
-- limit _(default to 10)_
-- page _(default to 1)_
-
-Example:
-
-```perl
-/api/v1/review-assignments/me?page=2&limit=10
-```
+- `page` (default `1`)
+- `limit` (default `10`)
 
 ## 3. Search Review Assignments
 
 **GET /search**
-Access: REVIEWER/ADMIN
+Access: REVIEWER, ADMIN
 
-### Request Params
+Query params:
 
-Optional:
+- `page` (default `1`)
+- `limit` (default `10`)
+- `paginate` (`true` by default; pass `false|0|no` to disable)
+- `submissionId` (integer)
+- `submissionTitle` (text)
+- `submissionStatuses` (integer[])
+- `submissionOwnerUsrIds` (integer[], ADMIN only)
+- `conferenceId` (integer)
+- `reviewerUsrIds` (integer[], ADMIN only)
+- `assignmentStatuses` (integer[])
+- `assignedByUsrIds` (integer[])
+- `assignedDateFrom` (`YYYY-MM-DD`)
+- `assignedDateTo` (`YYYY-MM-DD`)
 
-- page _(default to 1)_
-- limit _(default to 10)_
-- submissionTitle (text)
-- submissionStatuses (integer[])
-- submissionOwnerUsrIds (integer[]), ADMIN only
-- conferenceId (integer)
-- reviewerUsrIds (integer[]), ADMIN only
-- assignmentStatuses (integer[])
-- assignedByUsrIds (integer[])
-- assignedDateFrom (date in YYYY-MM-DD)
-- assignedDateTo (date in YYYY-MM-DD)
+Rules:
 
-Notes:
-
-- `submissionStatuses` values are validated against `CONTENT_SUBMISSION_STATUS`.
-- `assignmentStatuses` values are validated against `REVIEW_ASSIGNMENT_STATUS`.
-- REVIEWER cannot pass `DELETED` for `submissionStatuses` or `assignmentStatuses`.
-- REVIEWER is always filtered by logged-in reviewer user id.
-- REVIEWER always excludes deleted assignments and deleted submissions.
-- `submissionOwnerUsrIds`, `reviewerUsrIds` use `IN (...)` matching in SQL.
-
-Example:
-
-```perl
-/api/v1/review-assignments/search?page=1&limit=10&submissionTitle=graph&submissionStatuses=1,2&assignmentStatuses=1,2&conferenceId=5&assignedByUsrIds=3,5&assignedDateFrom=2026-06-01&assignedDateTo=2026-06-30
-```
+- `submissionStatuses` validated against content submission statuses.
+- `assignmentStatuses` validated against review assignment statuses.
+- REVIEWER cannot pass DELETED statuses.
+- REVIEWER cannot use `submissionOwnerUsrIds`, `reviewerUsrIds`, or `assignedByUsrIds`.
+- REVIEWER results exclude deleted assignments and deleted submissions.
+- `assignedDateFrom` must be `<= assignedDateTo`.
 
 ## 4. Save Review Assignment
 
-**POST /review-assignments**
+**POST /**
 Access: ADMIN
 
-### Request Body
+Request body:
 
-Required:
-
-- contentSubmissionId (integer)
-- reviewerUsrId (integer)
-
-Optional:
-
-- assignedByNotes (string)
+- `contentSubmissionId` (required integer)
+- `reviewerUsrId` (required integer)
+- `assignedByNotes` (optional string)
 
 Example:
 
@@ -102,27 +82,25 @@ Example:
 }
 ```
 
+Rules:
+
+- Submission must exist, be eligible, and not owned by selected reviewer.
+- Reviewer must exist and have REVIEWER role.
+- Duplicate assignment pair is rejected.
+
 ## 5. Update Review Assignment Status
 
-**PUT /:id/status**  
-Access: ADMIN / REVIEWER
-Notes: Cannot update CANCELLED/DELETED assignment.
+**PUT /:id/status**
+Access: ADMIN, REVIEWER
 
-### Request Body
+Request body:
 
-Required:
+- `status` (required integer)
+- `statusUpdateNotes` (optional; persisted for ADMIN updates)
 
-- status (integer)
+Rules:
 
-Optional:
-
-- statusUpdateNotes (text), shown for ADMIN only
-
-Example:
-
-```json
-{
-  "status": 1,
-  "statusUpdateNotes": "Accepted" // ADMIN only
-}
-```
+- ADMIN can set: ASSIGNED, CANCELLED, DELETED.
+- REVIEWER can set: ACCEPTED, DECLINED.
+- Cannot update assignment already CANCELLED or DELETED.
+- Submission must be in PENDING_APPROVAL/RETURNED and conference ACTIVE.

@@ -20,7 +20,7 @@ router
 
 router
   .route('/:id')
-  .get(getSubmission);
+  .get(authorize(USER_ROLE.USER, USER_ROLE.ADMIN, USER_ROLE.REVIEWER), getSubmission);
 
 router
   .route('/:id/status')
@@ -32,13 +32,13 @@ router
 
 router
   .route('/:id/versions')
-  .get(getSubmissionVersions)
-  .post(saveSubmissionVersion);
+  .get(authorize(USER_ROLE.USER, USER_ROLE.ADMIN, USER_ROLE.REVIEWER), getSubmissionVersions)
+  .post(authorize(USER_ROLE.USER, USER_ROLE.ADMIN, USER_ROLE.REVIEWER), saveSubmissionVersion);
 
 router
   .route('/:id/messages')
-  .get(getSubmissionMessages)
-  .post(saveSubmissionMessage);
+  .get(authorize(USER_ROLE.USER, USER_ROLE.ADMIN, USER_ROLE.REVIEWER), getSubmissionMessages)
+  .post(authorize(USER_ROLE.USER, USER_ROLE.ADMIN, USER_ROLE.REVIEWER), saveSubmissionMessage);
 
 router
   .route('/:id/reviews')

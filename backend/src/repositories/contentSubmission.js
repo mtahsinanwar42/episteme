@@ -120,11 +120,13 @@ export async function findSubmissionsBySearchFilters({
 
   if (!isAdmin) {
     where.push(`CS.owner_usr_id = :loggedInUserId`);
-  }
+  } else {
+    where.push(`CS.owner_usr_id <> :loggedInUserId`);
 
-  if (ownerUsrIds != null) {
-    where.push(`CS.owner_usr_id IN (:ownerUsrIds)`);
-    replacements.ownerUsrIds = ownerUsrIds;
+    if (ownerUsrIds != null) {
+      where.push(`CS.owner_usr_id IN (:ownerUsrIds)`);
+      replacements.ownerUsrIds = ownerUsrIds;
+    }
   }
 
   if (excludeDeleted) {

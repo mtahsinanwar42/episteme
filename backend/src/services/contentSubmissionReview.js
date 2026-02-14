@@ -112,7 +112,7 @@ export function createSubmissionReviewService({ ContentReview, ContentSubmission
 
     const submission = await ContentSubmission.findByPk(submissionId);
     const submissionTitle = submission.title;
-    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submissionId}`;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submissionId}/reviews`;
 
     emailPublisher.publishSubmissionReviewCreateEmail(admins, {
       reviewer: user,

@@ -171,7 +171,7 @@ export function createSubmissionVersionService({ ContentSubmissionVersion, Conte
 
     const submission = await ContentSubmission.findByPk(submissionId);
     const submissionTitle = submission.title;
-    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submissionId}`;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submissionId}/versions`;
 
     emailPublisher.publishSubmissionVersionCreateEmail(receivers, {
       uploader: user,

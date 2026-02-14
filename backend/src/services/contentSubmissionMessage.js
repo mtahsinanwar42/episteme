@@ -64,6 +64,8 @@ export function createSubmissionMessageService({ ContentSubmissionMessage, Conte
       contentSubmissionMsg = await saveSubmissionMessageForReviewer({ user, submissionId, payload, checks });
     } else if (isAdmin) {
       contentSubmissionMsg = await saveSubmissionMessageForAdmin({ user, submissionId, payload, checks });
+    } else {
+      throw new ErrorResponse(403, "Not authorized to message on this submission");
     }
 
     await publishSubmissionMsgCreateMail(user, { contentSubmissionMsg, });
@@ -156,7 +158,7 @@ export function createSubmissionMessageService({ ContentSubmissionMessage, Conte
 
     const submission = await ContentSubmission.findByPk(submissionId);
     const submissionTitle = submission.title;
-    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submissionId}`;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submissionId}/messages`;
 
     emailPublisher.publishSubmissionMsgCreateMail(receivers, {
       sender: user,

@@ -1,136 +1,125 @@
-# Submissions — Detail
+# Submissions - Detail Container
 
 ## Route
 
-- Path: `/submissions/:id`
+- Path: `/submissions/:submissionId`
+- Redirect: index route redirects to `/submissions/:submissionId/details`
 - Access:
   - USER
   - REVIEWER
   - ADMIN
-- Mode: View + partial update (status/statusUpdateNotes for ADMIN)
-
----
 
 ## Purpose
 
-- Display detailed information about a submission.
-- Provide access to related sections in Tabs: Versions, Messages, Reviews.
-- Allow ADMIN to update submission status and statusUpdateNotes for DRAFT, PENDING_APPROVAL and RETURNED submissions.
-- Allow role-based interaction with submission-related data.
+- Render shared submission context (header + metadata + left navigation).
+- Provide nested subpages:
+  - Details
+  - Messages
+  - Versions
+  - Reviews
+- Host modal actions:
+  - Status Update (ADMIN)
+  - DOI Update (ADMIN)
+  - Assign Reviewer (ADMIN)
+  - Review Assignment Status Update (REVIEWER view)
 
----
+## Navigation Model
 
-## API
+Sidebar links:
+
+- Details: `/submissions/:submissionId/details`
+- Messages: `/submissions/:submissionId/messages`
+- Versions: `/submissions/:submissionId/versions`
+- Reviews: `/submissions/:submissionId/reviews` (conditionally shown)
+
+Reviews link visibility:
+
+- ADMIN: always visible
+- REVIEWER (non-owner): visible only when reviewer has an assignment for this submission
+
+## Shared Data Fetch
 
 ### Fetch Submission Details
 
 - `GET /api/v1/submissions/:id`
-- Trigger: Page load
-- Purpose: Fetch submission metadata and current state
+- Trigger: initial page load
 
-### Status Update (ADMIN only)
+### Fetch Reviewer Assignment (reviewer non-owner only)
 
-- `PUT /api/v1/submissions/:id/status`
-- Trigger: Status update action (maybe a modal)
-- Request body: As defined in Submission API spec
+- `GET /api/v1/review-assignments/search?submissionId=<id>&paginate=false`
+- Purpose:
+  - Determine Reviews tab visibility for reviewer
+  - Populate assignment status badge and details modal
 
----
+## Header Actions
 
-## Page Structure
+Header shows submission title, submission status badge, conference link+badge, topics, abstract.
 
-### Section 1: Submission Metadata
+Action menu appears only for ADMIN and submission status in:
 
-Display submission-level information in a read-only format (unless specified).
+- PENDING_APPROVAL
+- RETURNED
+- APPROVED
 
-**Fields**
+Menu items:
 
-- Title (text)
-- Topics (text, derived from string[])
-- Conference (text)
-- Status (badge)
-- Status Update Notes (field shown if not null)
-- Owner (name & email — ADMIN only)
-- Created At (date/time)
-- Updated At (date/time)
+- Update Status: only when status is DRAFT/PENDING_APPROVAL/RETURNED (effective in UI: PENDING_APPROVAL or RETURNED)
+- Update DOI: only when status is APPROVED
+- Assign Reviewer: only when status is PENDING_APPROVAL or RETURNED
 
-**Actions**
+### Status Update Modal (ADMIN)
 
-- Status Update (ADMIN only). Shown for submissions of DRAFT, PENDING_APPROVAL or RETURNED status
-  - Opens status update control (inline or modal)
-  - Triggers submission status update API
-- DOI Update (ADMIN only). Shown for submissions of APPROVED status.
-  - Opens DOI update control (inline/modal)
-  - Triggers submission DOI update API
+- API: `PUT /api/v1/submissions/:id/status`
+- Editable fields:
+  - `status` (required)
+  - `statusUpdateNotes` (optional)
+- Available target statuses in UI:
+  - PENDING_APPROVAL
+  - RETURNED
+  - APPROVED
+  - REJECTED
+  - DELETED
+- Success toast: `Submission status updated successfully.`
 
----
+### Assign Reviewer Modal (ADMIN)
 
-### Section 2: Submission Details (Tabbed View)
+- APIs:
+  - `GET /api/v1/submissions/:id/reviewers?paginate=false` (existing assignees)
+  - `GET /api/v1/users?roles=REVIEWER&status=ACTIVE&paginate=false` (candidate reviewers)
+  - `POST /api/v1/review-assignments` (new assignment)
+- Reviewer selection excludes:
+  - Already assigned reviewers
+  - Submission owner
+- Optional `assignedByNotes` is included in create payload.
+- Success toast: `Reviewer assigned successfully.`
 
-Provide a tabbed interface below the metadata section.
+## Details Subpage
 
-**Tabs**
+Path: `/submissions/:submissionId/details`
 
-- Versions (USER / REVIEWER / ADMIN)
-- Messages (USER / REVIEWER / ADMIN)
-- Reviews (REVIEWER/ADMIN)
+Displays:
 
-> Tabs must be shown/hidden based on user role.
+- DOI (if present)
+- Submission status badge
+- Status update notes (if present)
+- Payment status (ADMIN only)
+- Created/Updated timestamps
+- Owner information card (ADMIN only)
 
----
-
-## Tab Behavior (High-Level)
-
-### Versions Tab
-
-- Displays submission versions.
-- Supports uploading a new version.
-- New version upload may be handled via modal.
-- Detailed behavior defined in: `versions.md`
-
-### Messages Tab
-
-- Displays submission-related messages.
-- Supports adding new messages.
-- Detailed behavior defined in: `messages.md`
-
-### Reviews Tab
-
-- Visible to REVIEWER/ADMIN.
-- Displays reviews and recommendations.
-- Supports adding a new review.
-- Detailed behavior defined in: `reviews.md`
-
----
-
-## Navigation & Deep Linking
-
-- Direct navigation to `/submissions/:id` must load:
-  - Submission metadata
-  - Default active tab (Versions)
-- Tab selection will update URL
-- Switching tabs does not reload the entire page.
-
----
-
-## Access Control Rules
+## Access Summary
 
 - USER:
-  - Can view submission details for own submissions only.
-  - Cannot update submission status.
+  - Can open own submissions.
+  - Does not get admin actions.
 - REVIEWER:
-  - Can view submission details for assigned submissions only.
-  - Can access Versions, Messages, and Reviews tabs.
+  - Can open assigned submissions.
+  - Sees assignment badge + assignment details modal.
 - ADMIN:
-  - Can view all submissions.
-  - Can update submission status _(for PENDING_APPROVAL or RETURNED submissions)_.
-  - Can update DOI _(for APPROVED submissions)_
-  - Can view owner information.
-
----
+  - Can open non-owned submissions.
+  - Can access status/DOI/reviewer assignment actions by status rules.
 
 ## States
 
-- Loading (initial page load)
-- Loading (status update action)
-- Error (submission not found or API failure)
-- Forbidden (user does not have access to this submission)
+- Loading: full page overlay while submission is being fetched
+- Error: error panel with API message
+- Not Found: redirects to `/404-not-found` when payload is empty
