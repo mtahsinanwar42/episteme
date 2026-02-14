@@ -2,20 +2,32 @@
 
 Base Path: **/api/v1/submissions/:id/reviewers**
 
----
-
 ## 1. Get Submission Reviewers
 
 **GET /**
 Access: ADMIN
 
-### Path Variable
+Path params:
 
-Required:
+- `id` (submission id)
 
-- id
+Query params:
 
-### Request Params
+- `page` (default `1`)
+- `limit` (default `10`)
+- `paginate` (`true` by default; pass `false|0|no` to disable)
 
-- page _(default to 1)_
-- limit _(default to 10)_
+Response:
+
+- Always: `success`, `total`, `data[]`
+- When paginated: includes `page`, `limit`
+
+Row shape (`data[]`):
+
+- Reviewer identity: `id`, `email`, `firstName`, `lastName`, `phone`, `roles`, `status`, `institution`, `occupation`, `country`
+- Assignment info: `assignmentId`, `assignmentStatus`, `assignmentStatusUpdateNotes`, `assignedAt`, `assignedByUserId`, `assignedByNotes`
+- Assigner identity: `assignedByEmail`, `assignedByFirstName`, `assignedByLastName`
+
+Notes:
+
+- Excludes assignments in DELETED status.

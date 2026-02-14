@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { Navigate, useOutletContext } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -139,8 +139,13 @@ export default function SubmissionReviews() {
     !isAdmin && isReviewerNonOwner && hasReviewForCurrentSubmissionVersion
       ? "You already submitted a review for the current submission version. Add Review will be available after a new version is uploaded."
       : null;
+  const statusNotAllowedInfoMessage =
+    !isAdmin && isReviewerNonOwner && !isAllowedStatus
+      ? "Review submission is only available for submissions with status Pending Approval or Returned."
+      : null;
   const reviewerNotAcceptedInfoMessage =
     !reviewerAlreadyReviewedInfoMessage &&
+    !statusNotAllowedInfoMessage &&
     !isAdmin &&
     isReviewerNonOwner &&
     hasReviewerAssignment &&
@@ -395,13 +400,7 @@ export default function SubmissionReviews() {
   }, [handleDownload, isAdmin, renderReviewer]);
 
   if (!isAdmin && !isReviewerNonOwner) {
-    return (
-      <div className="rounded-lg border border-border p-6">
-        <p className="text-sm text-muted-foreground">
-          You do not have access to view reviews.
-        </p>
-      </div>
-    );
+    return <Navigate to={`/submissions/${submissionId}/details`} replace />;
   }
   if (!isAdmin && isReviewerNonOwner && !assignmentsLoading && !hasReviewerAssignment) {
     return (
@@ -419,10 +418,10 @@ export default function SubmissionReviews() {
         <h3 className="font-semibold">Reviews</h3>
       </div>
 
-      {(reviewerAlreadyReviewedInfoMessage || reviewerNotAcceptedInfoMessage) && (
+      {(statusNotAllowedInfoMessage || reviewerAlreadyReviewedInfoMessage || reviewerNotAcceptedInfoMessage) && (
         <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-950/50 border-b border-blue-800/50 text-blue-300 text-xs">
           <Info className="w-3.5 h-3.5 shrink-0" />
-          <span>{reviewerAlreadyReviewedInfoMessage || reviewerNotAcceptedInfoMessage}</span>
+          <span>{statusNotAllowedInfoMessage || reviewerAlreadyReviewedInfoMessage || reviewerNotAcceptedInfoMessage}</span>
         </div>
       )}
 

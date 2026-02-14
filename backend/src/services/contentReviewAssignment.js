@@ -189,6 +189,14 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       throw new ErrorResponse(400, "Cannot update cancelled/deleted review assignment.");
     }
 
+    if (!isAdmin && ![
+      REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
+      REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
+      REVIEW_ASSIGNMENT_STATUS.DECLINED,
+    ].includes(assignment.status)) {
+      throw new ErrorResponse(400, "Cannot update review assignment from current status.");
+    }
+
     const { submissionExists } = await canUpdateReviewAssignmentStatus({
       contentSubmissionId: assignment.contentSubmissionId,
     });
@@ -223,7 +231,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
 
     const submission = await ContentSubmission.findByPk(contentSubmissionId);
     const submissionTitle = submission.title;
-    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${contentSubmissionId}`;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${contentSubmissionId}/details`;
 
     const assignedBy = {
       firstName: user.firstName,
@@ -249,7 +257,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
 
     const submission = await ContentSubmission.findByPk(contentSubmissionId);
     const submissionTitle = submission.title;
-    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${contentSubmissionId}`;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${contentSubmissionId}/details`;
 
     emailPublisher.publishReviewAssignmentUpdateStatusByAdminEmail(reviewer, {
       oldStatus,
@@ -273,7 +281,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
 
     const submission = await ContentSubmission.findByPk(contentSubmissionId);
     const submissionTitle = submission.title;
-    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${contentSubmissionId}`;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${contentSubmissionId}/details`;
 
     emailPublisher.publishReviewAssignmentUpdateStatusByReviewerEmail(admins, {
       oldStatus,

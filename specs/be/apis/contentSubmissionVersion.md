@@ -2,40 +2,55 @@
 
 Base Path: **/api/v1/submissions/:id/versions**
 
----
-
 ## 1. Get Submission Versions
 
 **GET /**
-Access: USER/REVIEWER/ADMIN
+Access: USER, REVIEWER, ADMIN
 
-### Path Variable
+Path params:
 
-Required:
+- `id` (submission id)
 
-- id
+Response:
+
+- `success`
+- `data[]` where each row includes:
+  - `versionId`, `versionNo`, `createdAt`, `changeLog`
+  - `uploader` object (`id`, `email`, `firstName`, `lastName`, `userType`)
+  - `file` object (`id`, `name`, `storageKey`) when present
+
+Notes:
+
+- List endpoint returns versions uploaded by USER/ADMIN.
+- REVIEWER upload versions are not returned by this listing query.
 
 ## 2. Save Submission Version
 
 **POST /**
-Access: USER/ADMIN/REVIEWER
-Notes: Can save PENDING_APPROVAL/RETURNED submission versions.
+Access: USER, ADMIN, REVIEWER
 
-### Request Body:
+Request body:
 
-Required:
-
-- contentFilePath (string)
-
-Optional:
-
-- message (string)
+- `contentFilePath` (required string)
+- `message` (optional string)
 
 Example:
 
 ```json
 {
-  "contentFilePath": "storage/private/submissions/paper1_b32e94f6_20260119T003737_499.docx",
-  "message": "hello, I've done the changes accordingly!"
+  "contentFilePath": "storage/private/submissions/paper1.docx",
+  "message": "Addressed reviewer notes"
 }
 ```
+
+Rules:
+
+- Submission must exist and be in PENDING_APPROVAL or RETURNED.
+- USER can upload only for owned submission.
+- REVIEWER can upload only when assignment status is ACCEPTED.
+- ADMIN can upload for accessible submission.
+
+Side effects:
+
+- USER upload updates submission current version and sets status to PENDING_APPROVAL.
+- ADMIN upload sets submission status to RETURNED.

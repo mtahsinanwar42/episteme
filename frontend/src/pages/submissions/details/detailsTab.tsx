@@ -1,7 +1,8 @@
-import { useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import {
   Calendar,
   CreditCard,
+  ExternalLink,
   FileCheck,
   ShieldCheck,
   FileText,
@@ -109,7 +110,20 @@ export default function SubmissionDetailsTab() {
             <div className="grid grid-cols-3 gap-4">
               <p className="text-sm text-muted-foreground">Name</p>
               <p className="font-medium col-span-2">
-                {submission.ownerFirstName} {submission.ownerLastName}
+                {submission.ownerUserId ? (
+                  <Link
+                    to={`/users/${submission.ownerUserId}`}
+                    target="_blank"
+                    className="inline-flex items-center gap-1 text-accent hover:text-accent/80 underline transition-colors"
+                  >
+                    {submission.ownerFirstName} {submission.ownerLastName}
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                ) : (
+                  <>
+                    {submission.ownerFirstName} {submission.ownerLastName}
+                  </>
+                )}
               </p>
             </div>
             {submission.ownerEmail && (

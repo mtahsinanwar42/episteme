@@ -1,145 +1,85 @@
 # Frontend Routing
 
-## Public Routes
+## Core Public Routes
 
-### Homepage
-
-- `/` _(redirects to /homepage)_
-- `/homepage`
-
-### About
-
-- `/about/mission`
-- `/about/ethics`
-- `/about/sustainability`
-- `/about/executive`
-- `/about/policies`
-- `/about/career`
-- `/about/contact`
-
-### Auth
-
+- `/`
 - `/login`
 - `/register`
 - `/forgot-password`
-- `/reset-password/:resetToken` _(token comes from email link)_
-
-### Public Content
-
+- `/reset-password/:resetToken`
+- `/about/mission` (feature-flagged)
+- `/about/ethics` (feature-flagged)
+- `/about/sustainability` (feature-flagged)
+- `/about/executive` (feature-flagged)
+- `/about/policies` (feature-flagged)
+- `/about/career` (feature-flagged)
+- `/about/contact` (feature-flagged)
 - `/activities`
-- `/activities/:id` _(View public; ADMIN can update fields inline)_
-
+- `/activities/search`
+- `/activities/:activityId`
 - `/announcements`
-- `/announcements/:id` _(View public; ADMIN can update fields inline)_
-
-- `/trainings`
-- `/trainings/:id` _(View public; ADMIN can update fields inline)_
-
+- `/announcements/search`
+- `/announcements/:announcementId`
 - `/blogs`
-- `/blogs/:id` _(View public; ADMIN can update fields inline)_
-
+- `/blogs/search`
+- `/blogs/:blogId`
+- `/trainings`
+- `/trainings/search`
+- `/trainings/:trainingId`
 - `/conferences`
-- `/conferences/:id`
-  - _(Publications section visible when conference is eligible for published output (e.g., ended/finished).)_
-  - _(ADMIN can update conference fields inline.)_
+- `/conferences/search`
+- `/conferences/:conferenceId`
 
----
+## Authenticated Profile Routes
 
-## Authenticated Routes (USER / REVIEWER / ADMIN)
+- `/profile`
+- `/profile/update-password`
 
-- `/me` _(View + Update inline)_
-- `/me/change-password`
+## Submission Routes
 
-- `/submissions/:id`
-- `/submissions/:id/versions`
-- `/submissions/:id/messages`
+- `/submissions` (USER, ADMIN)
+- `/submissions/new` (USER)
+- `/submissions/search` (USER, ADMIN)
+- `/submissions/:submissionId` (USER, REVIEWER, ADMIN)
+- `/submissions/:submissionId/details` (USER, REVIEWER, ADMIN)
+- `/submissions/:submissionId/messages` (USER, REVIEWER, ADMIN)
+- `/submissions/:submissionId/versions` (USER, REVIEWER, ADMIN)
+- `/submissions/:submissionId/reviews` (REVIEWER, ADMIN)
 
----
+Notes:
 
-## Role-Based Routes
+- `/submissions/:submissionId` redirects to `/submissions/:submissionId/details`.
+- Status Update, Assign Reviewer, DOI Update, Add Version, and Add Review are modal actions from detail subpages, not standalone routes.
 
-### ADMIN
+## Review Assignment Routes
 
-#### Files
+- `/review-assignments` (ADMIN)
+- `/review-assignments/search` (ADMIN, REVIEWER)
+- `/review-assignments/me` (REVIEWER)
 
-- `/files`
-- `/files/new`
-- `/files/:id` _(metadata view; download action available)_
-
-#### Content Management
-
-- `/activities/new`
-- `/blogs/new`
-- `/trainings/new`
-- `/announcements/new`
-
-#### Conferences
-
-- `/conferences/new`
-
-#### Users
+## Admin Management Routes
 
 - `/users`
 - `/users/new`
-- `/users/:id` _(View+Update inline)_
+- `/users/search`
+- `/users/:userId`
+- `/assets`
+- `/assets/new`
+- `/assets/search`
+- `/assets/:fileId`
+- `/activities/new`
+- `/activities/edit/:activityId`
+- `/trainings/new`
+- `/trainings/edit/:trainingId`
+- `/announcements/new`
+- `/announcements/edit/:announcementId`
+- `/blogs/new`
+- `/blogs/edit/:blogId`
+- `/conferences/new`
+- `/conferences/edit/:conferenceId`
 
-#### Submissions
+## Utility Routes
 
-- `/submissions`
-- `/submissions/:id/versions/new` _(or, modal)_
-- `/submissions/:id/reviews`
-- `/submissions/:id/reviewers`
-
-#### Review Assignments
-
-- `/review-assignments`
-- `/review-assignments/new`
-
----
-
-### REVIEWER
-
-- `/review-assignments/me`
-- `/submissions/:id/reviews`
-- `/submissions/:id/reviews/new` _(or, modal)_
-
----
-
-### USER
-
-- `/submissions`
-- `/submissions/new`
-- `/submissions/:id/versions/new` _(or, modal)_
-
----
-
-## Route Modes & Permissions Convention
-
-- For each route, the UI can be:
-  - View (read-only)
-  - Create (form)
-  - View + Update (inline) _(same route supports updates if user has permission)_
-
-- If a user lacks permission:
-  - Hide edit controls (read-only) + save/update button
-  - Attempted actions return 403 and UI shows an error message
-
-## Redirect Rules
-
-- If an unauthenticated user opens an authenticated route:
-  - Redirect to `/login`
-  - After login, redirect back to the originally requested route (if supported)
-
-- If a user lacks required role:
-  - Show 403 page or redirect to a safe default page
-
----
-
-## Utility Pages
-
-- `/forbidden` _(403 page)_
-- `/not-found` _(404 page)_
-
-## Not Found
-
-- Unknown routes → show 404 page
+- `/unauthorized`
+- `/404-not-found`
+- `*` -> redirects to `/404-not-found`

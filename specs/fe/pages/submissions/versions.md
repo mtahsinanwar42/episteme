@@ -1,145 +1,77 @@
-# Submissions — Versions
+# Submissions - Versions
 
 ## Route
 
-- Route: `/submissions/:id/versions`
+- Route: `/submissions/:submissionId/versions`
 - Access:
   - USER
   - REVIEWER
   - ADMIN
-- Mode: View + Create (role-based, for submissions of PENDING_APPROVAL or RETURNED status)
-
----
+- Mode: View + conditional Create
 
 ## Purpose
 
-- Display submission version history.
-- Allow USER and ADMIN to upload new versions.
-- Provide role-based visibility into submission versions.
+- Display version history for a submission.
+- Allow upload of a new version by ADMIN or submission owner USER.
 
----
-
-## API
+## APIs
 
 ### Fetch Versions
 
 - `GET /api/v1/submissions/:id/versions`
-- Trigger: Page load
-- Sort: Descending by version number (latest first)
+- Trigger: page load
+- UI sorting: descending by `versionNo`
 
-### Create New Version (USER / ADMIN)
+### Create New Version
 
 - `POST /api/v1/submissions/:id/versions`
-- Applicable for submissions of PENDING_APPROVAL or RETURNED status
-- Trigger: Add New Version action
-- Request body: As defined in Submission Version API spec
+- Trigger: Add New Version modal submit
 
----
+Request body:
 
-## UI Requirements
+```json
+{
+  "contentFilePath": "storage/private/submissions/...",
+  "message": "optional change log"
+}
+```
 
-### Versions List
+## Table Columns
 
-- Layout: **table view**
-- Default order: latest version first
-
-**Columns:**
-
-- Version No (number)
-- Change Log / Notes (text)
+- Version No
+- Change Log / Notes
 - Uploader (name + email)
-- File (file name with downloadable hyperlink)
-- Created At (date/time)
+- File (download button + filename)
+- Created At
 
----
+## Upload Rules
 
-## Role-Based Visibility
+Upload button shown only when all are true:
 
-### USER
+- Role is ADMIN, or role is USER and current user is submission owner
+- Submission status is PENDING_APPROVAL or RETURNED
 
-- Can view:
-  - Own uploaded versions
-  - ADMIN-uploaded versions
-- Latest version appears first.
-- Can upload a new version if the status is PENDING_APPROVAL or RETURNED.
+REVIEWER can view versions but cannot upload from this page.
 
----
+## Modal
 
-### REVIEWER
+Fields:
 
-- Can view:
-  - USER-uploaded versions only
-- Latest version appears first.
-- Cannot upload new versions.
+- Submission File (required, uploaded first via file service)
+- Change Log / Notes (optional)
 
----
+Behavior:
 
-### ADMIN
+- File upload failures show `Failed to upload submission file`
+- Submit without uploaded file shows `Submission file is required`
+- Success toast: `New version uploaded successfully.`
 
-- Can view:
-  - USER-uploaded versions
-  - ADMIN-uploaded versions
-- Latest version appears first.
-- Can upload a new version if the status is PENDING_APPROVAL or RETURNED.
+## Access Notes
 
----
-
-## Add New Version (USER / ADMIN)
-
-### Action
-
-- Display **“Add New Version”** button below the versions list if the submission status is PENDING_APPROVAL or RETURNED.
-- Button opens a modal for version creation.
-
-### Modal Fields
-
-- Submission File (required)
-  - Single file upload
-  - Accepted file types and max size:
-    - As enforced by backend (`FILE_BUCKETS.submissions`)
-- Change Log / Notes (optional, text area)
-
-### Submit Behavior
-
-- On submit:
-  - Call `POST /api/v1/submissions/:id/versions`
-- While submitting:
-  - Disable submit action
-  - Show loading indicator
-
-### Post-Submit Behavior
-
-- On success:
-  - Close modal
-  - Refresh versions list
-  - Show success message: “New version uploaded successfully.”
-- On validation error:
-  - Show field-level errors (if provided by API)
-  - Preserve entered values
-- On error:
-  - Show error message: “Failed to upload new version.”
-  - Allow retry
-
----
+Backend response for GET only includes versions uploaded by USER/ADMIN. Reviewer-uploaded versions are not included in this list endpoint.
 
 ## States
 
-- Loading (initial versions load)
-- Loading (version upload)
-- Empty:
-  - Message: “No versions available.”
-- Error (API failure)
-- Forbidden:
-  - REVIEWER attempting to upload a version
-
----
-
-## Access Control Rules
-
-- USER:
-  - Can view and upload versions for own submissions only.
-- REVIEWER:
-  - Can view versions for assigned submissions only.
-  - Must not see upload controls.
-- ADMIN:
-  - Can view and upload versions for all submissions.
+- Loading: table overlay while fetching
+- Empty: `No versions available.`
+- Error: API error text or fallback `Failed to load submission versions.`

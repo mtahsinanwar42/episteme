@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useUpdateSubmissionStatusMutation } from "@/hooks/useSubmissions";
 import { useSuccessToast } from "@/hooks/useSuccessToast";
+import { Info } from "lucide-react";
 
 interface StatusUpdateModalProps {
   open: boolean;
@@ -95,6 +96,15 @@ export function StatusUpdateModal({
         </DialogHeader>
         <DialogBody>
           <div className="space-y-4">
+            {selectedStatus === SubmissionStatus.DELETED && (
+              <div className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+                <Info className="h-4 w-4 shrink-0" />
+                <span>
+                  If status is set to Deleted, all the submission histories
+                  will be lost.
+                </span>
+              </div>
+            )}
             <div>
               <p className="text-sm text-foreground mb-2">
                 Title: {selectedSubmission?.title}

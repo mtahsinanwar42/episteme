@@ -57,8 +57,7 @@ export function useMessageGroups(
 
       if (
         receiver?.id !== undefined &&
-        receiver.id !== null &&
-        receiver.userType !== "ADMIN"
+        receiver.id !== null
       ) {
         if (!reviewerMap.has(receiver.id)) {
           reviewerMap.set(receiver.id, {

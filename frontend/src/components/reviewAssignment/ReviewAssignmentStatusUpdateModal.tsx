@@ -35,6 +35,7 @@ interface ReviewAssignmentStatusUpdateModalProps {
   selectedAssignment: ReviewAssignment | null;
   onClose: () => void;
   showNotes?: boolean;
+  showSubmissionInfo?: boolean;
   allowedStatuses: number[];
   canUpdateStatus?: boolean;
   mode?: "admin" | "reviewer";
@@ -46,6 +47,7 @@ export function ReviewAssignmentStatusUpdateModal({
   selectedAssignment,
   onClose,
   showNotes = false,
+  showSubmissionInfo = true,
   allowedStatuses,
   canUpdateStatus = true,
   mode = "admin",
@@ -60,7 +62,13 @@ export function ReviewAssignmentStatusUpdateModal({
 
   useEffect(() => {
     if (selectedAssignment) {
-      setSelectedStatus("");
+      const status = selectedAssignment.assignmentStatus;
+      setSelectedStatus(
+        status === ReviewAssignmentStatus.ACCEPTED ||
+          status === ReviewAssignmentStatus.DECLINED
+          ? ""
+          : status.toString(),
+      );
       setStatusUpdateNotes(
         selectedAssignment.assignmentStatusUpdateNotes || "",
       );
@@ -123,57 +131,61 @@ export function ReviewAssignmentStatusUpdateModal({
         <DialogBody>
           <div className="space-y-4">
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold">Submission Information</h3>
-              <div className="grid grid-cols-[140px_1fr] gap-x-3 gap-y-2 text-sm">
-                <span className="font-medium text-muted-foreground">
-                  Submission
-                </span>
-                <span>{selectedAssignment?.submissionTitle}</span>
-
-                <span className="font-medium text-muted-foreground">
-                  Submission Status
-                </span>
-                <span className="flex items-center">
-                  {selectedAssignment &&
-                    getSubmissionStatusBadge(
-                      selectedAssignment.submissionStatus,
-                    )}
-                </span>
-
-                <span className="font-medium text-muted-foreground">
-                  Conference
-                </span>
-                <span>{selectedAssignment?.conferenceTitle}</span>
-
-                <span className="font-medium text-muted-foreground">
-                  Conference Status
-                </span>
-                <span className="flex items-center">
-                  {selectedAssignment &&
-                    getConferenceStatusBadge(
-                      selectedAssignment.conferenceStatus,
-                    )}
-                </span>
-
-                {mode === "admin" && (
-                  <>
+              {showSubmissionInfo && (
+                <>
+                  <h3 className="text-sm font-semibold">Submission Information</h3>
+                  <div className="grid grid-cols-[140px_1fr] gap-x-3 gap-y-2 text-sm">
                     <span className="font-medium text-muted-foreground">
-                      Submission Owner
+                      Submission
                     </span>
-                    <div>
-                      <div>
-                        {selectedAssignment?.ownerFirstName}{" "}
-                        {selectedAssignment?.ownerLastName}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {selectedAssignment?.ownerEmail}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
+                    <span>{selectedAssignment?.submissionTitle}</span>
 
-              <hr className="border-border" />
+                    <span className="font-medium text-muted-foreground">
+                      Submission Status
+                    </span>
+                    <span className="flex items-center">
+                      {selectedAssignment &&
+                        getSubmissionStatusBadge(
+                          selectedAssignment.submissionStatus,
+                        )}
+                    </span>
+
+                    <span className="font-medium text-muted-foreground">
+                      Conference
+                    </span>
+                    <span>{selectedAssignment?.conferenceTitle}</span>
+
+                    <span className="font-medium text-muted-foreground">
+                      Conference Status
+                    </span>
+                    <span className="flex items-center">
+                      {selectedAssignment &&
+                        getConferenceStatusBadge(
+                          selectedAssignment.conferenceStatus,
+                        )}
+                    </span>
+
+                    {mode === "admin" && (
+                      <>
+                        <span className="font-medium text-muted-foreground">
+                          Submission Owner
+                        </span>
+                        <div>
+                          <div>
+                            {selectedAssignment?.ownerFirstName}{" "}
+                            {selectedAssignment?.ownerLastName}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {selectedAssignment?.ownerEmail}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <hr className="border-border" />
+                </>
+              )}
 
               <h3 className="text-sm font-semibold">Assignment Information</h3>
               <div className="grid grid-cols-[140px_1fr] gap-x-3 gap-y-2 text-sm">

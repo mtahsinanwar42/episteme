@@ -6,7 +6,7 @@ export interface DialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
 }
 
 const sizeClasses = {
@@ -14,6 +14,7 @@ const sizeClasses = {
   md: "max-w-md",
   lg: "max-w-lg",
   xl: "max-w-2xl",
+  "2xl": "max-w-4xl",
 };
 
 export function Dialog({
@@ -25,18 +26,20 @@ export function Dialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       <div
         className="fixed inset-0 bg-black/50"
         onClick={() => onOpenChange(false)}
       />
-      <div
-        className={cn(
-          "relative z-50 border border-border bg-card rounded-lg shadow-lg w-full mx-4 max-h-[85vh] flex flex-col",
-          sizeClasses[size],
-        )}
-      >
-        {children}
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div
+          className={cn(
+            "relative z-50 border border-border bg-card rounded-lg shadow-lg w-full max-h-[80vh] flex flex-col",
+            sizeClasses[size],
+          )}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

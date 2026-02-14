@@ -261,7 +261,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
         status: USER_STATUS.ACTIVE,
       },
     });
-    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submission.id}`;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submission.id}/details`;
 
     emailPublisher.publishSubmissionCreateToUserEmail(user, {
       submissionTitle: submission.title,
@@ -276,7 +276,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
 
   async function publishSubmissionStatusUpdateEmail({ submission, oldStatus, newStatus, notes }) {
     const user = await User.findByPk(submission.ownerUsrId);
-    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submission.id}`;
+    const submissionUrl = `${process.env.FRONTEND_BASE_URL}/submissions/${submission.id}/details`;
 
     emailPublisher.publishSubmissionStatusUpdatedMail(user, {
       oldStatus,

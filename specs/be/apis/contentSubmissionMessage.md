@@ -2,41 +2,53 @@
 
 Base Path: **/api/v1/submissions/:id/messages**
 
----
+## Visibility Scopes
+
+- `USER_ADMIN`
+- `ADMIN_REVIEWER`
 
 ## 1. Get Submission Messages
 
 **GET /**
-Access: USER/REVIEWER/ADMIN
+Access: USER, REVIEWER, ADMIN
 
-### Path Variable
+Path params:
 
-Required:
+- `id` (submission id)
 
-- id
+Response:
+
+- `success`
+- `data[]` where each row includes:
+  - `messageId`, `createdAt`, `visibilityScope`, `message`
+  - `sender` (`id`, `email`, `firstName`, `lastName`, `userType`)
+  - `receiver` (`id`, `email`, `firstName`, `lastName`) when present
 
 ## 2. Save Submission Message
 
 **POST /**
-Access: USER/ADMIN/REVIEWER
-Notes: Can save PENDING_APPROVAL/RETURNED submission messages.
+Access: USER, REVIEWER, ADMIN
 
-### Request Body:
+Request body:
 
-Required:
+- `message` (required string)
+- `scope` (required, one of visibility scopes)
+- `receiverUsrId` (required for ADMIN)
 
-- message (string)
-- scope (string)
-
-Optional:
-
-- receiverUsrId (integer, required for ADMIN)
-
-Example:
+Example (reviewer to admin):
 
 ```json
 {
-  "message": "Hello Admin, I'll review next week!",
+  "message": "I will submit my review tomorrow.",
   "scope": "ADMIN_REVIEWER"
 }
 ```
+
+Rules:
+
+- Submission must be in PENDING_APPROVAL or RETURNED.
+- USER can only use `USER_ADMIN` scope and only on owned submission.
+- REVIEWER can only use `ADMIN_REVIEWER` scope and only with ACCEPTED assignment.
+- ADMIN must provide `receiverUsrId`:
+  - if `scope=USER_ADMIN`, receiver must be submission owner
+  - if `scope=ADMIN_REVIEWER`, receiver must be an ACCEPTED assigned reviewer
