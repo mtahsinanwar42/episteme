@@ -25,6 +25,11 @@ Example:
 }
 ```
 
+Response (success):
+
+- `success: true`
+- `token` (JWT string)
+
 ---
 
 ## 2. Register
@@ -67,6 +72,11 @@ Example:
 }
 ```
 
+Response (success):
+
+- `success: true`
+- `token` (JWT string)
+
 ---
 
 ## 3. Get Current User
@@ -84,6 +94,11 @@ None
 
 **GET /logout**  
 Access: Authenticated
+
+Response:
+
+- `success: true`
+- `data: {}`
 
 ---
 
@@ -147,6 +162,11 @@ Example:
 }
 ```
 
+Response (success):
+
+- `success: true`
+- `token` (rotated JWT)
+
 ---
 
 ## 7. Forgot Password
@@ -188,3 +208,8 @@ Example:
   "password": "admin"
 }
 ```
+
+Response (success):
+
+- `success: true`
+- `token` (JWT)

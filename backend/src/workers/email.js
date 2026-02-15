@@ -1,8 +1,9 @@
 import { Kafka, logLevel } from "kafkajs";
 import { parseBrokers } from "../utils/kafka.js";
-import { getRedisClient } from "../config/redis.js";
 import { formatRecipientsForLog, sendMail } from "../utils/email/index.js";
-import { CACHE_TTL, KAFKA_CONSUMER_GROUPS, KAFKA_EVENT_TYPES, KAFKA_TOPICS } from "../utils/constants.js";
+import { IDEMPOTENCY_TTL, KAFKA_CONSUMER_GROUPS, KAFKA_EVENT_TYPES, KAFKA_TOPICS } from "../utils/constants.js";
+import { createIdempotencyService } from "../services/idempotency.js";
+import { sequelize } from "../config/db.js";
 
 const enabled = (process.env.KAFKA_ENABLED || "false").toLowerCase() === "true";
 
@@ -25,7 +26,8 @@ export async function startEmailWorker() {
 
   consumer = kafka.consumer({ groupId: KAFKA_CONSUMER_GROUPS.EMAIL_WORKER });
 
-  const redis = getRedisClient();
+  const { IdempotencyKey } = sequelize.models;
+  const idempotencyService = createIdempotencyService({ IdempotencyKey });
 
   await consumer.connect();
   await consumer.subscribe({ topic: KAFKA_TOPICS.EMAIL_SEND, fromBeginning: false });
@@ -74,14 +76,10 @@ export async function startEmailWorker() {
         return;
       }
 
-      if (redis) {
-        const dedupeKey = `dedupe:email:${envelope.id}`;
-        const ok = await redis.set(dedupeKey, "1", { NX: true, PX: CACHE_TTL.DEDUPE });
-
-        if (!ok) {
-          console.log(`[EmailWorker] Dedupe hit, skipping id=${envelope.id}`);
-          return;
-        }
+      const isNew = await idempotencyService.acquireKey("email", envelope.id, IDEMPOTENCY_TTL.EMAIL);
+      if (!isNew) {
+        console.log(`[EmailWorker] Dedupe hit, skipping id=${envelope.id}`);
+        return;
       }
 
       try {

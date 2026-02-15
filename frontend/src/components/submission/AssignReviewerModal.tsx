@@ -239,6 +239,7 @@ export function AssignReviewerModal({
       assignedByFirstName: selectedAssignmentRow.assignedByFirstName ?? "",
       assignedByLastName: selectedAssignmentRow.assignedByLastName ?? "",
       submissionTitle: selectedSubmission.title,
+      formId: selectedSubmission.formId,
       conferenceId: Number(selectedSubmission.conferenceId),
       submissionStatus: selectedSubmission.status ?? 0,
       submissionCreatedAt: selectedSubmission.createdAt ?? "",
@@ -340,6 +341,9 @@ export function AssignReviewerModal({
               <div>
                 <p className="text-sm text-foreground mb-4">
                   Submission: {selectedSubmission?.title}
+                </p>
+                <p className="text-sm text-foreground/80 mb-4">
+                  Form ID: {selectedSubmission?.formId || "-"}
                 </p>
               </div>
 

@@ -117,6 +117,7 @@ export default function ReviewAssignmentSearch() {
 
   const [formData, setFormData] = useState({
     submissionTitle: "",
+    formId: "",
     conferenceId: "",
     assignedDateFrom: "",
     assignedDateTo: "",
@@ -234,6 +235,7 @@ export default function ReviewAssignmentSearch() {
   const hasAnyField = useMemo(() => {
     return (
       formData.submissionTitle.trim() !== "" ||
+      formData.formId.trim() !== "" ||
       formData.conferenceId !== "" ||
       formData.assignedDateFrom !== "" ||
       formData.assignedDateTo !== "" ||
@@ -307,6 +309,14 @@ export default function ReviewAssignmentSearch() {
 
   const columns: ColumnDef<ReviewAssignment>[] = useMemo(() => {
     return [
+      {
+        accessorKey: "formId",
+        header: "Submission Form ID",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.original.formId || "-"}</span>
+        ),
+        enableSorting: false,
+      },
       {
         accessorKey: "submissionTitle",
         header: "Submission Title",
@@ -391,23 +401,6 @@ export default function ReviewAssignmentSearch() {
         ),
       },
       {
-        id: "assignedBy",
-        accessorFn: (row) =>
-          `${row.assignedByFirstName} ${row.assignedByLastName} ${row.assignedByEmail}`,
-        header: "Assigned By",
-        cell: ({ row }) => (
-          <div className="text-sm">
-            <div>
-              {row.original.assignedByFirstName} {row.original.assignedByLastName}
-            </div>
-            <div className="text-muted-foreground text-xs">
-              {row.original.assignedByEmail}
-            </div>
-          </div>
-        ),
-        enableSorting: false,
-      },
-      {
         accessorKey: "assignedAt",
         header: "Assigned At",
         cell: ({ row }) => (
@@ -464,6 +457,9 @@ export default function ReviewAssignmentSearch() {
     if (formData.submissionTitle.trim()) {
       params.submissionTitle = formData.submissionTitle.trim();
     }
+    if (formData.formId.trim()) {
+      params.formId = formData.formId.trim();
+    }
     if (formData.conferenceId) {
       params.conferenceId = Number(formData.conferenceId);
     }
@@ -508,6 +504,7 @@ export default function ReviewAssignmentSearch() {
   const handleReset = () => {
     setFormData({
       submissionTitle: "",
+      formId: "",
       conferenceId: "",
       assignedDateFrom: "",
       assignedDateTo: "",
@@ -586,6 +583,19 @@ export default function ReviewAssignmentSearch() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2 text-heading">
+                    Submission Form ID
+                  </label>
+                  <Input
+                    type="text"
+                    name="formId"
+                    value={formData.formId}
+                    onChange={handleInputChange}
+                    placeholder="Enter exact Submission Form ID"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-heading">
                     Submission Title
                   </label>
                   <Input
@@ -613,7 +623,10 @@ export default function ReviewAssignmentSearch() {
                     </SelectTrigger>
                     <SelectContent>
                       {conferences.map((conference) => (
-                        <SelectItem key={conference.id} value={String(conference.id)}>
+                        <SelectItem
+                          key={conference.id}
+                          value={String(conference.id)}
+                        >
                           {conference.title}
                         </SelectItem>
                       ))}
@@ -634,7 +647,9 @@ export default function ReviewAssignmentSearch() {
                           className="flex items-center gap-2 cursor-pointer"
                         >
                           <Checkbox
-                            checked={selectedSubmissionStatuses.includes(statusValue)}
+                            checked={selectedSubmissionStatuses.includes(
+                              statusValue,
+                            )}
                             onCheckedChange={() =>
                               setSelectedSubmissionStatuses((prev) =>
                                 prev.includes(statusValue)
@@ -697,7 +712,9 @@ export default function ReviewAssignmentSearch() {
                           className="flex items-center gap-2 cursor-pointer"
                         >
                           <Checkbox
-                            checked={selectedAssignmentStatuses.includes(statusValue)}
+                            checked={selectedAssignmentStatuses.includes(
+                              statusValue,
+                            )}
                             onCheckedChange={() =>
                               setSelectedAssignmentStatuses((prev) =>
                                 prev.includes(statusValue)
@@ -728,7 +745,9 @@ export default function ReviewAssignmentSearch() {
                       value={selectedAssignedByUsrIds}
                       onValueChange={setSelectedAssignedByUsrIds}
                       placeholder={
-                        assignedByUsersLoading ? "Loading users..." : "Select assigners"
+                        assignedByUsersLoading
+                          ? "Loading users..."
+                          : "Select assigners"
                       }
                       disabled={assignedByUsersLoading}
                       searchable
@@ -751,7 +770,9 @@ export default function ReviewAssignmentSearch() {
                       value={selectedReviewerUsrIds}
                       onValueChange={setSelectedReviewerUsrIds}
                       placeholder={
-                        reviewerUsersLoading ? "Loading users..." : "Select reviewers"
+                        reviewerUsersLoading
+                          ? "Loading users..."
+                          : "Select reviewers"
                       }
                       disabled={reviewerUsersLoading}
                       searchable
@@ -817,7 +838,11 @@ export default function ReviewAssignmentSearch() {
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => navigate(backUrl)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate(backUrl)}
+            >
               Cancel
             </Button>
 
@@ -844,11 +869,11 @@ export default function ReviewAssignmentSearch() {
             searchPlaceholder="Filter assignments"
             searchableColumnIds={[
               "submissionTitle",
+              "formId",
               "submissionStatus",
               "conferenceTitle",
               "reviewer",
               "assignmentStatus",
-              "assignedBy",
               "submitter",
             ]}
           />
@@ -872,7 +897,9 @@ export default function ReviewAssignmentSearch() {
         selectedAssignment={selectedAssignment}
         onClose={handleCloseStatusModal}
         showNotes={isAdmin}
-        allowedStatuses={isAdmin ? ADMIN_ALLOWED_STATUSES : REVIEWER_ALLOWED_STATUSES}
+        allowedStatuses={
+          isAdmin ? ADMIN_ALLOWED_STATUSES : REVIEWER_ALLOWED_STATUSES
+        }
         canUpdateStatus={
           selectedAssignment
             ? isAdmin

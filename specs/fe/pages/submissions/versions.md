@@ -18,13 +18,13 @@
 
 ### Fetch Versions
 
-- `GET /api/v1/submissions/:id/versions`
+- `GET /api/v1/submissions/:submissionId/versions`
 - Trigger: page load
 - UI sorting: descending by `versionNo`
 
 ### Create New Version
 
-- `POST /api/v1/submissions/:id/versions`
+- `POST /api/v1/submissions/:submissionId/versions`
 - Trigger: Add New Version modal submit
 
 Request body:

@@ -10,6 +10,7 @@ export interface ReviewAssignment {
   assignedByNotes: string | null;
 
   submissionTitle: string;
+  formId?: string;
   conferenceId: number;
   submissionStatus: number;
   submissionCreatedAt: string;

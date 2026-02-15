@@ -50,6 +50,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
     const isAdmin = roles.includes(USER_ROLE.ADMIN);
     const isReviewer = roles.includes(USER_ROLE.REVIEWER);
 
+    const safeFormId = isEmpty(filters.formId) ? null : String(filters.formId).trim();
     const safeSubmissionTitle = isEmpty(filters.submissionTitle) ? null : String(filters.submissionTitle).trim();
     const safeSubmissionStatuses = normalizeNumberArray(filters.submissionStatuses, { fieldName: "submissionStatuses" });
     const safeAssignmentStatuses = normalizeNumberArray(filters.assignmentStatuses, { fieldName: "assignmentStatuses" });
@@ -103,6 +104,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       page: filters.page,
       limit: filters.limit,
       paginate: shouldPaginate,
+      formId: safeFormId,
       submissionTitle: safeSubmissionTitle,
       submissionStatuses: safeSubmissionStatuses,
       submissionOwnerUsrIds: safeSubmissionOwnerUsrIds,

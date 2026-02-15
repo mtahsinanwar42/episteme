@@ -20,13 +20,13 @@
 
 ### Fetch Messages
 
-- `GET /api/v1/submissions/:id/messages`
+- `GET /api/v1/submissions/:submissionId/messages`
 - Trigger: page load
 - UI sorting: ascending by `createdAt`
 
 ### Create Message
 
-- `POST /api/v1/submissions/:id/messages`
+- `POST /api/v1/submissions/:submissionId/messages`
 - Trigger: send message
 - Allowed only when submission status is:
   - PENDING_APPROVAL
@@ -34,7 +34,7 @@
 
 ### Fetch Reviewers (ADMIN only)
 
-- `GET /api/v1/submissions/:id/reviewers?paginate=false`
+- `GET /api/v1/submissions/:submissionId/reviewers?paginate=false`
 - Purpose: admin recipient list and assignment metadata
 
 ### Fetch Reviewer Assignment (reviewer non-owner)

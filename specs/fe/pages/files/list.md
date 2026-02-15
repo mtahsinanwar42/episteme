@@ -1,46 +1,29 @@
-# Files — List
+# Assets List
 
 ## Route
 
-- Path: `/files`
+- Path: `/assets`
 - Access: ADMIN
 - Mode: View (read-only)
 
 ## Purpose
 
-- Display a paginated list of uploaded files with metadata.
-- Allow ADMIN to navigate to create/upload a new file.
-- Allow navigation to a file detail page.
+- Show uploaded asset files (filtered to `storage/public/assets`).
+- Support sorting, pagination, and quick text filtering.
+- Navigate to asset details and asset creation/search pages.
 
 ## API
 
 - `GET /api/v1/files`
-- Trigger: Page load + pagination changes
-- Query params: As defined in Files API spec
+- Trigger: page load, pagination, and table/search changes
+- FE query profile:
+  - `sort=-createdAt`
+  - `paginate=true`
+  - `storageKey[iLike]=storage/public/assets`
+  - `page`, `limit`
 
-## UI Requirements
+## Navigation
 
-- Show a list of file metadata (layout: table)
-- Each item displays (minimum):
-  - Name (text)
-  - Storage Key (text)
-  - Created At (date/time)
-- Each item provides navigation to: `/files/:id`
-
-## Pagination Requirements
-
-- Follow API spec pagination (`page`, `limit`)
-- Provide navigation controls:
-  - previous / next
-  - current page indicator
-- Default sort recommended: `-createdAt` (latest first)
-
-## Admin Enhancements
-
-- “Add New File” link/button → `/files/new`
-
-## States
-
-- Loading (initial and page changes)
-- Empty (no results)
-- Error (API failure)
+- View details: `/assets/:fileId`
+- New asset: `/assets/new`
+- Advanced search: `/assets/search`

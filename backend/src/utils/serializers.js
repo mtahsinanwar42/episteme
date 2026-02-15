@@ -82,6 +82,7 @@ export const serializeActivity = (activity, metadataFilePath) => {
 export const serializeContentSubmission = (submission, version, contentFilePath) => {
   return {
     id: submission.id,
+    formId: submission.formId,
     title: submission.title,
     abstract: submission.abstract,
     topics: submission.topics,

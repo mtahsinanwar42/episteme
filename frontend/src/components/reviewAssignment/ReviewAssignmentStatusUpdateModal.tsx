@@ -138,7 +138,12 @@ export function ReviewAssignmentStatusUpdateModal({
                     <span className="font-medium text-muted-foreground">
                       Submission
                     </span>
-                    <span>{selectedAssignment?.submissionTitle}</span>
+                    <div>
+                      <div>{selectedAssignment?.submissionTitle}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Submission Form ID: {selectedAssignment?.formId || "-"}
+                      </div>
+                    </div>
 
                     <span className="font-medium text-muted-foreground">
                       Submission Status

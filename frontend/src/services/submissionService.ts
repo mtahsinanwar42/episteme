@@ -28,6 +28,7 @@ export interface SearchSubmissionsParams {
   page?: number;
   limit?: number;
   title?: string;
+  formId?: string;
   topics?: string[];
   doi?: string;
   conferenceId?: number;
@@ -196,6 +197,7 @@ export const submissionService = {
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.title) queryParams.append("title", params.title);
+    if (params?.formId) queryParams.append("formId", params.formId);
     if (params?.doi) queryParams.append("doi", params.doi);
     if (params?.conferenceId !== undefined) {
       queryParams.append("conferenceId", params.conferenceId.toString());

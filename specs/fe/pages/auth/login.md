@@ -28,7 +28,7 @@
 
 - On success:
   - Store authentication token
-  - Redirect to originally requested route or `/homepage`
+  - Redirect to `redirectUrl` query param (if provided and safe), otherwise `/`
   - Keep the **user** object in global storage, by calling `GET /api/v1/auth/me` on success of this request.
 - On error:
   - Display backend error message

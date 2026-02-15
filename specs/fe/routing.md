@@ -1,5 +1,7 @@
 # Frontend Routing
 
+Canonical route config source: `frontend/src/routeConfig.tsx`
+
 ## Core Public Routes
 
 - `/`
@@ -83,3 +85,8 @@ Notes:
 - `/unauthorized`
 - `/404-not-found`
 - `*` -> redirects to `/404-not-found`
+
+## Notes
+
+- Homepage route is `/` (there is no `/homepage` route).
+- API usage by route/page is documented in `specs/fe/api-integration.md` and `specs/fe/pages/*`.

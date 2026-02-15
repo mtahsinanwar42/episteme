@@ -1,4 +1,4 @@
-# Announcements API
+# Activities API
 
 Base Path: **/api/v1/activities**
 

@@ -40,7 +40,7 @@ Required:
 
 ## 3. Upload File
 
-**GET /:bucket**  
+**POST /upload/:bucket**  
 Access: Authenticated
 
 ### Path Variables
@@ -53,7 +53,9 @@ Required:
 
 Required:
 
-- file (file)
+- multipart form-data field: `file`
+
+Allowed bucket values are validated server-side (`assets`, `submissions`, `profile_photos`, `cvs`), with per-bucket visibility/type/size rules.
 
 ## 4. Download File
 

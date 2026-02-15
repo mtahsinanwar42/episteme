@@ -28,8 +28,8 @@ import contactSupportRoutes from "./routes/support.js";
 import notificationRoutes from "./routes/notification.js";
 import { createRefDataService } from "./services/referenceData.js";
 import { createSchedulerService } from "./services/scheduler.js";
+import { createIdempotencyService } from "./services/idempotency.js";
 import { createKafkaTopics, startKafkaProducer, stopKafkaProducer } from "./config/kafka.js";
-import { startRedis, stopRedis } from "./config/redis.js";
 import { startEmailWorker, stopEmailWorker } from "./workers/email.js";
 import { KAFKA_TOPICS } from "./utils/constants.js";
 import { initializeBaseData } from "./seeder/index.js";
@@ -39,7 +39,6 @@ dotenv.config();
 const app = express();
 const __dirname = path.resolve();
 const refDataService = createRefDataService({});
-const schedulerService = createSchedulerService({ refDataService });
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -107,12 +106,13 @@ const PORT = process.env.PORT || 5000;
 async function start() {
   try {
     await connectDb();
-    initModels(sequelize);
+    const models = initModels(sequelize);
     await initializeBaseData();
 
+    const idempotencyService = createIdempotencyService({ IdempotencyKey: models.IdempotencyKey });
+    const schedulerService = createSchedulerService({ refDataService, idempotencyService });
     schedulerService.start();
 
-    await startRedis();
     await startKafkaProducer();
     await createKafkaTopics([
       KAFKA_TOPICS.EMAIL_SEND,
@@ -137,7 +137,6 @@ async function start() {
 async function shutdown() {
   await stopEmailWorker();
   await stopKafkaProducer();
-  await stopRedis();
   process.exit(0);
 }
 
