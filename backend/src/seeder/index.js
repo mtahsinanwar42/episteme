@@ -18,6 +18,7 @@ import {
   USER_ROLE,
   USER_STATUS,
   TRAINING_STATUS,
+  NOTIFICATION_TYPE,
 } from "../utils/constants.js";
 import { createRefDataService } from "../services/referenceData.js";
 
@@ -53,6 +54,7 @@ const {
   Announcement,
   Blog,
   Activity,
+  Notification,
 } = initModels(sequelize);
 
 export const ADMIN_USER_SEED = {
@@ -437,6 +439,7 @@ async function destroyData() {
   try {
     await sequelize.query(`
       TRUNCATE TABLE
+        episteme.notification,
         episteme.content_review,
         episteme.content_review_assignment,
         episteme.content_submission_payment,
@@ -634,7 +637,7 @@ async function createPendingSubmissionBundle({
     "Focus on novelty, clarity of contribution, and related work coverage.",
     "Assess technical soundness, reproducibility, and presentation quality.",
     "Evaluate overall contribution significance and practical applicability.",
-  ];
+    ];
 
   for (let i = 0; i < reviewerUsers.length; i++) {
     await ContentReviewAssignment.create({
@@ -826,7 +829,273 @@ async function importData() {
       }
     }
 
-    console.log(`Data Imported (${createdUsers.length + 1} users, ${submissionCounter} submissions)`.green.inverse);
+    const submissionRows = await ContentSubmission.findAll({
+      attributes: ["id", "title"],
+    });
+
+    function normalizeTitleKey(value) {
+      return String(value ?? "")
+        .normalize("NFKC")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim()
+        .replace(/\s+/g, " ");
+    }
+
+    const submissionIdByTitle = new Map(
+      submissionRows.map((submission) => [normalizeTitleKey(submission.title), Number(submission.id)])
+    );
+
+    function extractSubmissionTitle(message) {
+      const match = String(message).match(/"([^"]+)"/);
+      return match ? match[1] : null;
+    }
+
+    function resolveSubmissionId(submissionTitle) {
+      const normalizedTitle = normalizeTitleKey(submissionTitle);
+      const directId = submissionIdByTitle.get(normalizedTitle);
+
+      if (directId) {
+        return directId;
+      }
+
+      for (const [key, id] of submissionIdByTitle.entries()) {
+        if (key.includes(normalizedTitle) || normalizedTitle.includes(key)) {
+          return id;
+        }
+      }
+
+      return null;
+    }
+
+    const submissionLinkedNotificationTypes = new Set([
+      NOTIFICATION_TYPE.SUBMISSION_CREATED_TO_ADMIN,
+      NOTIFICATION_TYPE.SUBMISSION_STATUS_UPDATED,
+      NOTIFICATION_TYPE.SUBMISSION_MSG_CREATED,
+      NOTIFICATION_TYPE.SUBMISSION_VERSION_CREATED,
+      NOTIFICATION_TYPE.SUBMISSION_REVIEW_CREATED,
+      NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_CREATED,
+      NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_ADMIN,
+      NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_REVIEWER,
+    ]);
+
+    const notificationSeedData = [
+      {
+        usrId: user1.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_STATUS_UPDATED,
+        title: "Submission Status Updated",
+        message: "Your submission \"AI-Driven Knowledge Graphs for Open Science — Delft Perspective\" status has been updated to Pending Approval.",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: user1.id,
+        type: NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_CREATED,
+        title: "Reviewers Assigned",
+        message: "Reviewers have been assigned to your submission \"AI-Driven Knowledge Graphs for Open Science — Delft Perspective\".",
+        resourceType: "ContentReviewAssignment",
+        isRead: false,
+      },
+      {
+        usrId: user1.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_MSG_CREATED,
+        title: "New Message",
+        message: "You have a new message regarding your submission \"Graph-Based Peer Review Systems — Delft Perspective\".",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: user2.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_STATUS_UPDATED,
+        title: "Submission Status Updated",
+        message: "Your submission \"AI-Driven Knowledge Graphs for Open Science — ETH Perspective\" status has been updated to Pending Approval.",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: user2.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_MSG_CREATED,
+        title: "New Message",
+        message: "You have a new message regarding your submission \"Graph-Based Peer Review Systems — ETH Perspective\".",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: user3.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_STATUS_UPDATED,
+        title: "Submission Status Updated",
+        message: "Your submission \"AI-Driven Knowledge Graphs for Open Science — Lisbon Perspective\" status has been updated to Pending Approval.",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: reviewer1.id,
+        type: NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_CREATED,
+        title: "New Review Assignment",
+        message: "You have been assigned to review \"AI-Driven Knowledge Graphs for Open Science — Delft Perspective\".",
+        resourceType: "ContentReviewAssignment",
+        isRead: false,
+      },
+      {
+        usrId: reviewer1.id,
+        type: NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_CREATED,
+        title: "New Review Assignment",
+        message: "You have been assigned to review \"Graph-Based Peer Review Systems — ETH Perspective\".",
+        resourceType: "ContentReviewAssignment",
+        isRead: false,
+      },
+      {
+        usrId: reviewer2.id,
+        type: NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_CREATED,
+        title: "New Review Assignment",
+        message: "You have been assigned to review \"Observability-Driven Editorial Pipelines — Delft Perspective\".",
+        resourceType: "ContentReviewAssignment",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_CREATED_TO_ADMIN,
+        title: "New Submission Received",
+        message: "A new submission \"AI-Driven Knowledge Graphs for Open Science — Delft Perspective\" has been submitted by Alice Morgan.",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_CREATED_TO_ADMIN,
+        title: "New Submission Received",
+        message: "A new submission \"Graph-Based Peer Review Systems — ETH Perspective\" has been submitted by Bob Chen.",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_REVIEWER,
+        title: "Review Assignment Updated",
+        message: "Reviewer David Okafor has updated their assignment status for \"AI-Driven Knowledge Graphs for Open Science — Delft Perspective\".",
+        resourceType: "ContentReviewAssignment",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_CREATED_TO_ADMIN,
+        title: "New Submission Received",
+        message: "A new submission \"Observability-Driven Editorial Pipelines — Delft Perspective\" has been submitted by Alice Morgan.",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_CREATED_TO_ADMIN,
+        title: "New Submission Received",
+        message: "A new submission \"Observability-Driven Editorial Pipelines — ETH Perspective\" has been submitted by Bob Chen.",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_CREATED_TO_ADMIN,
+        title: "New Submission Received",
+        message: "A new submission \"Graph-Based Peer Review Systems — Lisbon Perspective\" has been submitted by Clara Silva.",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_MSG_CREATED,
+        title: "New Submission Message",
+        message: "Alice Morgan sent a new message for \"AI-Driven Knowledge Graphs for Open Science — Delft Perspective\".",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_MSG_CREATED,
+        title: "New Submission Message",
+        message: "Bob Chen sent a new message for \"Graph-Based Peer Review Systems — ETH Perspective\".",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_VERSION_CREATED,
+        title: "Submission Version Uploaded",
+        message: "A revised version was uploaded for \"Observability-Driven Editorial Pipelines — Delft Perspective\".",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_REVIEW_CREATED,
+        title: "New Review Submitted",
+        message: "A new review has been submitted for \"AI-Driven Knowledge Graphs for Open Science — ETH Perspective\".",
+        resourceType: "ContentSubmissionReview",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_REVIEW_CREATED,
+        title: "New Review Submitted",
+        message: "A new review has been submitted for \"Graph-Based Peer Review Systems — Delft Perspective\".",
+        resourceType: "ContentSubmissionReview",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_CREATED,
+        title: "Review Assignment Created",
+        message: "A new reviewer assignment has been created for \"Observability-Driven Editorial Pipelines — ETH Perspective\".",
+        resourceType: "ContentReviewAssignment",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_REVIEWER,
+        title: "Review Assignment Updated",
+        message: "Reviewer Elena Petrova has updated their assignment status for \"Graph-Based Peer Review Systems — Lisbon Perspective\".",
+        resourceType: "ContentReviewAssignment",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_REVIEWER,
+        title: "Review Assignment Updated",
+        message: "Reviewer Fatih Yilmaz has updated their assignment status for \"Observability-Driven Editorial Pipelines — ETH Perspective\".",
+        resourceType: "ContentReviewAssignment",
+        isRead: false,
+      },
+      {
+        usrId: admin.id,
+        type: NOTIFICATION_TYPE.SUBMISSION_STATUS_UPDATED,
+        title: "Submission Status Updated",
+        message: "Submission \"AI-Driven Knowledge Graphs for Open Science — Lisbon Perspective\" status has been updated to Under Review.",
+        resourceType: "ContentSubmission",
+        isRead: false,
+      },
+    ];
+
+    const normalizedNotificationSeedData = notificationSeedData.map((entry) => {
+      if (!submissionLinkedNotificationTypes.has(entry.type)) {
+        return entry;
+      }
+
+      const submissionTitle = extractSubmissionTitle(entry.message);
+      const submissionId = submissionTitle ? resolveSubmissionId(submissionTitle) : null;
+
+      if (!submissionId) {
+        throw new Error(`Unable to resolve submissionId for notification: ${entry.type} | ${entry.message}`);
+      }
+
+      return {
+        ...entry,
+        resourceType: "ContentSubmission",
+        resourceId: submissionId,
+      };
+    });
+
+    await Notification.bulkCreate(normalizedNotificationSeedData, { individualHooks: true });
+
+    console.log(`Data Imported (${createdUsers.length + 1} users, ${submissionCounter} submissions, ${normalizedNotificationSeedData.length} notifications)`.green.inverse);
     await sequelize.close();
     process.exit(0);
   } catch (err) {

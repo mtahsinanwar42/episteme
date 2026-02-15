@@ -6,13 +6,23 @@ import { findSubmissionVersionByIdAndUploaderUsrType } from "../repositories/con
 import { REVIEW_ASSIGNMENT_STATUS, REVIEW_RECOMMENDATION, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 
-export function createSubmissionReviewService({ ContentReview, ContentSubmission, ContentSubmissionVersion, ContentReviewAssignment, User, fileService, emailPublisher }) {
+export function createSubmissionReviewService({ ContentReview, ContentSubmission, ContentSubmissionVersion, ContentReviewAssignment, User, fileService, emailPublisher, notificationPublisher }) {
   if (!ContentReview || !ContentSubmission || !ContentSubmissionVersion || !ContentReviewAssignment || !User) {
     throw new Error("createSubmissionReviewService requires { ContentSubmission, ContentSubmissionVersion, ContentReviewAssignment, ContentReview, User } model");
   }
 
   if (!fileService || !emailPublisher) {
     throw new Error("createSubmissionReviewService requires { fileService }");
+  }
+
+  if (!notificationPublisher) {
+    throw new Error("createSubmissionReviewService requires { notificationPublisher }");
+  }
+
+  function publishNotificationSafely(promise, context) {
+    void promise.catch((err) => {
+      console.error(`[notification] ${context} failed`, err);
+    });
   }
 
   async function getSubmissionReviewsById(user, { submissionId }) {
@@ -121,6 +131,11 @@ export function createSubmissionReviewService({ ContentReview, ContentSubmission
       submissionTitle,
       submissionUrl,
     });
+    publishNotificationSafely(notificationPublisher.publishSubmissionReviewCreatedNotification(admins, {
+      reviewer: user,
+      submissionTitle,
+      submissionId,
+    }), "publishSubmissionReviewCreatedNotification");
   }
 
   return {

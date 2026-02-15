@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut, Menu } from "lucide-react";
 import { UserRole } from "@/models/user";
+import NotificationBell from "@/components/navbar/NotificationBell";
 import { config } from "@/config/config";
 import { aboutPageFlags } from "@/config/featureFlags";
 
@@ -303,6 +304,8 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4">
           {isLoggedIn ? (
+            <>
+            <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="focus:outline-none cursor-pointer">
@@ -376,6 +379,7 @@ export default function Navbar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </>
           ) : (
             <div className="flex items-center">
               <Link

@@ -6,7 +6,7 @@ import { isCurrentDateOrFuture, parseOptionalDateInput } from "../utils/dateTime
 import { isEmpty, isNotEmpty } from "../utils/string.js";
 import { normalizeNumberArray, toOptionalDateText, toOptionalInteger } from "../utils/search.js";
 
-export function createReviewAssignmentService({ ContentReviewAssignment, ContentSubmission, User, fileService, emailPublisher }) {
+export function createReviewAssignmentService({ ContentReviewAssignment, ContentSubmission, User, fileService, emailPublisher, notificationPublisher }) {
   if (!ContentReviewAssignment) {
     throw new Error("createReviewAssignmentService requires { ContentReviewAssignment } model");
   }
@@ -25,6 +25,16 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
 
   if (!emailPublisher) {
     throw new Error("createReviewAssignmentService requires { emailPublisher }");
+  }
+
+  if (!notificationPublisher) {
+    throw new Error("createReviewAssignmentService requires { notificationPublisher }");
+  }
+
+  function publishNotificationSafely(promise, context) {
+    void promise.catch((err) => {
+      console.error(`[notification] ${context} failed`, err);
+    });
   }
 
   async function getMyReviewAssignments(user, page, limit) {
@@ -282,7 +292,11 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       assignedBy,
       notes,
       dueAt,
-    })
+    });
+    publishNotificationSafely(notificationPublisher.publishReviewAssignmentCreatedNotification(reviewer, {
+      submissionTitle,
+      submissionId: contentSubmissionId,
+    }), "publishReviewAssignmentCreatedNotification");
   }
 
   async function publishReviewAssignmentUpdateStatusByAdminEmail(user, { oldStatus, newStatus, reviewerUsrId, contentSubmissionId, notes, dueAt, }) {
@@ -301,11 +315,15 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       oldStatus,
       newStatus,
       submissionTitle,
-      submissionUrl: submission.status !== CONTENT_SUBMISSION_STATUS.DELETED && submissionUrl,
+      submissionUrl: submission.currentStatus !== CONTENT_SUBMISSION_STATUS.DELETED && submissionUrl,
       assignedBy,
       notes,
       dueAt,
     });
+    publishNotificationSafely(notificationPublisher.publishReviewAssignmentStatusUpdatedByAdminNotification(reviewer, {
+      submissionTitle,
+      submissionId: contentSubmissionId,
+    }), "publishReviewAssignmentStatusUpdatedByAdminNotification");
   }
 
   async function publishReviewAssignmentUpdateStatusByReviewerEmail(user, { oldStatus, newStatus, contentSubmissionId, dueAt, }) {
@@ -330,6 +348,11 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       submissionUrl,
       dueAt,
     });
+    publishNotificationSafely(notificationPublisher.publishReviewAssignmentStatusUpdatedByReviewerNotification(admins, {
+      reviewer: user,
+      submissionTitle,
+      submissionId: contentSubmissionId,
+    }), "publishReviewAssignmentStatusUpdatedByReviewerNotification");
   }
 
   return {

@@ -8,7 +8,7 @@ import { toDate } from "../utils/dateTime.js";
 import { isEmpty } from "../utils/string.js";
 import { normalizeNumberArray, normalizeTextArray, toOptionalDateText, toOptionalInteger } from "../utils/search.js";
 
-export function createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, User, conferenceService, fileService, emailPublisher }) {
+export function createSubmissionService({ ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, User, conferenceService, fileService, emailPublisher, notificationPublisher }) {
   if (!ContentSubmission || !ContentSubmissionVersion || !User) {
     throw new Error("createSubmissionService requires { ContentSubmission, ContentSubmissionPayment, ContentSubmissionVersion, User } model");
   }
@@ -19,6 +19,16 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
 
   if (!emailPublisher) {
     throw new Error("createSubmissionService requires { emailPublisher }");
+  }
+
+  if (!notificationPublisher) {
+    throw new Error("createSubmissionService requires { notificationPublisher }");
+  }
+
+  function publishNotificationSafely(promise, context) {
+    void promise.catch((err) => {
+      console.error(`[notification] ${context} failed`, err);
+    });
   }
 
   async function getSubmissionsByUserIdAndRoles(user, { page, limit }) {
@@ -272,6 +282,11 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       submissionTitle: submission.title,
       submissionUrl,
     });
+    publishNotificationSafely(notificationPublisher.publishSubmissionCreatedToAdminNotification(admins, {
+      user,
+      submissionTitle: submission.title,
+      submissionId: submission.id,
+    }), "publishSubmissionCreatedToAdminNotification");
   }
 
   async function publishSubmissionStatusUpdateEmail({ submission, oldStatus, newStatus, notes }) {
@@ -285,6 +300,12 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       submissionTitle: submission.title,
       submissionUrl,
     });
+    publishNotificationSafely(notificationPublisher.publishSubmissionStatusUpdatedNotification(user, {
+      submissionTitle: submission.title,
+      submissionId: submission.id,
+      oldStatus,
+      newStatus,
+    }), "publishSubmissionStatusUpdatedNotification");
   }
 
   return {

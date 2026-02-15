@@ -4,13 +4,23 @@ import { CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE, USER_ROLE, USER_STATUS } from 
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { isEmpty } from "../utils/string.js";
 
-export function createSubmissionMessageService({ ContentSubmissionMessage, ContentSubmission, User, fileService, emailPublisher }) {
+export function createSubmissionMessageService({ ContentSubmissionMessage, ContentSubmission, User, fileService, emailPublisher, notificationPublisher }) {
   if (!ContentSubmissionMessage || !ContentSubmission || !User) {
     throw new Error("createSubmissionMessageService requires { ContentSubmissionMessage, ContentSubmision, User } model");
   }
 
   if (!fileService || !emailPublisher) {
     throw new Error("createSubmissionMessageService requires { fileService, emailPublisher }");
+  }
+
+  if (!notificationPublisher) {
+    throw new Error("createSubmissionMessageService requires { notificationPublisher }");
+  }
+
+  function publishNotificationSafely(promise, context) {
+    void promise.catch((err) => {
+      console.error(`[notification] ${context} failed`, err);
+    });
   }
 
   async function getSubmissionMessagesById(user, { submissionId }) {
@@ -166,6 +176,11 @@ export function createSubmissionMessageService({ ContentSubmissionMessage, Conte
       submissionTitle: submissionTitle,
       submissionUrl,
     });
+    publishNotificationSafely(notificationPublisher.publishSubmissionMsgCreatedNotification(receivers, {
+      sender: user,
+      submissionTitle,
+      submissionId,
+    }), "publishSubmissionMsgCreatedNotification");
   }
 
   return {

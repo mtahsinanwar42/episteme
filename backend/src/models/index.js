@@ -13,6 +13,7 @@ import ContentSubmissionMessageModel from "./ContentSubmissionMessage.js";
 import ContentReviewAssignmentModel from "./ContentReviewAssignment.js";
 import ContentReviewModel from "./ContentReview.js";
 import ContentSubmissionPaymentModel from "./ContentSubmissionPayment.js";
+import NotificationModel from "./Notification.js";
 
 export const initModels = (sequelize) => {
   const User = UserModel(sequelize, DataTypes);
@@ -28,6 +29,7 @@ export const initModels = (sequelize) => {
   const ContentReviewAssignment = ContentReviewAssignmentModel(sequelize, DataTypes);
   const ContentReview = ContentReviewModel(sequelize, DataTypes);
   const ContentSubmissionPayment = ContentSubmissionPaymentModel(sequelize, DataTypes);
+  const Notification = NotificationModel(sequelize, DataTypes);
 
   User.belongsTo(File, { foreignKey: "cvFileId", as: "cvFile" });
   User.belongsTo(File, { foreignKey: "photoFileId", as: "photoFile" });
@@ -149,6 +151,9 @@ export const initModels = (sequelize) => {
   User.hasMany(ContentSubmissionPayment, { foreignKey: "usrId", as: "payments" });
   ContentSubmissionPayment.belongsTo(User, { foreignKey: "usrId", as: "user" });
 
+  User.hasMany(Notification, { foreignKey: "usrId", as: "notifications" });
+  Notification.belongsTo(User, { foreignKey: "usrId", as: "user" });
+
   return {
     User,
     Conference,
@@ -163,5 +168,6 @@ export const initModels = (sequelize) => {
     Announcement,
     Training,
     Blog,
+    Notification,
   };
 };

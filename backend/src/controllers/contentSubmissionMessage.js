@@ -4,11 +4,15 @@ import { initModels } from "../models/index.js";
 import { createFileService } from "../services/file.js";
 import { createSubmissionMessageService } from "../services/contentSubmissionMessage.js";
 import { createEmailPublisher } from "../services/emailPublisher.js";
+import { createNotificationPublisher } from "../services/notificationPublisher.js";
+import { createNotificationService } from "../services/notification.js";
 
-const { ContentSubmissionMessage, ContentSubmission, User, File } = initModels(sequelize);
+const { ContentSubmissionMessage, ContentSubmission, User, File, Notification } = initModels(sequelize);
 const fileService = createFileService({ File });
 const emailPublisher = createEmailPublisher();
-const submissionMessageService = createSubmissionMessageService({ ContentSubmissionMessage, ContentSubmission, User, fileService, emailPublisher });
+const notificationService = createNotificationService({ Notification });
+const notificationPublisher = createNotificationPublisher({ notificationService });
+const submissionMessageService = createSubmissionMessageService({ ContentSubmissionMessage, ContentSubmission, User, fileService, emailPublisher, notificationPublisher });
 
 // @desc    Get submission messages by id
 // @route   GET /api/v1/submissions/:id/messages
