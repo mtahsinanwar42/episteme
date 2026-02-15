@@ -227,6 +227,14 @@ export function ReviewAssignmentStatusUpdateModal({
                     formatDateTime(selectedAssignment.assignedAt)}
                 </span>
 
+                <span className="font-medium text-muted-foreground">
+                  Due At
+                </span>
+                <span>
+                  {selectedAssignment &&
+                    formatDateTime(selectedAssignment.dueAt)}
+                </span>
+
                 {selectedAssignment?.assignedByNotes && (
                   <>
                     <span className="font-medium text-muted-foreground">

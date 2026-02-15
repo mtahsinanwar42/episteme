@@ -86,6 +86,7 @@ export const REVIEW_ASSIGNMENT_STATUS = Object.freeze({
   DECLINED: 3,
   COMPLETED: 4,
   CANCELLED: 5,
+  OVERDUE: 6,
   DELETED: 9,
 });
 export const REVIEW_RECOMMENDATION = Object.freeze({
@@ -135,6 +136,7 @@ export const UPDATE_SCHEDULER_TIME_PATTERN = Object.freeze({
   TOPICS: "0 0 2 * * 0",
   COUNTRIES: "0 30 2 * * 0",
   CONFERENCE_STATUS_TRANSITION: "0 0 3 * * 0",
+  REVIEW_ASSIGNMENT_OVERDUE_TRANSITION: "30 3 * * *",
 });
 
 export const KAFKA_EVENT_TYPES = Object.freeze({

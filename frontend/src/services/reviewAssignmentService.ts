@@ -19,6 +19,8 @@ export interface SearchReviewAssignmentsParams {
   reviewerUsrIds?: number[];
   assignedDateFrom?: string;
   assignedDateTo?: string;
+  dueDateFrom?: string;
+  dueDateTo?: string;
 }
 
 export const reviewAssignmentService = {
@@ -65,6 +67,7 @@ export const reviewAssignmentService = {
     contentSubmissionId: number | string;
     reviewerUsrId: number | string;
     assignedByNotes?: string;
+    dueAt: string;
   }): Promise<{ success: boolean; data: unknown }> => {
     return api.post("/review-assignments", data, true);
   },
@@ -117,6 +120,12 @@ export const reviewAssignmentService = {
     }
     if (params?.assignedDateTo) {
       queryParams.append("assignedDateTo", params.assignedDateTo);
+    }
+    if (params?.dueDateFrom) {
+      queryParams.append("dueDateFrom", params.dueDateFrom);
+    }
+    if (params?.dueDateTo) {
+      queryParams.append("dueDateTo", params.dueDateTo);
     }
 
     const queryString = queryParams.toString();

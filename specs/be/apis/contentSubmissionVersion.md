@@ -47,7 +47,7 @@ Rules:
 
 - Submission must exist and be in PENDING_APPROVAL or RETURNED.
 - USER can upload only for owned submission.
-- REVIEWER can upload only when assignment status is ACCEPTED.
+- REVIEWER can upload only when assignment status is ACCEPTED and assignment due date is not passed.
 - ADMIN can upload for accessible submission.
 
 Side effects:

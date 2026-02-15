@@ -38,6 +38,7 @@ import { DoiUpdateModal } from "@/components/submission/DoiUpdateModal";
 import { AssignReviewerModal } from "@/components/submission/AssignReviewerModal";
 import { ReviewAssignmentStatusUpdateModal } from "@/components/reviewAssignment/ReviewAssignmentStatusUpdateModal";
 import { getReviewAssignmentStatusBadge } from "@/components/common/ReviewAssignmentStatusBadge";
+import { isDueAtNotPassed } from "@/utils/dateFormatter";
 
 export type SubmissionOutletContext = {
   submission: Submission;
@@ -121,6 +122,8 @@ export default function SubmissionDetails() {
       assignment.assignmentStatus === ReviewAssignmentStatus.ACCEPTED ||
       assignment.assignmentStatus === ReviewAssignmentStatus.DECLINED;
 
+    const isNotOverdue = isDueAtNotPassed(assignment.dueAt);
+
     const isSubmissionEligible =
       assignment.submissionStatus === ContentSubmissionStatus.PENDING_APPROVAL ||
       assignment.submissionStatus === ContentSubmissionStatus.RETURNED;
@@ -128,7 +131,7 @@ export default function SubmissionDetails() {
     const isConferenceActive =
       assignment.conferenceStatus === ConferenceStatus.ACTIVE;
 
-    return isStatusUpdatable && isSubmissionEligible && isConferenceActive;
+    return isStatusUpdatable && isNotOverdue && isSubmissionEligible && isConferenceActive;
   };
 
   if (isLoading) {

@@ -19,7 +19,7 @@ import {
   getSubmissionStatusBadge,
   getSubmissionStatusLabel,
 } from "@/components/common/SubmissionStatusBadge";
-import { formatDateTime } from "@/utils/dateFormatter";
+import { formatDateTime, isDueAtNotPassed } from "@/utils/dateFormatter";
 import { ReviewAssignmentStatusUpdateModal } from "@/components/reviewAssignment/ReviewAssignmentStatusUpdateModal";
 import { getReviewAssignmentStatusLabel } from "@/components/common/ReviewAssignmentStatusBadge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,8 @@ function canReviewerUpdateStatus(assignment: ReviewAssignment): boolean {
     assignment.assignmentStatus === ReviewAssignmentStatus.ACCEPTED ||
     assignment.assignmentStatus === ReviewAssignmentStatus.DECLINED;
 
+  const isNotOverdue = isDueAtNotPassed(assignment.dueAt);
+
   const isSubmissionEligible =
     assignment.submissionStatus === ContentSubmissionStatus.PENDING_APPROVAL ||
     assignment.submissionStatus === ContentSubmissionStatus.RETURNED;
@@ -42,7 +44,7 @@ function canReviewerUpdateStatus(assignment: ReviewAssignment): boolean {
   const isConferenceActive =
     assignment.conferenceStatus === ConferenceStatus.ACTIVE;
 
-  return isStatusUpdatable && isSubmissionEligible && isConferenceActive;
+  return isStatusUpdatable && isNotOverdue && isSubmissionEligible && isConferenceActive;
 }
 
 export default function MyReviewAssignments() {
@@ -161,6 +163,16 @@ export default function MyReviewAssignments() {
         cell: ({ row }) => (
           <span className="text-sm">
             {formatDateTime(row.getValue("assignedAt") as string)}
+          </span>
+        ),
+        enableSorting: false,
+      },
+      {
+        accessorKey: "dueAt",
+        header: "Due At",
+        cell: ({ row }) => (
+          <span className="text-sm">
+            {formatDateTime(row.getValue("dueAt") as string)}
           </span>
         ),
         enableSorting: false,

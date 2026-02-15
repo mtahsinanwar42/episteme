@@ -34,7 +34,7 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import PageTitle from "@/components/common/PageTitle";
 import PageSubTitle from "@/components/common/PageSubTitle";
-import { formatDateTime } from "@/utils/dateFormatter";
+import { formatDateTime, isDueAtNotPassed } from "@/utils/dateFormatter";
 import {
   getSubmissionStatusBadge,
   getSubmissionStatusLabel,
@@ -59,6 +59,7 @@ const ASSIGNMENT_STATUS_OPTIONS = [
   ReviewAssignmentStatus.DECLINED,
   ReviewAssignmentStatus.COMPLETED,
   ReviewAssignmentStatus.CANCELLED,
+  ReviewAssignmentStatus.OVERDUE,
   ReviewAssignmentStatus.DELETED,
 ];
 
@@ -76,6 +77,7 @@ const REVIEWER_ALLOWED_STATUSES = [
 function canAdminUpdateStatus(assignment: ReviewAssignment): boolean {
   const isAssignmentUpdatable =
     assignment.assignmentStatus !== ReviewAssignmentStatus.CANCELLED &&
+    assignment.assignmentStatus !== ReviewAssignmentStatus.OVERDUE &&
     assignment.assignmentStatus !== ReviewAssignmentStatus.DELETED;
 
   const isSubmissionEligible =
@@ -94,6 +96,8 @@ function canReviewerUpdateStatus(assignment: ReviewAssignment): boolean {
     assignment.assignmentStatus === ReviewAssignmentStatus.ACCEPTED ||
     assignment.assignmentStatus === ReviewAssignmentStatus.DECLINED;
 
+  const isNotOverdue = isDueAtNotPassed(assignment.dueAt);
+
   const isSubmissionEligible =
     assignment.submissionStatus === ContentSubmissionStatus.PENDING_APPROVAL ||
     assignment.submissionStatus === ContentSubmissionStatus.RETURNED;
@@ -101,7 +105,7 @@ function canReviewerUpdateStatus(assignment: ReviewAssignment): boolean {
   const isConferenceActive =
     assignment.conferenceStatus === ConferenceStatus.ACTIVE;
 
-  return isStatusUpdatable && isSubmissionEligible && isConferenceActive;
+  return isStatusUpdatable && isNotOverdue && isSubmissionEligible && isConferenceActive;
 }
 
 export default function ReviewAssignmentSearch() {
@@ -116,6 +120,8 @@ export default function ReviewAssignmentSearch() {
     conferenceId: "",
     assignedDateFrom: "",
     assignedDateTo: "",
+    dueDateFrom: "",
+    dueDateTo: "",
   });
   const [selectedSubmissionStatuses, setSelectedSubmissionStatuses] = useState<
     string[]
@@ -231,6 +237,8 @@ export default function ReviewAssignmentSearch() {
       formData.conferenceId !== "" ||
       formData.assignedDateFrom !== "" ||
       formData.assignedDateTo !== "" ||
+      formData.dueDateFrom !== "" ||
+      formData.dueDateTo !== "" ||
       selectedSubmissionStatuses.length > 0 ||
       selectedAssignmentStatuses.length > 0 ||
       (isAdmin && selectedAssignedByUsrIds.length > 0) ||
@@ -248,7 +256,7 @@ export default function ReviewAssignmentSearch() {
   ]);
 
   const dateValidationError = useMemo(() => {
-    const { assignedDateFrom, assignedDateTo } = formData;
+    const { assignedDateFrom, assignedDateTo, dueDateFrom, dueDateTo } = formData;
 
     if (assignedDateFrom && !assignedDateTo) {
       return "Assigned Date To is required when Assigned Date From is provided";
@@ -258,6 +266,16 @@ export default function ReviewAssignmentSearch() {
     }
     if (assignedDateFrom && assignedDateTo && assignedDateFrom > assignedDateTo) {
       return "Assigned Date From must not be after Assigned Date To";
+    }
+
+    if (dueDateFrom && !dueDateTo) {
+      return "Due Date To is required when Due Date From is provided";
+    }
+    if (!dueDateFrom && dueDateTo) {
+      return "Due Date From is required when Due Date To is provided";
+    }
+    if (dueDateFrom && dueDateTo && dueDateFrom > dueDateTo) {
+      return "Due Date From must not be after Due Date To";
     }
 
     return null;
@@ -398,6 +416,14 @@ export default function ReviewAssignmentSearch() {
         enableSorting: false,
       },
       {
+        accessorKey: "dueAt",
+        header: "Due At",
+        cell: ({ row }) => (
+          <span className="text-sm">{formatDateTime(row.getValue("dueAt") as string)}</span>
+        ),
+        enableSorting: false,
+      },
+      {
         id: "actions",
         header: () => <div className="text-center">Actions</div>,
         cell: ({ row }) => {
@@ -447,6 +473,12 @@ export default function ReviewAssignmentSearch() {
     if (formData.assignedDateTo) {
       params.assignedDateTo = formData.assignedDateTo;
     }
+    if (formData.dueDateFrom) {
+      params.dueDateFrom = formData.dueDateFrom;
+    }
+    if (formData.dueDateTo) {
+      params.dueDateTo = formData.dueDateTo;
+    }
     if (selectedSubmissionStatuses.length > 0) {
       params.submissionStatuses = selectedSubmissionStatuses.map((value) =>
         Number(value),
@@ -479,6 +511,8 @@ export default function ReviewAssignmentSearch() {
       conferenceId: "",
       assignedDateFrom: "",
       assignedDateTo: "",
+      dueDateFrom: "",
+      dueDateTo: "",
     });
     setSelectedSubmissionStatuses([]);
     setSelectedAssignmentStatuses([]);
@@ -748,6 +782,32 @@ export default function ReviewAssignmentSearch() {
                       type="date"
                       name="assignedDateTo"
                       value={formData.assignedDateTo}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-heading">
+                      Due Date From
+                    </label>
+                    <Input
+                      type="date"
+                      name="dueDateFrom"
+                      value={formData.dueDateFrom}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-heading">
+                      Due Date To
+                    </label>
+                    <Input
+                      type="date"
+                      name="dueDateTo"
+                      value={formData.dueDateTo}
                       onChange={handleInputChange}
                     />
                   </div>

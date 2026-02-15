@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import { canCreateReviewAssignment, canUpdateReviewAssignmentStatus, findReviewAssignments, findReviewAssignmentsBySearchFilters, findReviewAssignmentsByUserId } from "../repositories/contentReviewAssignment.js";
 import { CONTENT_SUBMISSION_STATUS, REVIEW_ASSIGNMENT_STATUS, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
+import { isCurrentDateOrFuture, parseOptionalDateInput } from "../utils/dateTime.js";
 import { isEmpty, isNotEmpty } from "../utils/string.js";
 import { normalizeNumberArray, toOptionalDateText, toOptionalInteger } from "../utils/search.js";
 
@@ -75,9 +76,15 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
 
     const safeAssignedDateFrom = toOptionalDateText(filters.assignedDateFrom, { fieldName: "assignedDateFrom" });
     const safeAssignedDateTo = toOptionalDateText(filters.assignedDateTo, { fieldName: "assignedDateTo" });
+    const safeDueDateFrom = toOptionalDateText(filters.dueDateFrom, { fieldName: "dueDateFrom" });
+    const safeDueDateTo = toOptionalDateText(filters.dueDateTo, { fieldName: "dueDateTo" });
 
     if (safeAssignedDateFrom && safeAssignedDateTo && safeAssignedDateFrom > safeAssignedDateTo) {
       throw new ErrorResponse(400, "assignedDateFrom cannot be greater than assignedDateTo");
+    }
+
+    if (safeDueDateFrom && safeDueDateTo && safeDueDateFrom > safeDueDateTo) {
+      throw new ErrorResponse(400, "dueDateFrom cannot be greater than dueDateTo");
     }
 
     return findReviewAssignmentsBySearchFilters({
@@ -96,15 +103,31 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       assignedByUsrIds: safeAssignedByUsrIds,
       assignedDateFrom: safeAssignedDateFrom,
       assignedDateTo: safeAssignedDateTo,
+      dueDateFrom: safeDueDateFrom,
+      dueDateTo: safeDueDateTo,
       isAdmin,
     });
   }
 
   async function saveReviewAssignment(user, payload) {
-    const { contentSubmissionId, reviewerUsrId, assignedByNotes } = payload;
+    const { contentSubmissionId, reviewerUsrId, assignedByNotes, dueAt } = payload;
 
-    if (isNaN(contentSubmissionId) || isNaN(reviewerUsrId)) {
-      throw new ErrorResponse(404, "contentSubmissionId and reviewerUsrId are required");
+    if (isNaN(contentSubmissionId) || isNaN(reviewerUsrId) || dueAt === undefined || dueAt === null) {
+      throw new ErrorResponse(400, "contentSubmissionId, reviewerUsrId and dueAt are required");
+    }
+
+    let parsedDueAt = null;
+    const parsedDueAtInput = parseOptionalDateInput(dueAt);
+
+    if (parsedDueAtInput.isEmpty || parsedDueAtInput.isInvalid) {
+      throw new ErrorResponse(400, "dueAt must be a valid date");
+    }
+
+    if (parsedDueAtInput.isProvided) {
+      parsedDueAt = parsedDueAtInput.date;
+      if (!isCurrentDateOrFuture(parsedDueAt)) {
+        throw new ErrorResponse(400, "dueAt must be current date or future date");
+      }
     }
 
     const { assignmentExists, submissionExists, reviewerExists } = await canCreateReviewAssignment({ contentSubmissionId, reviewerUsrId });
@@ -126,6 +149,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       reviewerUsrId: Number(reviewerUsrId),
       assignedByUsrId: Number(user.id),
       assignedByNotes: assignedByNotes ?? null,
+      dueAt: parsedDueAt,
       status: REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
     });
 
@@ -133,6 +157,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       reviewerUsrId: Number(reviewerUsrId),
       contentSubmissionId: Number(contentSubmissionId),
       notes: assignedByNotes ?? null,
+      dueAt: assignment.dueAt,
     });
 
     return assignment;
@@ -184,17 +209,27 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
     }
 
     const oldStatus = assignment.status;
-
-    if ([REVIEW_ASSIGNMENT_STATUS.CANCELLED, REVIEW_ASSIGNMENT_STATUS.DELETED].includes(assignment.status)) {
-      throw new ErrorResponse(400, "Cannot update cancelled/deleted review assignment.");
-    }
-
-    if (!isAdmin && ![
+    const nonUpdatableStatuses = [
+      REVIEW_ASSIGNMENT_STATUS.CANCELLED,
+      REVIEW_ASSIGNMENT_STATUS.OVERDUE,
+      REVIEW_ASSIGNMENT_STATUS.DELETED,
+    ];
+    const reviewerAllowedCurrentStatuses = [
       REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
       REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
       REVIEW_ASSIGNMENT_STATUS.DECLINED,
-    ].includes(assignment.status)) {
+    ];
+
+    if (nonUpdatableStatuses.includes(oldStatus)) {
+      throw new ErrorResponse(400, "Cannot update cancelled/overdue/deleted review assignment.");
+    }
+
+    if (!isAdmin && !reviewerAllowedCurrentStatuses.includes(oldStatus)) {
       throw new ErrorResponse(400, "Cannot update review assignment from current status.");
+    }
+
+    if (!isAdmin && assignment.dueAt && new Date(assignment.dueAt) < new Date()) {
+      throw new ErrorResponse(400, "Cannot update overdue review assignment.");
     }
 
     const { submissionExists } = await canUpdateReviewAssignmentStatus({
@@ -214,19 +249,21 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
         reviewerUsrId: Number(assignment.reviewerUsrId),
         contentSubmissionId: Number(assignment.contentSubmissionId),
         notes: updates.statusUpdateNotes,
+        dueAt: assignment.dueAt,
       });
     } else {
       await publishReviewAssignmentUpdateStatusByReviewerEmail(user, {
         oldStatus,
         newStatus: updates.status,
         contentSubmissionId: Number(assignment.contentSubmissionId),
+        dueAt: assignment.dueAt,
       });
     }
 
     return assignment;
   }
 
-  async function publishReviewAssignmentCreateEmail(user, { reviewerUsrId, contentSubmissionId, notes, }) {
+  async function publishReviewAssignmentCreateEmail(user, { reviewerUsrId, contentSubmissionId, notes, dueAt, }) {
     const reviewer = await User.findByPk(reviewerUsrId);
 
     const submission = await ContentSubmission.findByPk(contentSubmissionId);
@@ -244,10 +281,11 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       submissionUrl,
       assignedBy,
       notes,
+      dueAt,
     })
   }
 
-  async function publishReviewAssignmentUpdateStatusByAdminEmail(user, { oldStatus, newStatus, reviewerUsrId, contentSubmissionId, notes, }) {
+  async function publishReviewAssignmentUpdateStatusByAdminEmail(user, { oldStatus, newStatus, reviewerUsrId, contentSubmissionId, notes, dueAt, }) {
     const reviewer = await User.findByPk(reviewerUsrId);
     const assignedBy = {
       firstName: user.firstName,
@@ -266,10 +304,11 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       submissionUrl: submission.status !== CONTENT_SUBMISSION_STATUS.DELETED && submissionUrl,
       assignedBy,
       notes,
+      dueAt,
     });
   }
 
-  async function publishReviewAssignmentUpdateStatusByReviewerEmail(user, { oldStatus, newStatus, contentSubmissionId, }) {
+  async function publishReviewAssignmentUpdateStatusByReviewerEmail(user, { oldStatus, newStatus, contentSubmissionId, dueAt, }) {
     const admins = await User.findAll({
       where: {
         roles: {
@@ -289,6 +328,7 @@ export function createReviewAssignmentService({ ContentReviewAssignment, Content
       reviewer: user,
       submissionTitle,
       submissionUrl,
+      dueAt,
     });
   }
 

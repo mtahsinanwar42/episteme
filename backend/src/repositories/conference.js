@@ -207,6 +207,7 @@ export async function markConferenceAsFinished(
     assignmentToBeCancelledStatus: [
       REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
       REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
+      REVIEW_ASSIGNMENT_STATUS.OVERDUE,
     ],
   };
 

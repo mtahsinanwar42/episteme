@@ -52,14 +52,14 @@ Request body:
 Add Review button is visible only when all are true:
 
 - Reviewer is non-owner and has assignment for this submission
-- Assignment status is ACCEPTED
+- Assignment status is ACCEPTED and assignment due date/time is not passed
 - Submission status is PENDING_APPROVAL or RETURNED
 - Reviewer has not already submitted a review for `submission.currentContentSubmissionVersionId`
 
 Info messages shown when blocked:
 
 - `Review submission is only available for submissions with status Pending Approval or Returned.`
-- `You cannot submit a review unless the assignment status is Accepted.`
+- `You cannot submit a review unless the assignment status is Accepted and not overdue.`
 - `You already submitted a review for the current submission version. Add Review will be available after a new version is uploaded.`
 
 ## Table Columns

@@ -128,5 +128,5 @@ Request body:
 Notes:
 
 - Cannot update once submission is already APPROVED, REJECTED, or DELETED.
-- Setting status to APPROVED/REJECTED auto-cancels ASSIGNED/ACCEPTED review assignments.
+- Setting status to APPROVED/REJECTED auto-cancels ASSIGNED/ACCEPTED/OVERDUE review assignments.
 - Setting status to DELETED also marks associated review assignments as DELETED.

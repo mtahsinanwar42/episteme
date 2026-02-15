@@ -175,6 +175,7 @@ export interface SubmissionReviewer {
   assignmentStatus?: number;
   assignmentStatusUpdateNotes?: string | null;
   assignedAt?: string;
+  dueAt?: string;
   assignedByUserId?: string | number;
   assignedByNotes?: string;
   assignedByEmail?: string;

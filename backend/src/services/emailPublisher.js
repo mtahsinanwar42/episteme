@@ -252,6 +252,7 @@ export function createEmailPublisher() {
       submissionUrl,
       assignedBy,
       notes,
+      dueAt,
     }) {
       return publishEmail({
         actorUserId: reviewer.id,
@@ -271,6 +272,7 @@ export function createEmailPublisher() {
             email: assignedBy.email,
           },
           notes,
+          dueAt,
         },
       });
     },
@@ -282,6 +284,7 @@ export function createEmailPublisher() {
       submissionUrl,
       assignedBy,
       notes,
+      dueAt,
     }) {
       return publishEmail({
         to: buildRecipient(reviewer),
@@ -302,6 +305,7 @@ export function createEmailPublisher() {
             email: assignedBy.email,
           },
           notes,
+          dueAt,
         },
       });
     },
@@ -312,6 +316,7 @@ export function createEmailPublisher() {
       reviewer,
       submissionTitle,
       submissionUrl,
+      dueAt,
     }) {
       return publishEmail({
         actorUserId: reviewer.id,
@@ -327,6 +332,7 @@ export function createEmailPublisher() {
             lastName: reviewer.lastName,
             email: reviewer.email,
           },
+          dueAt,
         },
       });
     },

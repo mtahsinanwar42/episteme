@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import { UPDATE_SCHEDULER_TIME_PATTERN } from "../utils/constants.js";
 import { findConferencesToAutoFinish, markConferenceAsFinished } from "../repositories/conference.js";
+import { markOverdueReviewAssignments } from "../repositories/contentReviewAssignment.js";
 import { sequelize } from "../config/db.js";
 
 export function createSchedulerService({ refDataService }) {
@@ -90,6 +91,19 @@ export function createSchedulerService({ refDataService }) {
       console.error("[Scheduler] transitionConferenceStatus failed:", err);
     }
   }
+  async function transitionOverdueReviewAssignmentsJob() {
+    console.log("[Scheduler] transitionOverdueReviewAssignments started");
+
+    try {
+      const updatedCount = await markOverdueReviewAssignments();
+
+      console.log(
+        `[Scheduler] transitionOverdueReviewAssignments finished (${updatedCount} assignments transitioned)`
+      );
+    } catch (err) {
+      console.error("[Scheduler] transitionOverdueReviewAssignments failed:", err);
+    }
+  }
 
   function start() {
     cron.schedule(UPDATE_SCHEDULER_TIME_PATTERN.TOPICS, refreshTopicsJob, {
@@ -99,6 +113,9 @@ export function createSchedulerService({ refDataService }) {
       scheduled: true,
     });
     cron.schedule(UPDATE_SCHEDULER_TIME_PATTERN.CONFERENCE_STATUS_TRANSITION, transitionConferenceStatusJob, {
+      scheduled: true,
+    });
+    cron.schedule(UPDATE_SCHEDULER_TIME_PATTERN.REVIEW_ASSIGNMENT_OVERDUE_TRANSITION, transitionOverdueReviewAssignmentsJob, {
       scheduled: true,
     });
 

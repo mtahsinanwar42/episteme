@@ -17,6 +17,7 @@ import {
   MessageThread,
   useMessageGroups,
 } from "@/components/submission/message";
+import { isDueAtNotPassed } from "@/utils/dateFormatter";
 
 export default function SubmissionMessages() {
   const { submission, isAdmin, isReviewerNonOwner } =
@@ -73,7 +74,8 @@ export default function SubmissionMessages() {
     return (reviewerAssignmentsData?.data ?? []).some(
       (assignment) =>
         Number(assignment.submissionId) === Number(submissionId) &&
-        Number(assignment.assignmentStatus) === ReviewAssignmentStatus.ACCEPTED,
+        Number(assignment.assignmentStatus) === ReviewAssignmentStatus.ACCEPTED &&
+        isDueAtNotPassed(assignment.dueAt),
     );
   }, [isReviewerNonOwner, reviewerAssignmentsData, submissionId]);
 
@@ -88,6 +90,9 @@ export default function SubmissionMessages() {
       if (status !== ReviewAssignmentStatus.ACCEPTED) {
         return "You cannot send new messages unless the assignment status is Accepted.";
       }
+      if (!isDueAtNotPassed(reviewer.dueAt)) {
+        return "You cannot send new messages because this review assignment is overdue.";
+      }
       return null;
     },
     [isAdmin, reviewersData],
@@ -97,7 +102,7 @@ export default function SubmissionMessages() {
   const reviewerSelfInfoMessage = useMemo(() => {
     if (!isReviewerNonOwner) return null;
     if (!hasAcceptedReviewerAssignment) {
-      return "You cannot send new messages unless the assignment status is Accepted.";
+      return "You cannot send new messages unless the assignment status is Accepted and not overdue.";
     }
     return null;
   }, [

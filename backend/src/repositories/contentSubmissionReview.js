@@ -126,6 +126,7 @@ export async function findSubmissionReviewersById({
       CRA.status          AS "assignmentStatus",
       CRA.status_update_notes AS "assignmentStatusUpdateNotes",
       CRA.assigned_at     AS "assignedAt",
+      CRA.due_at          AS "dueAt",
       CRA.assigned_by_usr_id AS "assignedByUserId",
       CRA.assigned_by_notes  AS "assignedByNotes",
       AB.email            AS "assignedByEmail",
@@ -184,6 +185,7 @@ export async function canCreateSubmissionReview({
         WHERE CRA.content_submission_id = :submissionId
           AND CRA.reviewer_usr_id = :loggedInUserId
           AND CRA.status = :acceptedAssignmentStatus
+          AND CRA.due_at >= NOW()
       ) AS "isAssignedReviewer";
   `;
 

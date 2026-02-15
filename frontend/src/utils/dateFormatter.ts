@@ -105,6 +105,52 @@ export function formatDateForInput(
 }
 
 /**
+ * Formats a local Date as YYYY-MM-DD for date inputs.
+ */
+export function formatLocalDateForInput(date: Date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Converts a date input value (YYYY-MM-DD) to an ISO string at local end-of-day.
+ */
+export function formatDateInputToLocalEndOfDayIso(
+  dateInputValue: string,
+): string {
+  if (!dateInputValue) return "";
+
+  const [yearText, monthText, dayText] = dateInputValue.split("-");
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+
+  if (!year || !month || !day) return "";
+
+  return new Date(year, month - 1, day, 23, 59, 59, 999).toISOString();
+}
+
+export function isDateInputTodayOrFuture(dateInputValue: string): boolean {
+  if (!dateInputValue) return false;
+
+  return dateInputValue >= formatLocalDateForInput();
+}
+
+export function isDueAtNotPassed(dueAt: string | undefined | null): boolean {
+  if (!dueAt) return true;
+
+  const parsed = new Date(dueAt);
+  if (Number.isNaN(parsed.getTime())) {
+    return false;
+  }
+
+  return parsed.getTime() >= Date.now();
+}
+
+/**
  * Converts a date input value (YYYY-MM-DD) to ISO string for backend
  * @param dateInputValue - Date string from input field (YYYY-MM-DD)
  * @returns ISO date string adjusted for backend timezone expectations

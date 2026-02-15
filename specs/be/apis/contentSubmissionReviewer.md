@@ -25,7 +25,7 @@ Response:
 Row shape (`data[]`):
 
 - Reviewer identity: `id`, `email`, `firstName`, `lastName`, `phone`, `roles`, `status`, `institution`, `occupation`, `country`
-- Assignment info: `assignmentId`, `assignmentStatus`, `assignmentStatusUpdateNotes`, `assignedAt`, `assignedByUserId`, `assignedByNotes`
+- Assignment info: `assignmentId`, `assignmentStatus`, `assignmentStatusUpdateNotes`, `assignedAt`, `dueAt`, `assignedByUserId`, `assignedByNotes`
 - Assigner identity: `assignedByEmail`, `assignedByFirstName`, `assignedByLastName`
 
 Notes:
