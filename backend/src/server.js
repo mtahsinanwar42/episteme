@@ -25,6 +25,7 @@ import announcementRoutes from "./routes/announcement.js";
 import submissionRoutes from "./routes/contentSubmission.js";
 import reviewAssignmentRoutes from "./routes/contentReviewAssignment.js";
 import contactSupportRoutes from "./routes/support.js";
+import notificationRoutes from "./routes/notification.js";
 import { createRefDataService } from "./services/referenceData.js";
 import { createSchedulerService } from "./services/scheduler.js";
 import { createKafkaTopics, startKafkaProducer, stopKafkaProducer } from "./config/kafka.js";
@@ -88,6 +89,7 @@ app.use('/api/v1/activities', activityRoutes);
 app.use('/api/v1/announcements', announcementRoutes);
 app.use('/api/v1/submissions', submissionRoutes);
 app.use('/api/v1/review-assignments', reviewAssignmentRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 if (process.env.FILE_STORAGE_PATH) {
   const storageBaseAbs = path.resolve(__dirname, process.env.FILE_STORAGE_PATH);

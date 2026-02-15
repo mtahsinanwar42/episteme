@@ -5,13 +5,23 @@ import { CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTE
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { isEmpty } from "../utils/string.js";
 
-export function createSubmissionVersionService({ ContentSubmissionVersion, ContentSubmission, User, fileService, emailPublisher }) {
+export function createSubmissionVersionService({ ContentSubmissionVersion, ContentSubmission, User, fileService, emailPublisher, notificationPublisher }) {
   if (!ContentSubmissionVersion || !ContentSubmission || !User) {
     throw new Error("createSubmissionVersionService requires { ContentSubmissionVersion, ContentSubmission, User } model");
   }
 
   if (!fileService || !emailPublisher) {
     throw new Error("createSubmissionVersionService requires { fileService, emailPublisher }");
+  }
+
+  if (!notificationPublisher) {
+    throw new Error("createSubmissionVersionService requires { notificationPublisher }");
+  }
+
+  function publishNotificationSafely(promise, context) {
+    void promise.catch((err) => {
+      console.error(`[notification] ${context} failed`, err);
+    });
   }
 
   async function getSubmissionVersionsById(user, { submissionId }) {
@@ -179,6 +189,11 @@ export function createSubmissionVersionService({ ContentSubmissionVersion, Conte
       submissionTitle,
       submissionUrl,
     });
+    publishNotificationSafely(notificationPublisher.publishSubmissionVersionCreatedNotification(receivers, {
+      uploader: user,
+      submissionTitle,
+      submissionId,
+    }), "publishSubmissionVersionCreatedNotification");
   }
 
   return {

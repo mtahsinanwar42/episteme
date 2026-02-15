@@ -161,6 +161,16 @@ h6 {
     @apply bg-linear-to-br;
     background-image: linear-gradient(135deg, var(--card-gradient));
   }
+
+  .notif-entry:hover {
+    background-color: rgba(59, 130, 246, 0.14) !important;
+    border-left-color: rgb(59, 130, 246) !important;
+  }
+
+  html[data-theme="dark"] .notif-entry:hover {
+    background-color: rgba(59, 130, 246, 0.24) !important;
+    border-left-color: rgb(96, 165, 250) !important;
+  }
 }
 
 /* React Quill Editor Styles */

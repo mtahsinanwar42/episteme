@@ -3,7 +3,7 @@ import { USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import { serializeUser } from "../utils/serializers.js";
 import { isEmpty, isNotEmpty, isValidEmail, isValidPhone } from "../utils/string.js";
 
-export function createUserService({ User, fileService, emailPublisher }) {
+export function createUserService({ User, fileService, emailPublisher, notificationPublisher }) {
   if (!User) {
     throw new Error("createUserService requires { User } model");
   }
@@ -14,6 +14,16 @@ export function createUserService({ User, fileService, emailPublisher }) {
 
   if (!emailPublisher) {
     throw new Error("createUserService requires { emailPublisher }");
+  }
+
+  if (!notificationPublisher) {
+    throw new Error("createUserService requires { notificationPublisher }");
+  }
+
+  function publishNotificationSafely(promise, context) {
+    void promise.catch((err) => {
+      console.error(`[notification] ${context} failed`, err);
+    });
   }
 
   function normalizeRoles(roles) {
@@ -196,6 +206,10 @@ export function createUserService({ User, fileService, emailPublisher }) {
         oldRoles,
         newRoles: updates.roles,
       });
+      publishNotificationSafely(notificationPublisher.publishUserRolesUpdatedNotification(user, {
+        oldRoles,
+        newRoles: updates.roles,
+      }), "publishUserRolesUpdatedNotification");
     }
 
     const statusChanged = Number.isInteger(updates.status) && updates.status !== oldStatus;

@@ -5,11 +5,15 @@ import { createFileService } from "../services/file.js";
 import { createSubmissionReviewService } from "../services/contentSubmissionReview.js";
 import { DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO } from "../utils/constants.js";
 import { createEmailPublisher } from "../services/emailPublisher.js";
+import { createNotificationPublisher } from "../services/notificationPublisher.js";
+import { createNotificationService } from "../services/notification.js";
 
-const { ContentReview, ContentReviewAssignment, ContentSubmission, User, ContentSubmissionVersion, File } = initModels(sequelize);
+const { ContentReview, ContentReviewAssignment, ContentSubmission, User, ContentSubmissionVersion, File, Notification } = initModels(sequelize);
 const fileService = createFileService({ File });
 const emailPublisher = createEmailPublisher();
-const submissionReviewService = createSubmissionReviewService({ ContentReview, ContentSubmission, ContentSubmissionVersion, ContentReviewAssignment, User, fileService, emailPublisher });
+const notificationService = createNotificationService({ Notification });
+const notificationPublisher = createNotificationPublisher({ notificationService });
+const submissionReviewService = createSubmissionReviewService({ ContentReview, ContentSubmission, ContentSubmissionVersion, ContentReviewAssignment, User, fileService, emailPublisher, notificationPublisher });
 
 // @desc    Get submission reviews by id
 // @route   GET /api/v1/submissions/:id/reviews

@@ -5,11 +5,15 @@ import { initModels } from "../models/index.js";
 import { createFileService } from "../services/file.js";
 import { createUserService } from "../services/user.js";
 import { createEmailPublisher } from "../services/emailPublisher.js";
+import { createNotificationPublisher } from "../services/notificationPublisher.js";
+import { createNotificationService } from "../services/notification.js";
 
-const { User, File } = initModels(sequelize);
+const { User, File, Notification } = initModels(sequelize);
 const fileService = createFileService({ File });
 const emailPublisher = createEmailPublisher();
-const userService = createUserService({ User, fileService, emailPublisher });
+const notificationService = createNotificationService({ Notification });
+const notificationPublisher = createNotificationPublisher({ notificationService });
+const userService = createUserService({ User, fileService, emailPublisher, notificationPublisher });
 
 // @desc    Get all users
 // @route   GET /api/v1/users
