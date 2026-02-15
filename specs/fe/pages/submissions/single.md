@@ -90,6 +90,7 @@ Menu items:
 - Reviewer selection excludes:
   - Already assigned reviewers
   - Submission owner
+- Required `dueAt` is included in create payload and must be current/future date.
 - Optional `assignedByNotes` is included in create payload.
 - Success toast: `Reviewer assigned successfully.`
 
@@ -114,6 +115,7 @@ Displays:
 - REVIEWER:
   - Can open assigned submissions.
   - Sees assignment badge + assignment details modal.
+  - Reviewer status update actions are additionally blocked when assignment due date/time is passed.
 - ADMIN:
   - Can open non-owned submissions.
   - Can access status/DOI/reviewer assignment actions by status rules.

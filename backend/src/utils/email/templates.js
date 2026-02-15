@@ -284,6 +284,8 @@ export function getMailContents(mailType, metadata = {}) {
     },
 
     [MAIL_TYPES.REVIEW_ASSIGNMENT_CREATED]: (m) => {
+      const dueAtText = m.dueAt ? new Date(m.dueAt).toISOString() : null;
+
       return {
         subject: `New Review Assignment: ${esc(m.submissionTitle)}`,
         html: emailLayout({
@@ -294,6 +296,7 @@ export function getMailContents(mailType, metadata = {}) {
             p(
               `<strong>Assigned By:</strong> ${esc(m.assignedBy.firstName)} ${esc(m.assignedBy.lastName)}, ${esc(m.assignedBy.email)}`
             ),
+            dueAtText ? p(`<strong>Due At:</strong> ${esc(dueAtText)}`) : "",
             m.notes ? p(`<strong>Notes:</strong> ${esc(m.notes)}`) : "",
             p(`Open submission: ${a(m.submissionUrl, "View submission")}`),
             p(`If you have questions, contact the assigner.`),
@@ -306,6 +309,7 @@ export function getMailContents(mailType, metadata = {}) {
     [MAIL_TYPES.REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_ADMIN]: (m) => {
       const oldStatus = getFormattedEnumLabel(REVIEW_ASSIGNMENT_STATUS, m.oldStatus);
       const newStatus = getFormattedEnumLabel(REVIEW_ASSIGNMENT_STATUS, m.newStatus);
+      const dueAtText = m.dueAt ? new Date(m.dueAt).toISOString() : null;
 
       return {
         subject: `Review Assignment Status Updated: ${esc(m.submissionTitle)}`,
@@ -317,6 +321,7 @@ export function getMailContents(mailType, metadata = {}) {
             p(`<strong>Updated By:</strong> ${esc(m.assignedBy.firstName)} ${esc(m.assignedBy.lastName)}, ${esc(m.assignedBy.email)}`),
             p(`<strong>Previous Status:</strong> ${esc(oldStatus)}`),
             p(`<strong>New Status:</strong> ${esc(newStatus)}`),
+            dueAtText ? p(`<strong>Due At:</strong> ${esc(dueAtText)}`) : "",
             m.notes ? p(`<strong>Notes:</strong> ${esc(m.notes)}`) : "",
             m.submissionUrl ? p(`Open submission: ${a(m.submissionUrl, "View submission")}`) : "",
           ].filter(Boolean).join(""),
@@ -328,6 +333,7 @@ export function getMailContents(mailType, metadata = {}) {
     [MAIL_TYPES.REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_REVIEWER]: (m) => {
       const oldStatus = getFormattedEnumLabel(REVIEW_ASSIGNMENT_STATUS, m.oldStatus);
       const newStatus = getFormattedEnumLabel(REVIEW_ASSIGNMENT_STATUS, m.newStatus);
+      const dueAtText = m.dueAt ? new Date(m.dueAt).toISOString() : null;
 
       return {
         subject: `Review Assignment Updated by Reviewer: ${esc(m.submissionTitle)}`,
@@ -339,6 +345,7 @@ export function getMailContents(mailType, metadata = {}) {
             p(`<strong>Reviewer:</strong> ${esc(m.reviewer.firstName)} ${esc(m.reviewer.lastName)}, ${esc(m.reviewer.email)}`),
             p(`<strong>Previous Status:</strong> ${esc(oldStatus)}`),
             p(`<strong>New Status:</strong> ${esc(newStatus)}`),
+            dueAtText ? p(`<strong>Due At:</strong> ${esc(dueAtText)}`) : "",
             p(`Open submission: ${a(m.submissionUrl, "View submission")}`),
           ].filter(Boolean).join(""),
           footerHtml,

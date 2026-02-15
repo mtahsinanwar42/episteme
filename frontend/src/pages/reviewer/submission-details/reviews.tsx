@@ -36,7 +36,7 @@ import {
 import { useSearchReviewAssignments } from "@/hooks/useReviewAssignments";
 import { ReviewAssignmentStatus } from "@/models/reviewAssignment";
 import { fileService } from "@/services/fileService";
-import { formatDateTime } from "@/utils/dateFormatter";
+import { formatDateTime, isDueAtNotPassed } from "@/utils/dateFormatter";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DownloadCloud, Info } from "lucide-react";
 
@@ -114,7 +114,8 @@ export default function SubmissionReviews() {
     return assignments.some(
       (assignment) =>
         Number(assignment.submissionId) === Number(submissionId) &&
-        assignment.assignmentStatus === ReviewAssignmentStatus.ACCEPTED,
+        assignment.assignmentStatus === ReviewAssignmentStatus.ACCEPTED &&
+        isDueAtNotPassed(assignment.dueAt),
     );
   }, [isReviewerNonOwner, assignmentsData, submissionId]);
   const hasReviewForCurrentSubmissionVersion = useMemo(() => {
@@ -150,7 +151,7 @@ export default function SubmissionReviews() {
     isReviewerNonOwner &&
     hasReviewerAssignment &&
     !hasAcceptedAssignment
-      ? "You cannot submit a review unless the assignment status is Accepted."
+      ? "You cannot submit a review unless the assignment status is Accepted and not overdue."
       : null;
 
   const isSubmitting =

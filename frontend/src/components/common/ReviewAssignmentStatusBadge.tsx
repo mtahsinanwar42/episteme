@@ -25,6 +25,8 @@ export const getReviewAssignmentStatusBadge = (status: number) => {
       return <Badge variant="outline">Completed</Badge>;
     case ReviewAssignmentStatus.CANCELLED:
       return <Badge variant="secondary">Cancelled</Badge>;
+    case ReviewAssignmentStatus.OVERDUE:
+      return <Badge variant="destructive">Overdue</Badge>;
     case ReviewAssignmentStatus.DELETED:
       return <Badge variant="destructive">Deleted</Badge>;
     default:

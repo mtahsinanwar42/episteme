@@ -1,4 +1,4 @@
-# Review Assignments — New
+# Review Assignments - New
 
 ## Route
 
@@ -12,7 +12,7 @@
 
 - Allow ADMIN to assign a submission to a reviewer.
 - Capture optional notes for the reviewer during assignment.
-- Create a new review assignment for a submission.
+- Capture required assignment due date.
 
 ---
 
@@ -21,36 +21,41 @@
 ### Create Review Assignment
 
 - `POST /api/v1/review-assignments`
-- Trigger: Form submission
-- Request body: As defined in Review Assignment API spec
+- Trigger: form submission
+- Request body:
+  - `contentSubmissionId` (required)
+  - `reviewerUsrId` (required)
+  - `assignedByNotes` (optional)
+  - `dueAt` (required date value)
 
 ### Supporting Data (if applicable)
 
 - Submissions list:
   - `GET /api/v1/submissions`
-  - Purpose: Populate submission selection, PENDING APPROVAL + RETURNED ones.
+  - Purpose: populate submission selection.
 - Reviewers list:
   - `GET /api/v1/users`
-  - Purpose: Populate reviewer selection
-
-> Query params tweaking needed.
+  - Purpose: populate reviewer selection.
 
 ---
 
 ## UI Requirements
 
-- Layout: **form view**
+- Layout: form view
 
 ### Fields
 
 - Submission (select, required)
-  - Represents `contentSubmissionId`
+  - Maps to `contentSubmissionId`
 - Reviewer (select, required)
-  - Represents `reviewerUsrId`
+  - Maps to `reviewerUsrId`
+- Due Date (required date input)
+  - Maps to `dueAt`
+  - Must be current date or future date
 - Notes for Reviewer (text area, optional)
-  - Represents `assignedByNotes`
+  - Maps to `assignedByNotes`
 
-**Actions**
+### Actions
 
 - Primary: Assign
 - Secondary: Cancel (navigate back to `/review-assignments`)
@@ -59,11 +64,12 @@
 
 ## Form Behavior
 
-- All required fields must be provided before submission.
+- Required fields must be provided before submission.
+- `dueAt` validation blocks past dates.
 - Submit action triggers review assignment creation API.
 - While submitting:
-  - Disable submit action
-  - Show loading indicator
+  - Disable submit action.
+  - Show loading indicator.
 
 ---
 
@@ -74,7 +80,7 @@
 - Navigate to:
   - `/review-assignments`
 - Show success message:
-  - “Review assignment created successfully.”
+  - `Review assignment created successfully.`
 
 ### On Validation Error
 
@@ -84,23 +90,22 @@
 ### On Error
 
 - Show error message:
-  - “Failed to create review assignment.”
+  - `Failed to create review assignment.`
 - Allow retry.
 
 ---
 
 ## States
 
-- Loading (initial load of submissions / reviewers)
+- Loading (initial load of submissions/reviewers)
 - Loading (form submission)
 - Error (API failure)
 - Forbidden:
-  - Non-ADMIN attempting to access this page
+  - non-ADMIN attempting to access this page
 
 ---
 
 ## Access Control Rules
 
 - Only ADMIN can access this page.
-- ADMIN can assign any submission to any reviewer.
 - REVIEWER and USER must not see navigation entry or access this route.

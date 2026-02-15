@@ -9,6 +9,7 @@ Base Path: **/api/v1/review-assignments**
 - `3` DECLINED
 - `4` COMPLETED
 - `5` CANCELLED
+- `6` OVERDUE
 - `9` DELETED
 
 ## 1. Get All Review Assignments
@@ -51,6 +52,8 @@ Query params:
 - `assignedByUsrIds` (integer[])
 - `assignedDateFrom` (`YYYY-MM-DD`)
 - `assignedDateTo` (`YYYY-MM-DD`)
+- `dueDateFrom` (`YYYY-MM-DD`)
+- `dueDateTo` (`YYYY-MM-DD`)
 
 Rules:
 
@@ -60,6 +63,7 @@ Rules:
 - REVIEWER cannot use `submissionOwnerUsrIds`, `reviewerUsrIds`, or `assignedByUsrIds`.
 - REVIEWER results exclude deleted assignments and deleted submissions.
 - `assignedDateFrom` must be `<= assignedDateTo`.
+- `dueDateFrom` must be `<= dueDateTo`.
 
 ## 4. Save Review Assignment
 
@@ -71,6 +75,7 @@ Request body:
 - `contentSubmissionId` (required integer)
 - `reviewerUsrId` (required integer)
 - `assignedByNotes` (optional string)
+- `dueAt` (required date value; accepts ISO-8601 datetime or `YYYY-MM-DD`; must be current date or future date)
 
 Example:
 
@@ -78,7 +83,8 @@ Example:
 {
   "contentSubmissionId": 13,
   "reviewerUsrId": 19,
-  "assignedByNotes": "Please review this"
+  "assignedByNotes": "Please review this",
+  "dueAt": "2026-02-21T23:59:59.999Z"
 }
 ```
 
@@ -102,5 +108,6 @@ Rules:
 
 - ADMIN can set: ASSIGNED, CANCELLED, DELETED.
 - REVIEWER can set: ACCEPTED, DECLINED.
-- Cannot update assignment already CANCELLED or DELETED.
+- Cannot update assignment already CANCELLED, OVERDUE, or DELETED.
+- REVIEWER cannot update when assignment due date is already passed.
 - Submission must be in PENDING_APPROVAL/RETURNED and conference ACTIVE.

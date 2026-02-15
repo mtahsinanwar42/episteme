@@ -34,6 +34,12 @@ export default (sequelize, DataTypes) => {
         field: "assigned_at",
         defaultValue: DataTypes.NOW,
       },
+      dueAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: "due_at",
+        defaultValue: sequelize.literal(`NOW() + INTERVAL '7 DAYS'`),
+      },
       status: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -54,6 +60,7 @@ export default (sequelize, DataTypes) => {
       hooks: {
         beforeCreate(row) {
           row.assignedAt = row.assignedAt ?? new Date();
+          row.dueAt = row.dueAt ?? new Date(Date.now() + (7 * 24 * 60 * 60 * 1000));
         },
       },
     }

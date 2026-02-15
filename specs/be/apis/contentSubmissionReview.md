@@ -55,7 +55,7 @@ Example:
 Rules:
 
 - Submission must be in PENDING_APPROVAL or RETURNED.
-- Reviewer must have ACCEPTED assignment for the submission.
+- Reviewer must have ACCEPTED assignment for the submission and assignment due date must not be passed.
 - If `reviewerContentSubmissionVersionId` is provided, it must reference a version uploaded by REVIEWER.
 
 Side effect:

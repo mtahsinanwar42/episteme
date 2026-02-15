@@ -137,6 +137,7 @@ export async function canCreateSubmissionVersion({
       WHERE CRA.content_submission_id = :submissionId
         AND CRA.reviewer_usr_id = :loggedInUserId
         AND CRA.status = :acceptedAssignmentStatus
+        AND CRA.due_at >= NOW()
     ) AS "isAssignedReviewer"
   ;
 `;

@@ -49,6 +49,7 @@
 - Assigned By (name + email)
 - Assignment Status (badge)
 - Assigned At (formatted datetime)
+- Due At (formatted datetime)
 - Submitter (name + email)
 - Actions
 
@@ -69,6 +70,7 @@
 - Conference Status
 - Assigned By
 - Assigned At
+- Due At
 - Assignment Notes (shown only when `assignedByNotes` exists; displayed in italic style)
 - Submitter
 - Assignment Status
@@ -77,6 +79,7 @@
 ### Update Eligibility (`canUpdateStatus`)
 
 - Assignment status is one of: `ASSIGNED`, `ACCEPTED`, `DECLINED`
+- Assignment due date/time is not passed
 - Submission status is `PENDING_APPROVAL` or `RETURNED`
 - Conference status is `ACTIVE`
 

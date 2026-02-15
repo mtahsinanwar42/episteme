@@ -48,7 +48,7 @@ Rules:
 
 - Submission must be in PENDING_APPROVAL or RETURNED.
 - USER can only use `USER_ADMIN` scope and only on owned submission.
-- REVIEWER can only use `ADMIN_REVIEWER` scope and only with ACCEPTED assignment.
+- REVIEWER can only use `ADMIN_REVIEWER` scope and only with ACCEPTED assignment whose due date is not passed.
 - ADMIN must provide `receiverUsrId`:
   - if `scope=USER_ADMIN`, receiver must be submission owner
-  - if `scope=ADMIN_REVIEWER`, receiver must be an ACCEPTED assigned reviewer
+  - if `scope=ADMIN_REVIEWER`, receiver must be an ACCEPTED assigned reviewer whose due date is not passed

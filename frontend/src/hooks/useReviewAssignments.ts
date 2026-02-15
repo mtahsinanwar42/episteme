@@ -67,6 +67,7 @@ export function useCreateReviewAssignmentMutation() {
       contentSubmissionId: number | string;
       reviewerUsrId: number | string;
       assignedByNotes?: string;
+      dueAt: string;
     }) => reviewAssignmentService.createReviewAssignment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reviewAssignments"] });

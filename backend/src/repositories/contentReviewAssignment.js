@@ -11,6 +11,7 @@ const GET_REVIEW_ASSIGNMENTS_BASE_SELECT = `
     CRA.status                AS "assignmentStatus",
     CRA.status_update_notes   AS "assignmentStatusUpdateNotes",
     CRA.assigned_at           AS "assignedAt",
+    CRA.due_at                AS "dueAt",
     CRA.assigned_by_usr_id    AS "assignedByUserId",
     CRA.assigned_by_notes     AS "assignedByNotes",
 
@@ -134,6 +135,8 @@ export async function findReviewAssignmentsBySearchFilters({
   assignedByUsrIds,
   assignedDateFrom,
   assignedDateTo,
+  dueDateFrom,
+  dueDateTo,
   isAdmin = false,
 }) {
   const pageNum = Math.max(1, Number(page) || DEFAULT_PAGE_NO);
@@ -207,6 +210,16 @@ export async function findReviewAssignmentsBySearchFilters({
   if (assignedDateTo != null) {
     where.push(`CRA.assigned_at < (:assignedDateTo::DATE + INTERVAL '1 day')`);
     replacements.assignedDateTo = assignedDateTo;
+  }
+
+  if (dueDateFrom != null) {
+    where.push(`CRA.due_at >= :dueDateFrom::DATE`);
+    replacements.dueDateFrom = dueDateFrom;
+  }
+
+  if (dueDateTo != null) {
+    where.push(`CRA.due_at < (:dueDateTo::DATE + INTERVAL '1 day')`);
+    replacements.dueDateTo = dueDateTo;
   }
 
   const sql = `
@@ -316,4 +329,27 @@ export async function findReviewAssignmentBySubmissionIdAndReviewerUsrId({
       reviewerUsrId: Number(reviewerUsrId),
     }
   });
+}
+
+export async function markOverdueReviewAssignments() {
+  const sql = `
+    UPDATE episteme.content_review_assignment CRA
+    SET status = :overdueStatus
+    WHERE CRA.status IN (:openStatuses)
+      AND CRA.due_at < NOW()
+    RETURNING CRA.id;
+  `;
+
+  const rows = await sequelize.query(sql, {
+    type: QueryTypes.UPDATE,
+    replacements: {
+      overdueStatus: REVIEW_ASSIGNMENT_STATUS.OVERDUE,
+      openStatuses: [
+        REVIEW_ASSIGNMENT_STATUS.ASSIGNED,
+        REVIEW_ASSIGNMENT_STATUS.ACCEPTED,
+      ],
+    },
+  });
+
+  return rows?.[0]?.length ?? 0;
 }

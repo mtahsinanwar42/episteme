@@ -61,6 +61,8 @@ export const searchReviewAssignments = asyncHandler(async (req, res) => {
     assignedByUsrIds,
     assignedDateFrom,
     assignedDateTo,
+    dueDateFrom,
+    dueDateTo,
   } = req.query;
 
   const shouldPaginate = !/^(false|0|no)$/i.test(String(paginate));
@@ -79,6 +81,8 @@ export const searchReviewAssignments = asyncHandler(async (req, res) => {
     assignedByUsrIds,
     assignedDateFrom,
     assignedDateTo,
+    dueDateFrom,
+    dueDateTo,
   });
 
   const response = {
@@ -108,7 +112,7 @@ export const saveReviewAssignment = asyncHandler(async (req, res) => {
 });
 
 // @desc    Update review assignment status by id
-// @route   PUT /api/v1/review-assignments/:id
+// @route   PUT /api/v1/review-assignments/:id/status
 // @access  Private
 export const updateReviewAssignmentStatus = asyncHandler(async (req, res) => {
   const assignment = await reviewAssignmentService.updateReviewAssignmentStatusById(req.user, req.params.id, req.body);

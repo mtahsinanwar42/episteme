@@ -5,6 +5,7 @@ export interface ReviewAssignment {
   assignmentStatus: number;
   assignmentStatusUpdateNotes: string | null;
   assignedAt: string;
+  dueAt: string;
   assignedByUserId: number;
   assignedByNotes: string | null;
 
@@ -54,6 +55,7 @@ export enum ReviewAssignmentStatus {
   DECLINED = 3,
   COMPLETED = 4,
   CANCELLED = 5,
+  OVERDUE = 6,
   DELETED = 9,
 }
 
@@ -63,6 +65,7 @@ export const ReviewAssignmentStatusLabel: Record<number, string> = {
   [ReviewAssignmentStatus.DECLINED]: "Declined",
   [ReviewAssignmentStatus.COMPLETED]: "Completed",
   [ReviewAssignmentStatus.CANCELLED]: "Cancelled",
+  [ReviewAssignmentStatus.OVERDUE]: "Overdue",
   [ReviewAssignmentStatus.DELETED]: "Deleted",
 };
 

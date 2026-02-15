@@ -59,7 +59,7 @@
 ### REVIEWER (non-owner)
 
 - Sees single thread with admin.
-- Send is disabled unless reviewer assignment status is ACCEPTED.
+- Send is disabled unless reviewer assignment status is ACCEPTED and assignment due date/time is not passed.
 - Send payload:
 
 ```json
@@ -92,14 +92,15 @@
 }
 ```
 
-- Sending to a reviewer is disabled unless that reviewer assignment status is ACCEPTED.
+- Sending to a reviewer is disabled unless that reviewer assignment status is ACCEPTED and assignment due date/time is not passed.
 
 ## Send Blocking Messages
 
 - Submission status not eligible:
   - `Message creation is only available for submissions with status Pending Approval or Returned.`
-- Reviewer assignment not accepted:
-  - `You cannot send new messages unless the assignment status is Accepted.`
+- Reviewer assignment not accepted/overdue:
+  - `You cannot send new messages unless the assignment status is Accepted and not overdue.`
+  - `You cannot send new messages because this review assignment is overdue.`
 
 ## States
 

@@ -33,6 +33,7 @@ const ADMIN_ALLOWED_STATUSES = [
 function canAdminUpdateStatus(assignment: ReviewAssignment): boolean {
   const isAssignmentUpdatable =
     assignment.assignmentStatus !== ReviewAssignmentStatus.CANCELLED &&
+    assignment.assignmentStatus !== ReviewAssignmentStatus.OVERDUE &&
     assignment.assignmentStatus !== ReviewAssignmentStatus.DELETED;
 
   const isSubmissionEligible =
@@ -203,6 +204,16 @@ export default function AllReviewAssignments() {
         cell: ({ row }) => (
           <span className="text-sm">
             {formatDateTime(row.getValue("assignedAt") as string)}
+          </span>
+        ),
+        enableSorting: false,
+      },
+      {
+        accessorKey: "dueAt",
+        header: "Due At",
+        cell: ({ row }) => (
+          <span className="text-sm">
+            {formatDateTime(row.getValue("dueAt") as string)}
           </span>
         ),
         enableSorting: false,

@@ -29,7 +29,12 @@ import {
   useCreateReviewAssignmentMutation,
 } from "@/hooks/useReviewAssignments";
 import { useSuccessToast } from "@/hooks/useSuccessToast";
-import { formatDateTime } from "@/utils/dateFormatter";
+import {
+  formatDateInputToLocalEndOfDayIso,
+  formatDateTime,
+  formatLocalDateForInput,
+  isDateInputTodayOrFuture,
+} from "@/utils/dateFormatter";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   getReviewAssignmentStatusLabel,
@@ -48,8 +53,15 @@ export function AssignReviewerModal({
   selectedSubmission,
   onClose,
 }: AssignReviewerModalProps) {
+  const getDefaultDueAt = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
+    return formatLocalDateForInput(date);
+  };
+
   const [selectedReviewerId, setSelectedReviewerId] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
+  const [dueAt, setDueAt] = useState<string>(getDefaultDueAt());
   const [reviewerSearch, setReviewerSearch] = useState<string>("");
   const [isReviewerDropdownOpen, setIsReviewerDropdownOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -142,19 +154,25 @@ export function AssignReviewerModal({
     return `${reviewer.firstName} ${reviewer.lastName} (${reviewer.email})`;
   }, [selectedReviewerId, allReviewersResponse]);
 
+  const isDueAtValid = useMemo(() => {
+    return isDateInputTodayOrFuture(dueAt);
+  }, [dueAt]);
+
   const handleAssignReviewer = () => {
-    if (!selectedSubmission || !selectedReviewerId) return;
+    if (!selectedSubmission || !selectedReviewerId || !isDueAtValid) return;
 
     createAssignmentMutation.mutate(
       {
         contentSubmissionId: submissionId!,
         reviewerUsrId: Number(selectedReviewerId),
         assignedByNotes: notes.trim() || undefined,
+        dueAt: formatDateInputToLocalEndOfDayIso(dueAt),
       },
       {
         onSuccess: () => {
           setSelectedReviewerId("");
           setNotes("");
+          setDueAt(getDefaultDueAt());
           setReviewerSearch("");
           setIsReviewerDropdownOpen(false);
           showSuccessToast("Reviewer assigned successfully.");
@@ -169,6 +187,7 @@ export function AssignReviewerModal({
   const handleClose = () => {
     setSelectedReviewerId("");
     setNotes("");
+    setDueAt(getDefaultDueAt());
     setReviewerSearch("");
     setIsReviewerDropdownOpen(false);
     setIsStatusModalOpen(false);
@@ -181,6 +200,7 @@ export function AssignReviewerModal({
 
     const isAssignmentUpdatable =
       assignmentStatus !== ReviewAssignmentStatus.CANCELLED &&
+      assignmentStatus !== ReviewAssignmentStatus.OVERDUE &&
       assignmentStatus !== ReviewAssignmentStatus.DELETED;
 
     const isSubmissionEligible =
@@ -212,6 +232,7 @@ export function AssignReviewerModal({
       assignmentStatus: selectedAssignmentRow.assignmentStatus ?? 0,
       assignmentStatusUpdateNotes: selectedAssignmentRow.assignmentStatusUpdateNotes ?? null,
       assignedAt: selectedAssignmentRow.assignedAt ?? "",
+      dueAt: selectedAssignmentRow.dueAt ?? "",
       assignedByUserId: Number(selectedAssignmentRow.assignedByUserId),
       assignedByNotes: selectedAssignmentRow.assignedByNotes ?? null,
       assignedByEmail: selectedAssignmentRow.assignedByEmail ?? "",
@@ -276,6 +297,11 @@ export function AssignReviewerModal({
       accessorKey: "assignedAt",
       header: "Assigned At",
       cell: ({ row }) => formatDateTime(row.original.assignedAt) || "-",
+    },
+    {
+      accessorKey: "dueAt",
+      header: "Due At",
+      cell: ({ row }) => formatDateTime(row.original.dueAt) || "-",
     },
     {
       id: "actions",
@@ -384,6 +410,25 @@ export function AssignReviewerModal({
                 </div>
 
                 <div className="flex flex-col space-y-2">
+                  <label htmlFor="dueAt" className="text-sm font-medium">
+                    Due Date *
+                  </label>
+                  <Input
+                    id="dueAt"
+                    name="dueAt"
+                    type="date"
+                    value={dueAt}
+                    onChange={(e) => setDueAt(e.target.value)}
+                    min={formatLocalDateForInput()}
+                  />
+                  {dueAt && !isDueAtValid && (
+                    <span className="text-red-600 text-xs">
+                      Due date must be today or a future date
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col space-y-2">
                   <label htmlFor="notes" className="text-sm font-medium">
                     Notes for Reviewer
                   </label>
@@ -401,7 +446,7 @@ export function AssignReviewerModal({
                   <Button
                     onClick={handleAssignReviewer}
                     disabled={
-                      createAssignmentMutation.isPending || !selectedReviewerId
+                      createAssignmentMutation.isPending || !selectedReviewerId || !isDueAtValid
                     }
                     className="w-full sm:w-auto"
                   >
