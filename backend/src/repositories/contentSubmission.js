@@ -1,6 +1,7 @@
 import { sequelize } from "../config/db.js";
 import { QueryTypes } from "sequelize";
-import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, CONTENT_SUBMISSION_PAYMENT_STATUS, REVIEW_ASSIGNMENT_STATUS, USER_ROLE, STATUS_UPDATE_NOTES } from "../utils/constants.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_STATUS, DEFAULT_PAGE_LIMIT, DEFAULT_PAGE_NO, CONTENT_SUBMISSION_PAYMENT_STATUS, MONTH_ABBR, REVIEW_ASSIGNMENT_STATUS, USER_ROLE, STATUS_UPDATE_NOTES, CONTENT_SUBMISSION_SRC_PREFIX } from "../utils/constants.js";
+import ErrorResponse from "../utils/ErrorResponse.js";
 
 export async function findSubmissionsByUserDetails({
   loggedInUserId,
@@ -31,6 +32,7 @@ export async function findSubmissionsByUserDetails({
     SELECT
       COUNT(*) OVER()    AS "total",
       CS.id              AS "submissionId",
+      CS.form_id         AS "formId",
       CS.title           AS "title",
       CS.topics          AS "topics",
       CS.doi             AS "doi",
@@ -90,6 +92,7 @@ export async function findSubmissionsBySearchFilters({
   page = DEFAULT_PAGE_NO,
   limit = DEFAULT_PAGE_LIMIT,
   paginate = true,
+  formId,
   title,
   topics,
   doi,
@@ -134,6 +137,11 @@ export async function findSubmissionsBySearchFilters({
     replacements.deletedSubmissionStatus = CONTENT_SUBMISSION_STATUS.DELETED;
   }
 
+  if (formId != null) {
+    where.push(`CS.form_id = UPPER(:formId)`);
+    replacements.formId = formId;
+  }
+
   if (title != null) {
     where.push(`CS.title ILIKE :title`);
     replacements.title = `%${title}%`;
@@ -173,6 +181,7 @@ export async function findSubmissionsBySearchFilters({
     SELECT
       COUNT(*) OVER()    AS "total",
       CS.id              AS "submissionId",
+      CS.form_id         AS "formId",
       CS.title           AS "title",
       CS.topics          AS "topics",
       CS.doi             AS "doi",
@@ -240,6 +249,7 @@ export async function findSubmissionByIdAndUserDetails({
   const baseSelect = `
     SELECT
       CS.id              AS "submissionId",
+      CS.form_id         AS "formId",
       CS.title           AS "title",
       CS.abstract        AS "abstract",
       CS.topics          AS "topics",
@@ -308,6 +318,32 @@ export async function findSubmissionByIdAndUserDetails({
   });
 
   return rows[0] ?? null;
+}
+
+export async function generateFormId({ startAt, srcPrefix, t }) {
+  const startDate = new Date(startAt);
+  if (Number.isNaN(startDate.getTime())) {
+    throw new Error("Invalid startAt for formId generation");
+  }
+
+  if (!Object.values(CONTENT_SUBMISSION_SRC_PREFIX).includes(srcPrefix)) {
+    throw new ErrorResponse(400, "Invalid ContentSubmission source prefix");
+  }
+
+  const month = MONTH_ABBR[startDate.getMonth()];
+  const year = startDate.getFullYear();
+
+  const sql = `
+    SELECT NEXTVAL('episteme.content_submission_form_id_seq')
+  `;
+
+  const [row] = await sequelize.query(sql, {
+    type: QueryTypes.SELECT,
+    ...(t ? { transaction: t } : {}),
+  });
+
+  const nextVal = Number(row.nextval);
+  return `EPI-${srcPrefix}-${month}-${year}-${String(nextVal).padStart(3, "0")}`;
 }
 
 export async function markSubmissionAsStatus(

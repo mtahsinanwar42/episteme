@@ -2,6 +2,7 @@ export interface Submission {
   submissionId: string | number;
   // legacy/alias id used by some frontend components
   id?: string | number;
+  formId?: string;
   title: string;
   topics?: string[];
   abstract?: string | null;

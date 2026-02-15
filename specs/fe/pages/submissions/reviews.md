@@ -24,18 +24,18 @@
 
 ### Fetch Reviews
 
-- `GET /api/v1/submissions/:id/reviews`
+- `GET /api/v1/submissions/:submissionId/reviews`
 - Trigger: when page has access
 - UI sorting: descending by `createdAt`
 
 ### Create Reviewer Version (optional)
 
-- `POST /api/v1/submissions/:id/versions`
+- `POST /api/v1/submissions/:submissionId/versions`
 - Called only when reviewer uploads a file.
 
 ### Create Review
 
-- `POST /api/v1/submissions/:id/reviews`
+- `POST /api/v1/submissions/:submissionId/reviews`
 
 Request body:
 

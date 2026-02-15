@@ -106,6 +106,14 @@ export default function Submissions() {
 
     return [
       {
+        accessorKey: "formId",
+        header: "Form ID",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.original.formId || "-"}</span>
+        ),
+        enableSorting: false,
+      },
+      {
         accessorKey: "title",
         header: "Title",
         cell: ({ row }) => (
@@ -232,6 +240,7 @@ export default function Submissions() {
           searchPlaceholder="Filter Submissions"
           searchableColumnIds={[
             "title",
+            "formId",
             "status",
             "conferenceTitle",
             "owner",

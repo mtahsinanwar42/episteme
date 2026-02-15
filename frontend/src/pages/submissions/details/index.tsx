@@ -168,7 +168,9 @@ export default function SubmissionDetails() {
           shouldUseSubmissionsBreadcrumb
             ? { label: "Submissions", href: "/submissions" }
             : { label: "Review Assignments", href: "/review-assignments/me" },
-          { label: submission.title },
+          {
+            label: submission.formId || submission.title,
+          },
         ]}
       />
 
@@ -233,9 +235,14 @@ export default function SubmissionDetails() {
         <div>
           <div className="mb-6">
             <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="mb-0">{submission.title}</h1>
-                {getSubmissionStatusBadge(submission.status)}
+              <div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="mb-0">{submission.title}</h1>
+                  {getSubmissionStatusBadge(submission.status)}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  Form ID: {submission.formId || "-"}
+                </div>
               </div>
 
               {canShowAdminActions && (

@@ -14,6 +14,7 @@ import ContentReviewAssignmentModel from "./ContentReviewAssignment.js";
 import ContentReviewModel from "./ContentReview.js";
 import ContentSubmissionPaymentModel from "./ContentSubmissionPayment.js";
 import NotificationModel from "./Notification.js";
+import IdempotencyKeyModel from "./IdempotencyKey.js";
 
 export const initModels = (sequelize) => {
   const User = UserModel(sequelize, DataTypes);
@@ -30,6 +31,7 @@ export const initModels = (sequelize) => {
   const ContentReview = ContentReviewModel(sequelize, DataTypes);
   const ContentSubmissionPayment = ContentSubmissionPaymentModel(sequelize, DataTypes);
   const Notification = NotificationModel(sequelize, DataTypes);
+  const IdempotencyKey = IdempotencyKeyModel(sequelize, DataTypes);
 
   User.belongsTo(File, { foreignKey: "cvFileId", as: "cvFile" });
   User.belongsTo(File, { foreignKey: "photoFileId", as: "photoFile" });
@@ -169,5 +171,6 @@ export const initModels = (sequelize) => {
     Training,
     Blog,
     Notification,
+    IdempotencyKey,
   };
 };

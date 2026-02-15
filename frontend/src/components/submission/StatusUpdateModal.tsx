@@ -109,6 +109,9 @@ export function StatusUpdateModal({
               <p className="text-sm text-foreground mb-2">
                 Title: {selectedSubmission?.title}
               </p>
+              <p className="text-sm text-foreground/80 mb-2">
+                Form ID: {selectedSubmission?.formId || "-"}
+              </p>
               <p className="text-sm text-foreground/80">
                 Current status:{" "}
                 {

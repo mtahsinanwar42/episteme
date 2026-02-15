@@ -72,6 +72,7 @@ export default function SubmissionSearch() {
 
   const [formData, setFormData] = useState({
     title: "",
+    formId: "",
     doi: "",
     conferenceId: "",
     createdDateFrom: "",
@@ -149,6 +150,7 @@ export default function SubmissionSearch() {
   const hasAnyField = useMemo(() => {
     return (
       formData.title.trim() !== "" ||
+      formData.formId.trim() !== "" ||
       formData.doi.trim() !== "" ||
       formData.conferenceId !== "" ||
       formData.createdDateFrom !== "" ||
@@ -215,6 +217,14 @@ export default function SubmissionSearch() {
     };
 
     return [
+      {
+        accessorKey: "formId",
+        header: "Form ID",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.original.formId || "-"}</span>
+        ),
+        enableSorting: false,
+      },
       {
         accessorKey: "title",
         header: "Title",
@@ -309,6 +319,7 @@ export default function SubmissionSearch() {
 
     const params: SearchSubmissionsParams = {};
     if (formData.title.trim()) params.title = formData.title.trim();
+    if (formData.formId.trim()) params.formId = formData.formId.trim();
     if (formData.doi.trim()) params.doi = formData.doi.trim();
     if (formData.conferenceId) params.conferenceId = Number(formData.conferenceId);
     if (formData.createdDateFrom) params.createdDateFrom = formData.createdDateFrom;
@@ -328,6 +339,7 @@ export default function SubmissionSearch() {
   const handleReset = () => {
     setFormData({
       title: "",
+      formId: "",
       doi: "",
       conferenceId: "",
       createdDateFrom: "",
@@ -375,15 +387,34 @@ export default function SubmissionSearch() {
             </div>
           )}
           {topicsError && (
-            <div className="text-red-600 text-sm">{(topicsError as Error).message}</div>
+            <div className="text-red-600 text-sm">
+              {(topicsError as Error).message}
+            </div>
           )}
           {isAdmin && usersError && (
-            <div className="text-red-600 text-sm">{(usersError as Error).message}</div>
+            <div className="text-red-600 text-sm">
+              {(usersError as Error).message}
+            </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium mb-2 text-heading">Title</label>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Form ID
+              </label>
+              <Input
+                type="text"
+                name="formId"
+                value={formData.formId}
+                onChange={handleInputChange}
+                placeholder="Enter exact Form ID"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Title
+              </label>
               <Input
                 type="text"
                 name="title"
@@ -394,7 +425,9 @@ export default function SubmissionSearch() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-heading">DOI</label>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                DOI
+              </label>
               <Input
                 type="text"
                 name="doi"
@@ -420,7 +453,10 @@ export default function SubmissionSearch() {
                 </SelectTrigger>
                 <SelectContent>
                   {conferences.map((conference) => (
-                    <SelectItem key={conference.id} value={String(conference.id)}>
+                    <SelectItem
+                      key={conference.id}
+                      value={String(conference.id)}
+                    >
                       {conference.title}
                     </SelectItem>
                   ))}
@@ -429,7 +465,9 @@ export default function SubmissionSearch() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-heading">Topics</label>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Topics
+              </label>
               <MultiSelect
                 options={topics.map((topic) => ({
                   label: topic,
@@ -437,7 +475,9 @@ export default function SubmissionSearch() {
                 }))}
                 value={selectedTopics}
                 onValueChange={setSelectedTopics}
-                placeholder={topicsLoading ? "Loading topics..." : "Select topics"}
+                placeholder={
+                  topicsLoading ? "Loading topics..." : "Select topics"
+                }
                 disabled={topicsLoading}
                 searchable
                 hideSelectAll
@@ -446,7 +486,9 @@ export default function SubmissionSearch() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-heading">Status</label>
+              <label className="block text-sm font-medium mb-2 text-heading">
+                Status
+              </label>
               <div className="flex flex-wrap gap-4 mt-1">
                 {statusOptions.map((status) => {
                   const statusValue = String(status);
@@ -486,7 +528,9 @@ export default function SubmissionSearch() {
                   }))}
                   value={selectedOwnerUsrIds}
                   onValueChange={setSelectedOwnerUsrIds}
-                  placeholder={usersLoading ? "Loading users..." : "Select owners"}
+                  placeholder={
+                    usersLoading ? "Loading users..." : "Select owners"
+                  }
                   disabled={usersLoading}
                   searchable
                   hideSelectAll
@@ -554,6 +598,7 @@ export default function SubmissionSearch() {
             searchPlaceholder="Filter Submissions"
             searchableColumnIds={[
               "title",
+              "formId",
               "status",
               "conferenceTitle",
               "owner",

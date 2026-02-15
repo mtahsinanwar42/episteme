@@ -76,7 +76,7 @@
 ### On Success
 
 - Navigate to newly created submission detail page:
-  - `/submissions/:id`
+  - `/submissions/:submissionId`
 - Show success message:
   - “Submission created successfully.”
 

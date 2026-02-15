@@ -41,7 +41,7 @@ Reviews link visibility:
 
 ### Fetch Submission Details
 
-- `GET /api/v1/submissions/:id`
+- `GET /api/v1/submissions/:submissionId`
 - Trigger: initial page load
 
 ### Fetch Reviewer Assignment (reviewer non-owner only)
@@ -69,7 +69,7 @@ Menu items:
 
 ### Status Update Modal (ADMIN)
 
-- API: `PUT /api/v1/submissions/:id/status`
+- API: `PUT /api/v1/submissions/:submissionId/status`
 - Editable fields:
   - `status` (required)
   - `statusUpdateNotes` (optional)
@@ -84,7 +84,7 @@ Menu items:
 ### Assign Reviewer Modal (ADMIN)
 
 - APIs:
-  - `GET /api/v1/submissions/:id/reviewers?paginate=false` (existing assignees)
+  - `GET /api/v1/submissions/:submissionId/reviewers?paginate=false` (existing assignees)
   - `GET /api/v1/users?roles=REVIEWER&status=ACTIVE&paginate=false` (candidate reviewers)
   - `POST /api/v1/review-assignments` (new assignment)
 - Reviewer selection excludes:

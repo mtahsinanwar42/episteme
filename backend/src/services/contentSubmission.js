@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
 import { sequelize } from "../config/db.js";
-import { findSubmissionByIdAndUserDetails, findSubmissionsBySearchFilters, findSubmissionsByUserDetails, markSubmissionAsApprovedOrRejected, markSubmissionAsDeleted, markSubmissionAsStatus } from "../repositories/contentSubmission.js";
-import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE, USER_STATUS } from "../utils/constants.js";
+import { findSubmissionByIdAndUserDetails, findSubmissionsBySearchFilters, findSubmissionsByUserDetails, generateFormId, markSubmissionAsApprovedOrRejected, markSubmissionAsDeleted, markSubmissionAsStatus } from "../repositories/contentSubmission.js";
+import { CONFERENCE_STATUS, CONTENT_SUBMISSION_PAYMENT_STATUS, CONTENT_SUBMISSION_SRC_PREFIX, CONTENT_SUBMISSION_STATUS, CONTENT_SUBMISSION_UPLOADER_USER_TYPE, CONTENT_SUBMISSION_VERSION_INITIAL, USER_ROLE, USER_STATUS } from "../utils/constants.js";
 import ErrorResponse from "../utils/ErrorResponse.js";
 import { serializeContentSubmission } from "../utils/serializers.js";
 import { toDate } from "../utils/dateTime.js";
@@ -44,6 +44,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     const roles = Array.isArray(user.roles) ? user.roles : [];
     const isAdmin = roles.includes(USER_ROLE.ADMIN);
 
+    const safeFormId = isEmpty(filters.formId) ? null : String(filters.formId).trim();
     const safeTitle = isEmpty(filters.title) ? null : String(filters.title).trim();
     const safeDoi = isEmpty(filters.doi) ? null : String(filters.doi).trim();
 
@@ -80,6 +81,7 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
       page: filters.page,
       limit: filters.limit,
       paginate: shouldPaginate,
+      formId: safeFormId,
       title: safeTitle,
       topics: safeTopics,
       doi: safeDoi,
@@ -135,8 +137,15 @@ export function createSubmissionService({ ContentSubmission, ContentSubmissionPa
     const contentFileId = await fileService.getFileIdByPath(contentFilePath, { fieldName: "contentFilePath" });
 
     return sequelize.transaction(async (t) => {
+      const formId = await generateFormId({
+        startAt: conference.startAt,
+        srcPrefix: CONTENT_SUBMISSION_SRC_PREFIX.CONFERENCE,
+        t,
+      });
+
       const submission = await ContentSubmission.create(
         {
+          formId,
           title,
           abstract,
           topics,

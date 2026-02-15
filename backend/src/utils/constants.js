@@ -1,3 +1,5 @@
+export const MONTH_ABBR = Object.freeze(["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]);
+
 export function getFormattedEnumLabel(enumObj, value, fallback = "Unknown") {
   const rawLabel = Object.keys(enumObj).find(
     (key) => enumObj[key] === value
@@ -57,6 +59,10 @@ export const ACTIVITY_STATUS = Object.freeze({
   DRAFT: 0,
   PUBLISHED: 1,
   DELETED: 9,
+});
+
+export const CONTENT_SUBMISSION_SRC_PREFIX = Object.freeze({
+  CONFERENCE: "CONF",
 });
 
 export const CONTENT_SUBMISSION_STATUS = Object.freeze({
@@ -137,6 +143,7 @@ export const UPDATE_SCHEDULER_TIME_PATTERN = Object.freeze({
   COUNTRIES: "0 30 2 * * 0",
   CONFERENCE_STATUS_TRANSITION: "0 0 3 * * 0",
   REVIEW_ASSIGNMENT_OVERDUE_TRANSITION: "30 3 * * *",
+  IDEMPOTENCY_KEY_CLEANUP: "0 */2 * * *",
 });
 
 export const KAFKA_EVENT_TYPES = Object.freeze({
@@ -149,8 +156,8 @@ export const KAFKA_CONSUMER_GROUPS = Object.freeze({
   EMAIL_WORKER: "email-worker-group",
 });
 
-export const CACHE_TTL = Object.freeze({
-  DEDUPE: 10 * 60 * 1000,
+export const IDEMPOTENCY_TTL = Object.freeze({
+  EMAIL: 10 * 60 * 1000,
 });
 
 export const MAIL_TYPES = Object.freeze({
@@ -161,20 +168,20 @@ export const MAIL_TYPES = Object.freeze({
   PASSWORD_RESET_REQUEST: 4,
 
   USER_CREATED: 5,
-  USER_ROLES_UPDATED: 6, // notif
+  USER_ROLES_UPDATED: 6,
   USER_STATUS_UPDATED: 7,
 
   SUBMISSION_CREATED_TO_USER: 8,
-  SUBMISSION_CREATED_TO_ADMIN: 9, // notif
-  SUBMISSION_STATUS_UPDATED: 10, // notif
+  SUBMISSION_CREATED_TO_ADMIN: 9,
+  SUBMISSION_STATUS_UPDATED: 10,
 
-  SUBMISSION_MSG_CREATED: 11, // notif
-  SUBMISSION_VERSION_CREATED: 12, // notif
-  SUBMISSION_REVIEW_CREATED: 13, // notif
+  SUBMISSION_MSG_CREATED: 11,
+  SUBMISSION_VERSION_CREATED: 12,
+  SUBMISSION_REVIEW_CREATED: 13,
 
-  REVIEW_ASSIGNMENT_CREATED: 14, // notif
-  REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_ADMIN: 15, // notif
-  REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_REVIEWER: 16, // notif
+  REVIEW_ASSIGNMENT_CREATED: 14,
+  REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_ADMIN: 15,
+  REVIEW_ASSIGNMENT_STATUS_UPDATED_BY_REVIEWER: 16,
 
   CONTACT_SUPPORT: 17,
 });

@@ -16,6 +16,7 @@ const GET_REVIEW_ASSIGNMENTS_BASE_SELECT = `
     CRA.assigned_by_notes     AS "assignedByNotes",
 
     CS.title                  AS "submissionTitle",
+    CS.form_id                AS "formId",
     CS.conference_id          AS "conferenceId",
     CS.current_status         AS "submissionStatus",
     CS.created_at             AS "submissionCreatedAt",
@@ -125,6 +126,7 @@ export async function findReviewAssignmentsBySearchFilters({
   page = DEFAULT_PAGE_NO,
   limit = DEFAULT_PAGE_LIMIT,
   paginate = true,
+  formId,
   submissionTitle,
   submissionStatuses,
   submissionOwnerUsrIds,
@@ -160,6 +162,11 @@ export async function findReviewAssignmentsBySearchFilters({
     replacements.reviewerUserId = Number(loggedInUserId);
     replacements.deletedAssignmentStatus = REVIEW_ASSIGNMENT_STATUS.DELETED;
     replacements.deletedSubmissionStatus = CONTENT_SUBMISSION_STATUS.DELETED;
+  }
+
+  if (formId != null) {
+    where.push(`CS.form_id = UPPER(:formId)`);
+    replacements.formId = formId;
   }
 
   if (submissionTitle != null) {

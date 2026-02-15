@@ -1,39 +1,24 @@
-# Files — Upload (Assets Only)
+# New Asset
 
 ## Route
 
-- Path: `/files/new`
+- Path: `/assets/new`
 - Access: ADMIN
-- Mode: Create (upload)
+- Mode: Create
 
 ## Purpose
 
-- Allow ADMIN to upload a file to the **assets** bucket only.
-- After upload, show success and navigate to the file list /files
+- Upload a single file to the `assets` bucket.
+- Show success/failure feedback and return to assets listing.
 
 ## API
 
-- File upload endpoint: As defined in File API spec (bucket-based upload): `POST /api/v1/files/upload/assets`
-- Constraint:
-  - **Only bucket=assets is allowed from the frontend**
-  - The upload request must always target the assets bucket (no user-selectable bucket)
+- `POST /api/v1/files/upload/assets`
+- Multipart body:
+  - `file` (required)
 
-## Form Fields
+## UI Behavior
 
-- File — file upload (required)
-
-## Behavior
-
-- Upload target:
-  - bucket is fixed to `assets` (frontend-defined)
-- On success:
-  - Show success message including original file name
-  - Navigate Back to `/files` (dev choice)
-- On error:
-  - Show backend error message
-
-## States
-
-- Loading (upload)
-- Error
-- Success
+- Upload starts immediately after file selection.
+- Success state displays uploaded file summary.
+- `Close` action navigates to `/assets`.

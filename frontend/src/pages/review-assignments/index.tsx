@@ -93,6 +93,14 @@ export default function AllReviewAssignments() {
   const columns: ColumnDef<ReviewAssignment>[] = useMemo(
     () => [
       {
+        accessorKey: "formId",
+        header: "Submission Form ID",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.original.formId || "-"}</span>
+        ),
+        enableSorting: false,
+      },
+      {
         accessorKey: "submissionTitle",
         header: "Submission Title",
         cell: ({ row }) => (
@@ -183,22 +191,6 @@ export default function AllReviewAssignments() {
         ),
       },
       {
-        id: "assignedBy",
-        header: "Assigned By",
-        cell: ({ row }) => (
-          <div className="text-sm">
-            <div>
-              {row.original.assignedByFirstName}{" "}
-              {row.original.assignedByLastName}
-            </div>
-            <div className="text-muted-foreground text-xs">
-              {row.original.assignedByEmail}
-            </div>
-          </div>
-        ),
-        enableSorting: false,
-      },
-      {
         accessorKey: "assignedAt",
         header: "Assigned At",
         cell: ({ row }) => (
@@ -280,6 +272,7 @@ export default function AllReviewAssignments() {
           searchPlaceholder="Filter assignments"
           searchableColumnIds={[
             "submissionTitle",
+            "formId",
             "submissionStatus",
             "conferenceTitle",
             "reviewer",

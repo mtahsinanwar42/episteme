@@ -8,6 +8,12 @@ export default (sequelize, DataTypes) => {
         autoIncrement: true,
         field: "id",
       },
+      formId: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        unique: true,
+        field: "form_id",
+      },
       ownerUsrId: {
         type: DataTypes.BIGINT,
         allowNull: false,

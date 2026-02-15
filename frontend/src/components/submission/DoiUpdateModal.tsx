@@ -68,6 +68,9 @@ export function DoiUpdateModal({
               <p className="text-sm text-foreground mb-2">
                 Title: {selectedSubmission?.title}
               </p>
+              <p className="text-sm text-foreground/80 mb-2">
+                Form ID: {selectedSubmission?.formId || "-"}
+              </p>
               {selectedSubmission?.doi && (
                 <p className="text-sm text-foreground/80">
                   Current DOI: {selectedSubmission.doi}

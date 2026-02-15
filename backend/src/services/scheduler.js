@@ -4,7 +4,7 @@ import { findConferencesToAutoFinish, markConferenceAsFinished } from "../reposi
 import { markOverdueReviewAssignments } from "../repositories/contentReviewAssignment.js";
 import { sequelize } from "../config/db.js";
 
-export function createSchedulerService({ refDataService }) {
+export function createSchedulerService({ refDataService, idempotencyService }) {
 
   async function refreshTopicsJob() {
     console.log("[Scheduler] refreshTopics started");
@@ -105,6 +105,17 @@ export function createSchedulerService({ refDataService }) {
     }
   }
 
+  async function cleanupIdempotencyKeysJob() {
+    console.log("[Scheduler] cleanupIdempotencyKeys started");
+
+    try {
+      await idempotencyService.cleanupExpiredKeys();
+      console.log("[Scheduler] cleanupIdempotencyKeys finished");
+    } catch (err) {
+      console.error("[Scheduler] cleanupIdempotencyKeys failed:", err);
+    }
+  }
+
   function start() {
     cron.schedule(UPDATE_SCHEDULER_TIME_PATTERN.TOPICS, refreshTopicsJob, {
       scheduled: true,
@@ -116,6 +127,9 @@ export function createSchedulerService({ refDataService }) {
       scheduled: true,
     });
     cron.schedule(UPDATE_SCHEDULER_TIME_PATTERN.REVIEW_ASSIGNMENT_OVERDUE_TRANSITION, transitionOverdueReviewAssignmentsJob, {
+      scheduled: true,
+    });
+    cron.schedule(UPDATE_SCHEDULER_TIME_PATTERN.IDEMPOTENCY_KEY_CLEANUP, cleanupIdempotencyKeysJob, {
       scheduled: true,
     });
 

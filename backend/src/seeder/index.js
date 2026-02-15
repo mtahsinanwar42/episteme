@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import colors from "colors";
+import { QueryTypes } from "sequelize";
 import { sequelize, connectDb } from "../config/db.js";
 import { initModels } from "../models/index.js";
 import {
@@ -12,8 +13,10 @@ import {
   CONFERENCE_STATUS,
   CONTENT_SUBMISSION_MSG_VISIBILITY_SCOPE,
   CONTENT_SUBMISSION_PAYMENT_STATUS,
+  CONTENT_SUBMISSION_SRC_PREFIX,
   CONTENT_SUBMISSION_STATUS,
   CONTENT_SUBMISSION_UPLOADER_USER_TYPE,
+  MONTH_ABBR,
   REVIEW_ASSIGNMENT_STATUS,
   USER_ROLE,
   USER_STATUS,
@@ -439,6 +442,7 @@ async function destroyData() {
   try {
     await sequelize.query(`
       TRUNCATE TABLE
+        episteme.idempotency_key,
         episteme.notification,
         episteme.content_review,
         episteme.content_review_assignment,
@@ -455,6 +459,7 @@ async function destroyData() {
         episteme."user"
       RESTART IDENTITY CASCADE;
     `);
+    await sequelize.query(`ALTER SEQUENCE episteme.content_submission_form_id_seq RESTART WITH 1;`);
 
     if (path.resolve(storageAbsRoot) === path.resolve(projectRoot)) {
       throw new Error("Refusing to delete storage: resolved storage path points to project root.");
@@ -607,8 +612,14 @@ async function createPendingSubmissionBundle({
   paymentProviderPaymentId,
   messages,
 }) {
+  const formId = await generateFormIdForSeed({
+    conferenceStartAt: conference.startAt,
+    srcPrefix: CONTENT_SUBMISSION_SRC_PREFIX.CONFERENCE,
+  });
+
   // Create submission with PENDING_APPROVAL status
   const submission = await ContentSubmission.create({
+    formId,
     ownerUsrId: ownerUser.id,
     title,
     abstract,
@@ -682,6 +693,31 @@ async function createPendingSubmissionBundle({
   });
 
   return submission;
+}
+
+async function generateFormIdForSeed({ conferenceStartAt, srcPrefix }) {
+  const startDate = new Date(conferenceStartAt);
+  if (Number.isNaN(startDate.getTime())) {
+    throw new Error("Invalid conferenceStartAt for formId generation in seed");
+  }
+
+  if (!Object.values(CONTENT_SUBMISSION_SRC_PREFIX).includes(srcPrefix)) {
+    throw new Error("Invalid ContentSubmission source prefix in seed");
+  }
+
+  const month = MONTH_ABBR[startDate.getMonth()];
+  const year = startDate.getFullYear();
+
+  const sql = `
+    SELECT NEXTVAL('episteme.content_submission_form_id_seq')
+  `;
+
+  const [row] = await sequelize.query(sql, {
+    type: QueryTypes.SELECT,
+  });
+
+  const sequence = Number(row.nextval);
+  return `EPI-${srcPrefix}-${month}-${year}-${String(sequence).padStart(3, "0")}`;
 }
 
 async function importData() {

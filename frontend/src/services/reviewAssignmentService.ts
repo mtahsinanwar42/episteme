@@ -11,6 +11,7 @@ export interface SearchReviewAssignmentsParams {
   paginate?: boolean;
   submissionId?: number;
   submissionTitle?: string;
+  formId?: string;
   submissionStatuses?: number[];
   submissionOwnerUsrIds?: number[];
   conferenceId?: number;
@@ -87,6 +88,9 @@ export const reviewAssignmentService = {
     }
     if (params?.submissionTitle) {
       queryParams.append("submissionTitle", params.submissionTitle);
+    }
+    if (params?.formId) {
+      queryParams.append("formId", params.formId);
     }
     if (params?.conferenceId !== undefined) {
       queryParams.append("conferenceId", params.conferenceId.toString());
