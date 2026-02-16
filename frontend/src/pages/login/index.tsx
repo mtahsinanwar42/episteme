@@ -44,7 +44,7 @@ function Login() {
         Cookies.set("token", response.token, {
           expires: 7,
           secure: true,
-          sameSite: "strict",
+          sameSite: "lax",
         });
 
         dispatch(setToken(response.token));
