@@ -57,5 +57,5 @@ for service in $REQUESTED_SERVICES; do
 done
 
 echo "[docker-start] Starting services: $REQUESTED_SERVICES"
-docker compose up -d $REQUESTED_SERVICES
+docker compose up -d --build $REQUESTED_SERVICES
 echo "[docker-start] Done."
