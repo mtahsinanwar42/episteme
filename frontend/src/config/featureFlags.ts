@@ -6,8 +6,8 @@ export const aboutPageFlags: Record<string, boolean> = {
   mission: true,
   ethics: true,
   sustainability: true,
-  executive: true,
-  policies: true,
-  career: true,
+  executive: false,
+  policies: false,
+  career: false,
   contact: true,
 };

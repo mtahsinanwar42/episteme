@@ -7,7 +7,6 @@ export default function Executive() {
       name: 'Dr. Sarah Chen',
       role: 'Chief Executive Officer',
       bio: 'Visionary leader with 15+ years in open science and academic publishing',
-      image: '/assets/images/about_leadership_tahsin.jpg',
       expertise: ['Strategy', 'Innovation', 'Leadership'],
     },
     {

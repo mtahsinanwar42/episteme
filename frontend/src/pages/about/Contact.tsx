@@ -58,7 +58,7 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen">
-      <Breadcrumb items={[{ label: 'Contact' }]} />
+      <Breadcrumb items={[{ label: "Contact" }]} />
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-400 py-20 px-4 rounded-lg mb-16 overflow-hidden">
         <div className="absolute inset-0 opacity-20"></div>
@@ -79,10 +79,10 @@ export default function Contact() {
           <h3 className="text-xl font-bold mb-2">Support</h3>
           <p className="text-foreground/80 mb-4">Technical Support</p>
           <a
-            href="mailto:support@episteme.org"
+            href="mailto:epistemeone@gmail.com"
             className="text-teal-400 font-semibold hover:underline"
           >
-            support@episteme.org
+            epistemeone@gmail.com
           </a>
         </div>
       </div>
@@ -182,10 +182,10 @@ export default function Contact() {
               className="w-full text-foreground! shadow-lg enabled:hover:brightness-105"
               style={{
                 background:
-                  'linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)',
+                  "linear-gradient(120deg, #646cff, #7f84ff 50%, #4f46e5)",
               }}
             >
-              {submitting ? 'Sending...' : 'Send'}
+              {submitting ? "Sending..." : "Send"}
             </Button>
           </form>
         </div>
@@ -200,7 +200,7 @@ export default function Contact() {
               How can I report an issue?
             </h3>
             <p className="text-foreground/80">
-              Please contact our support team at support@episteme.org with
+              Please contact our support team at epistemeone@gmail.com with
               details about the issue. We'll investigate and get back to you
               promptly.
             </p>
@@ -220,7 +220,7 @@ export default function Contact() {
             </h3>
             <p className="text-foreground/80">
               Yes! We're always interested in strategic partnerships. Email
-              support@episteme.org to discuss opportunities.
+              epistemeone@gmail.com to discuss opportunities.
             </p>
           </div>
           <div className="bg-slate-800 rounded-xl p-8 border border-gray-700">
@@ -249,7 +249,7 @@ export default function Contact() {
             <div className="text-5xl mb-4">🏢</div>
             <h3 className="text-xl font-bold mb-2">Headquarters</h3>
             <p className="text-foreground/80">
-              Our main office is located in San Francisco, California.
+              Our main office is located in Dhaka, Bangladesh.
             </p>
           </div>
           <div className="text-center">

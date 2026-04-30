@@ -284,11 +284,12 @@ export default function Navbar() {
         }`}
       >
         <div>
-          <Link
-            to="/"
-            className="font-semibold bg-linear-to-r from-indigo-400 via-violet-400 to-violet-500 bg-clip-text text-transparent text-3xl"
-          >
-            EPISTEME
+          <Link to="/">
+            <img
+              src="/assets/images/episteme-logo.jpeg"
+              alt="Episteme"
+              className="h-10 w-auto"
+            />
           </Link>
         </div>
 
